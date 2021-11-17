@@ -194,7 +194,7 @@ class VariablesFactory
             ['function' => 'f10', 'select' => new F10],
             ['function' => 'f11', 'select' => new F11],
             ['function' => 'f12', 'select' => new F_12_13],
-            ['function' => 'f3', 'select' => new F_12_13],
+            ['function' => 'f13', 'select' => new F_12_13],
             ['function' => 'ucp', 'select' => new UCP],
             ['function' => 'cocomo', 'select' => new COCOMO],
             ['function' => 'agile', 'select' => new Agile]

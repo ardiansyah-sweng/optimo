@@ -1,2 +1,2 @@
 # optimo
-Metaheuristic Optimization (Design patter applied)
+Metaheuristic Optimization (Design pattern applied)
