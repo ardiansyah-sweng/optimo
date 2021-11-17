@@ -21,15 +21,32 @@ class Optimizers
                     ->getVariables();
             }
             return $ret;
-        } else {
-            return (new VariablesFactory())
-                ->initializeVariableFactory($this->functionsToOptimized)
-                ->getVariables();
         }
     }
 
     function getParameters()
     {
-        //
+        if (is_array($this->optimizerAlgorithms)) {
+            foreach ($this->optimizerAlgorithms as $optimizer) {
+                $ret[] = (new LocalParameterFactory())
+                    ->initializingLocalParameter($optimizer)
+                    ->getLocalParameter();
+            }
+            return $ret;
+        } else {
+            return (new LocalParameterFactory())
+                ->initializingLocalParameter($this->optimizerAlgorithms)
+                ->getLocalParameter();
+        }
+    }
+
+    function createIndividu()
+    {
+        if (is_array($this->getVariables())) {
+                print_r($this->getVariables());
+                echo "\n";
+        } else {
+            return rand($this->functionsToOptimized['ranges']['lowerBound'], $this->functionsToOptimized['ranges']['upperBound']);
+        }
     }
 }
