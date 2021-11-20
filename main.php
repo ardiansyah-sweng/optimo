@@ -1,12 +1,23 @@
 <?php
 require 'vendor/autoload.php';
 
-$optimizerAlgorithm = 'cpso';
+$optimizerAlgorithm = ['pso'];
 $optimizerAlgorithms = ['pso', 'cpso', 'ga', 'rao'];
-$functionToOptimize = 'ucp';
-$functionsToOptimize = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'ucp', 'cocomo', 'agile'];
+$functionToOptimized = ['f1'];
+$functionsToOptimized = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'ucp', 'cocomo', 'agile'];
+
+/**
+ * Normal: just seek optimized value
+ * Convergence: seek the stabil convergence
+ * Evaluation: repeat solution N times
+ */
 $experimentType = ['evaluation','convergence','normal'];
+
+/**
+ * 
+ */
 $variableType = ['random','seeds'];
 
-$optimizer = new Optimizers($optimizerAlgorithms, $functionsToOptimize);
-$optimizer->createIndividu();
+$experiment = new Preparation($experimentType[1], $optimizerAlgorithm, $functionToOptimized);
+$result = $experiment->setup();
+
