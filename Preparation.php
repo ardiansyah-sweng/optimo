@@ -5,12 +5,14 @@ class Preparation
     private $experimentType;
     private $optimizerAlgorithms;
     private $functionsToOptimized;
+    private $variableType;
 
-    function __construct($experimentType, $optimizerAlgorithms, $functionsToOptimized)
+    function __construct($experimentType, $optimizerAlgorithms, $functionsToOptimized, $variableType)
     {
         $this->experimentType = $experimentType;
         $this->optimizerAlgorithms = $optimizerAlgorithms;
         $this->functionsToOptimized = $functionsToOptimized;
+        $this->variableType = $variableType;
     }
 
     function getVariableAndParameter()
@@ -103,13 +105,16 @@ class Preparation
         }
 
         if ($this->setupIsOneForOne()) {
-            echo (new ExperimentFactory())
-                ->initializeExperiment($this->experimentType);
-            echo "\n";
-            print_r($parameters[0]);
-            echo "\n";
-            print_r($variables[0]);
-            echo "\n";
+            // echo (new ExperimentFactory())
+            //     ->initializeExperiment($this->experimentType);
+            // echo "\n";
+            // print_r($parameters[0]);
+            // echo "\n";
+            // print_r($variables[0]);
+            // echo "\n";
+
+            $optimizer = new Optimizers($this->optimizerAlgorithms, $this->functionsToOptimized, $variables[0]['ranges'], $parameters[0]['populationSize'], $this->variableType);
+            $optimizer->generateInitialPopulation();
         }
     }
 }
