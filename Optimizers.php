@@ -22,7 +22,7 @@ class Optimizers
     {
         # variable type: random OR seed
         if ($this->variableType === 'random'){
-            return (new Randomizers())->randomVariableValueByRange($this->variableRanges);
+            return (new Randomizers())::randomVariableValueByRange($this->variableRanges);
         }
         
         if ($this->variableType === 'seeds') {
