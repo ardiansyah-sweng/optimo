@@ -1,0 +1,23 @@
+{
+    "name": "1/optimo-1",
+    "autoload": {
+        "psr-4": {
+            "1\\Optimo1\\": "src/"
+        },
+        "files":[
+            "Optimizers.php",
+            "Preparation.php",
+            "Variables.php",
+            "LocalParameters.php",
+            "Experiments.php",
+            "randomizer.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "ardiansyah-sweng",
+            "email": "ardiansyah.2019@outlook.com"
+        }
+    ],
+    "require": {}
+}
