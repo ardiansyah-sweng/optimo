@@ -37,5 +37,6 @@ class Optimizers
             $population[] = $this->createIndividu();
         }
         print_r($population);
+        $population = [];
     }
 }

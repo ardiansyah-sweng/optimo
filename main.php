@@ -18,6 +18,11 @@ $experimentType = ['evaluation','convergence','normal'];
  */
 $variableType = ['random','seeds'];
 
-$experiment = new Preparation($experimentType[1], $optimizerAlgorithm, $functionToOptimized, $variableType[0]);
-$result = $experiment->setup();
+$experiment = new Preparation(
+    $experimentType[1], 
+    $optimizerAlgorithms, 
+    $functionsToOptimized, 
+    $variableType[0]
+);
+$experiment->setup();
 

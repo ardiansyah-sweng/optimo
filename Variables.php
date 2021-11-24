@@ -196,8 +196,8 @@ class VariablesFactory
             ['function' => 'f12', 'select' => new F_12_13],
             ['function' => 'f13', 'select' => new F_12_13],
             ['function' => 'ucp', 'select' => new UCP],
-            ['function' => 'cocomo', 'select' => new COCOMO],
-            ['function' => 'agile', 'select' => new Agile]
+            // ['function' => 'cocomo', 'select' => new COCOMO],
+            // ['function' => 'agile', 'select' => new Agile]
         ];
         $index = array_search($functionToOptimized, array_column($functionsToOptimized, 'function'));
         return $functionsToOptimized[$index]['select'];

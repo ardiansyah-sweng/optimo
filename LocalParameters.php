@@ -41,9 +41,10 @@ class CPSO extends PSO implements LocalParameter
         $pso = new PSO;
         return [
             'parameterName' => 'cpsoParameter',
-            'psoParameter' => $pso->getLocalParameter(),
+            // 'psoParameter' => $pso->getLocalParameter(),
             'chaotic1' => 'singer',
-            'chaotic2' => 'sine' 
+            'chaotic2' => 'sine',
+            'populationSize' => $pso->getLocalParameter()['populationSize'] 
         ];
     }
 }

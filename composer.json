@@ -1,8 +1,8 @@
 {
-    "name": "1/optimo-1",
+    "name": "pc/optimo",
     "autoload": {
         "psr-4": {
-            "1\\Optimo1\\": "src/"
+            "Pc\\Optimo\\": "src/"
         },
         "files":[
             "Optimizers.php",
@@ -16,7 +16,7 @@
     "authors": [
         {
             "name": "ardiansyah-sweng",
-            "email": "ardiansyah.2019@outlook.com"
+            "email": "ardiansyah@tif.uad.ac.id"
         }
     ],
     "require": {}
