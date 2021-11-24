@@ -72,30 +72,18 @@ class Preparation
     {
         $parameters = $this->getVariableAndParameter()['parameter'];
         $variables = $this->getVariableAndParameter()['variable'];
-        print_r($this->getVariableAndParameter());die;
 
         if ($this->setupIsAllForAll()) {
             foreach ($parameters as $parameter) {
                 foreach ($variables as $variable) {
-                    // echo (new ExperimentFactory())
-                    //     ->initializeExperiment($this->experimentType);
-                    // echo "\n";
-                    // print_r($parameter);
-                    // echo "\n";
-                    // print_r($variable);
-
-                    if ($this->variableIsMoreThanTwo($variables['numOfVariables'])){
-                        ## fixed one variable, and three variables
-                    }
-
-                    // $optimizer = new Optimizers(
-                    //     $this->optimizerAlgorithms,
-                    //     $this->functionsToOptimized,
-                    //     $variable['ranges'],
-                    //     $parameters[0]['populationSize'],
-                    //     $this->variableType
-                    // );
-                    // $optimizer->generateInitialPopulation();
+                    $optimizer = new Optimizers(
+                        $this->optimizerAlgorithms,
+                        $this->functionsToOptimized,
+                        $variable['ranges'],
+                        $parameters[0]['populationSize'],
+                        $this->variableType
+                    );
+                    $optimizer->generateInitialPopulation();
                 }
                 echo "\n \n";
             }

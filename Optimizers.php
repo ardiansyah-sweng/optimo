@@ -30,12 +30,25 @@ class Optimizers
         }
     }
 
+    function isUniformInitialization()
+    {
+        if ($this->optimizerAlgorithms === 'ucpso' || 
+            $this->optimizerAlgorithms === 'mucpso'){
+            return true;
+        }
+    }
+
     function generateInitialPopulation()
     {
         # initial population based on optimizer algorithm
         for ($i=0; $i<$this->populationSize; $i++){
             $population[] = $this->createIndividu();
         }
+
+        if ($this->isUniformInitialization()){
+            // uniform processing
+        }
+
         print_r($population);
         $population = [];
     }
