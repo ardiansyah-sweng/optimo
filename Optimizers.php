@@ -21,21 +21,30 @@ class Optimizers
     function createIndividu()
     {
         # variable type: random OR seed
-        if ($this->variableType === 'random'){
+        if ($this->variableType === 'random') {
             return (new Randomizers())::randomVariableValueByRange($this->variableRanges);
         }
-        
+
         if ($this->variableType === 'seeds') {
-           return 'seeds';
+            return 'seeds';
         }
     }
 
     function generateInitialPopulation()
     {
         # initial population based on optimizer algorithm
-        for ($i=0; $i<$this->populationSize; $i++){
+        for ($i = 0; $i < $this->populationSize; $i++) {
             $population[] = $this->createIndividu();
         }
+
+        # for uniform swarm initialization
+        foreach ($this->optimizerAlgorithms as $optimizer) {
+            if ($optimizer === 'ucpso' || $optimizer === 'mucpso') {
+                echo (new UniformFactory())->initializingUniform($optimizer);
+            }
+        }
+
         print_r($population);
+        $population = [];
     }
 }

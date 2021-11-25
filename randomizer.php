@@ -11,7 +11,10 @@ class Randomizers
 
     static function randomVariableValueByRange($variableRanges)
     {
-        return mt_rand($variableRanges['lowerBound'] * 100, $variableRanges['upperBound'] * 100) / 100;
+        foreach ($variableRanges as $range){
+            $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
+        }
+        return $ret;
     }
 
     static function getCutPointIndex($lengthOfChromosome)

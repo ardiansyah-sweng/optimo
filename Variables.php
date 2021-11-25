@@ -12,8 +12,7 @@ class F_1_3_4_6 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -100, 
-                'upperBound' => 100
+                ['lowerBound' => -100, 'upperBound' => 100]
             ]
         ];
     }
@@ -26,8 +25,7 @@ class F2 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -10,
-                'upperBound' => 10
+                ['lowerBound' => -10, 'upperBound' => 10]
             ]
         ];
     }
@@ -40,8 +38,7 @@ class F5 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -30,
-                'upperBound' => 30
+                ['lowerBound' => -30, 'upperBound' => 30]
             ]
         ];
     }
@@ -54,8 +51,7 @@ class F7 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -1.28,
-                'upperBound' => 1.28
+                ['lowerBound' => -1.28, 'upperBound' => 1.28]
             ]
         ];
     }
@@ -68,8 +64,7 @@ class F8 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -500,
-                'upperBound' => 500
+                ['lowerBound' => -500, 'upperBound' => 500]
             ]
         ];
     }
@@ -82,8 +77,7 @@ class F9 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -5.12,
-                'upperBound' => 5.12
+                ['lowerBound' => -5.12, 'upperBound' => 5.12]
             ]
         ];
     }
@@ -96,8 +90,7 @@ class F10 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -32,
-                'upperBound' => 32
+                ['lowerBound' => -32, 'upperBound' => 32]
             ]
         ];
     }
@@ -110,8 +103,7 @@ class F11 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -600,
-                'upperBound' => 600
+                ['lowerBound' => -600, 'upperBound' => 600]
             ]
         ];
     }
@@ -124,8 +116,7 @@ class F_12_13 implements Variables
         return [
             'numOfVariables' => 30,
             'ranges' => [
-                'lowerBound' => -50,
-                'upperBound' => 50
+                ['lowerBound' => -50, 'upperBound' => 50]
             ]
         ];
     }
@@ -151,11 +142,10 @@ class COCOMO implements Variables
     function getVariables()
     {
         return [
-            'numOfVariables' => 3,
+            'numOfVariables' => 2,
             'ranges' => [
-                ['lowerBound' => 5, 'upperBound' => 7.49],
-                ['lowerBound' => 7.5, 'upperBound' => 12.49],
-                ['lowerBound' => 12.5, 'upperBound' => 15]
+                ['lowerBound' => 0, 'upperBound' => 10],
+                ['lowerBound' => 0.3, 'upperBound' => 2],
             ]
         ];
     }
@@ -166,11 +156,21 @@ class Agile implements Variables
     function getVariables()
     {
         return [
-            'numOfVariables' => 3,
+            'numOfVariables' => 13,
             'ranges' => [
-                ['lowerBound' => 5, 'upperBound' => 7.49],
-                ['lowerBound' => 7.5, 'upperBound' => 12.49],
-                ['lowerBound' => 12.5, 'upperBound' => 15]
+                ['lowerBound' => 0.91, 'upperBound' => 1],
+                ['lowerBound' => 0.89, 'upperBound' => 1],
+                ['lowerBound' => 0.96, 'upperBound' => 1],
+                ['lowerBound' => 0.85, 'upperBound' => 1],
+                ['lowerBound' => 0.91, 'upperBound' => 1],
+                ['lowerBound' => 0.96, 'upperBound' => 1],
+                ['lowerBound' => 0.90, 'upperBound' => 1],
+                ['lowerBound' => 0.98, 'upperBound' => 1],
+                ['lowerBound' => 0.98, 'upperBound' => 1],
+                ['lowerBound' => 0.96, 'upperBound' => 1],
+                ['lowerBound' => 0.95, 'upperBound' => 1],
+                ['lowerBound' => 0.97, 'upperBound' => 1],
+                ['lowerBound' => 0.98, 'upperBound' => 1]
             ]
         ];
     }

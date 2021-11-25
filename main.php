@@ -1,9 +1,9 @@
 <?php
 require 'vendor/autoload.php';
 
-$optimizerAlgorithm = ['pso'];
-$optimizerAlgorithms = ['pso', 'cpso', 'ga', 'rao'];
-$functionToOptimized = ['f1'];
+$optimizerAlgorithm = ['ucpso'];
+$optimizerAlgorithms = ['pso', 'cpso', 'ga', 'rao', 'ucpso', 'mucpso'];
+$functionToOptimized = ['agile'];
 $functionsToOptimized = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'ucp', 'cocomo', 'agile'];
 
 /**
@@ -18,6 +18,11 @@ $experimentType = ['evaluation','convergence','normal'];
  */
 $variableType = ['random','seeds'];
 
-$experiment = new Preparation($experimentType[1], $optimizerAlgorithm, $functionToOptimized, $variableType[0]);
-$result = $experiment->setup();
+$experiment = new Preparation(
+    $experimentType[1], 
+    $optimizerAlgorithm, 
+    $functionsToOptimized, 
+    $variableType[0]
+);
+$experiment->setup();
 

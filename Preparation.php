@@ -61,6 +61,13 @@ class Preparation
         }
     }
 
+    function variableIsMoreThanTwo($numOfVariable)
+    {
+        if ($numOfVariable > 2){
+            return true;
+        }
+    }
+
     function setup()
     {
         $parameters = $this->getVariableAndParameter()['parameter'];
@@ -69,51 +76,56 @@ class Preparation
         if ($this->setupIsAllForAll()) {
             foreach ($parameters as $parameter) {
                 foreach ($variables as $variable) {
-                    echo (new ExperimentFactory())
-                        ->initializeExperiment($this->experimentType);
-                    echo "\n";
-                    print_r($parameter);
-                    echo "\n";
-                    print_r($variable);
+                    $optimizer = new Optimizers(
+                        $this->optimizerAlgorithms,
+                        $this->functionsToOptimized,
+                        $variable['ranges'],
+                        $parameters[0]['populationSize'],
+                        $this->variableType
+                    );
+                    $optimizer->generateInitialPopulation();
                 }
                 echo "\n \n";
             }
         }
 
+        ## All Optimizer for One Function
         if ($this->setupIsAllForOne()) {
             foreach ($parameters as $parameter) {
-                echo (new ExperimentFactory())
-                    ->initializeExperiment($this->experimentType);
-                echo "\n";
-                print_r($parameter);
-                echo "\n";
-                print_r($variables);
-                echo "\n";
+                $optimizer = new Optimizers(
+                    $this->optimizerAlgorithms,
+                    $this->functionsToOptimized,
+                    $variables[0]['ranges'],
+                    $parameter['populationSize'],
+                    $this->variableType
+                );
+                $optimizer->generateInitialPopulation();
             }
         }
 
+        ## One Optimizer for All Functions
         if ($this->setupIsOneForAll()) {
             foreach ($variables as $variable) {
-                echo (new ExperimentFactory())
-                    ->initializeExperiment($this->experimentType);
-                echo "\n";
-                print_r($parameters);
-                echo "\n";
-                print_r($variable);
-                echo "\n";
+                $optimizer = new Optimizers(
+                    $this->optimizerAlgorithms,
+                    $this->functionsToOptimized,
+                    $variable['ranges'],
+                    $parameters[0]['populationSize'],
+                    $this->variableType
+                );
+                $optimizer->generateInitialPopulation();
             }
         }
 
+        ## One Optimizer for One Function
         if ($this->setupIsOneForOne()) {
-            // echo (new ExperimentFactory())
-            //     ->initializeExperiment($this->experimentType);
-            // echo "\n";
-            // print_r($parameters[0]);
-            // echo "\n";
-            // print_r($variables[0]);
-            // echo "\n";
-
-            $optimizer = new Optimizers($this->optimizerAlgorithms, $this->functionsToOptimized, $variables[0]['ranges'], $parameters[0]['populationSize'], $this->variableType);
+            $optimizer = new Optimizers(
+                $this->optimizerAlgorithms, 
+                $this->functionsToOptimized, 
+                $variables[0]['ranges'], 
+                $parameters[0]['populationSize'], 
+                $this->variableType
+            );
             $optimizer->generateInitialPopulation();
         }
     }
