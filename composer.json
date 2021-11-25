@@ -10,7 +10,8 @@
             "Variables.php",
             "LocalParameters.php",
             "Experiments.php",
-            "randomizer.php"
+            "randomizer.php",
+            "UniformInitialization.php"
         ]
     },
     "authors": [

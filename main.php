@@ -1,8 +1,8 @@
 <?php
 require 'vendor/autoload.php';
 
-$optimizerAlgorithm = ['pso'];
-$optimizerAlgorithms = ['pso', 'cpso', 'ga', 'rao'];
+$optimizerAlgorithm = ['ucpso'];
+$optimizerAlgorithms = ['pso', 'cpso', 'ga', 'rao', 'ucpso', 'mucpso'];
 $functionToOptimized = ['agile'];
 $functionsToOptimized = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'ucp', 'cocomo', 'agile'];
 
@@ -20,7 +20,7 @@ $variableType = ['random','seeds'];
 
 $experiment = new Preparation(
     $experimentType[1], 
-    $optimizerAlgorithms, 
+    $optimizerAlgorithm, 
     $functionsToOptimized, 
     $variableType[0]
 );
