@@ -7,7 +7,7 @@ class Preparation
     private $functionsToOptimized;
     private $variableType;
 
-    function __construct($experimentType, $optimizerAlgorithms, $functionsToOptimized, $variableType)
+    function __construct(string $experimentType, array $optimizerAlgorithms, array $functionsToOptimized, string $variableType)
     {
         $this->experimentType = $experimentType;
         $this->optimizerAlgorithms = $optimizerAlgorithms;
@@ -15,7 +15,7 @@ class Preparation
         $this->variableType = $variableType;
     }
 
-    function getVariableAndParameter()
+    function getVariableAndParameter():array
     {
         foreach ($this->functionsToOptimized as $function) {
             $variables[] = (new VariablesFactory())
