@@ -71,35 +71,10 @@ class PreparationTest extends TestCase
 
     function test_setup()
     {
+        $optimizerAlgorithms = ['pso'];
+        $functionToOptimized = ['f1','f2','agile'];
 
-        $parameters = [
-                    'parameterName' => 'gaParameter',
-                    'populationSize' => 30,
-                    'cr' => 0.9,
-                    'mr' => 0.01
-        ];
-        $agileVarRanges = [
-                ['lowerBound' => 0.91, 'upperBound' => 1],
-                ['lowerBound' => 0.89, 'upperBound' => 1],
-                ['lowerBound' => 0.96, 'upperBound' => 1],
-                ['lowerBound' => 0.85, 'upperBound' => 1],
-                ['lowerBound' => 0.91, 'upperBound' => 1],
-                ['lowerBound' => 0.96, 'upperBound' => 1],
-                ['lowerBound' => 0.90, 'upperBound' => 1],
-                ['lowerBound' => 0.98, 'upperBound' => 1],
-                ['lowerBound' => 0.98, 'upperBound' => 1],
-                ['lowerBound' => 0.96, 'upperBound' => 1],
-                ['lowerBound' => 0.95, 'upperBound' => 1],
-                ['lowerBound' => 0.97, 'upperBound' => 1],
-                ['lowerBound' => 0.98, 'upperBound' => 1]
-        ];
-
-        foreach ($agileVarRanges as $range){
-            $randomizer = Randomizers::randomVariableValueByRange($range);
-            echo $randomizer;
-            echo "\n";
-        }
-
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionToOptimized, 'random');
+        print_r($prep->setup());die;
     }
-
 }
