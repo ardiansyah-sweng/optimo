@@ -5,7 +5,8 @@
             "Pc\\Optimo\\": "src/"
         },
         "classmap":[
-            "src"
+            "src",
+            "utils"
         ]
     },
     "authors": [
