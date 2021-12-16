@@ -4,14 +4,9 @@
         "psr-4": {
             "Pc\\Optimo\\": "src/"
         },
-        "files":[
-            "Optimizers.php",
-            "Preparation.php",
-            "Variables.php",
-            "LocalParameters.php",
-            "Experiments.php",
-            "randomizer.php",
-            "UniformInitialization.php"
+        "classmap":[
+            "src",
+            "utils"
         ]
     },
     "authors": [
@@ -20,5 +15,7 @@
             "email": "ardiansyah@tif.uad.ac.id"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "9.5"
+    }
 }
