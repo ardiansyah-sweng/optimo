@@ -85,7 +85,6 @@ class Preparation
                     );
                     $optimizer->generateInitialPopulation();
                 }
-                echo "\n \n";
             }
         }
 
@@ -99,7 +98,7 @@ class Preparation
                     $parameter['populationSize'],
                     $this->variableType
                 );
-                $optimizer->generateInitialPopulation();
+                return $optimizer->generateInitialPopulation();
             }
         }
 
@@ -113,7 +112,7 @@ class Preparation
                     $parameters[0]['populationSize'],
                     $this->variableType
                 );
-                $optimizer->generateInitialPopulation();
+                return $optimizer->generateInitialPopulation();
             }
         }
 
@@ -126,7 +125,7 @@ class Preparation
                 $parameters[0]['populationSize'], 
                 $this->variableType
             );
-            $optimizer->generateInitialPopulation();
+            return $optimizer->generateInitialPopulation();
         }
     }
 }

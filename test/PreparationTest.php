@@ -71,10 +71,11 @@ class PreparationTest extends TestCase
 
     function test_setup()
     {
-        $optimizerAlgorithms = ['pso'];
-        $functionToOptimized = ['f1','f2','agile'];
+        $optimizerAlgorithms = ['ucpso'];
+        $functionToOptimized = ['f1'];
 
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionToOptimized, 'random');
-        print_r($prep->setup());die;
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionToOptimized, 'seeds');
+        print_r($prep->setup());
+        die;
     }
 }
