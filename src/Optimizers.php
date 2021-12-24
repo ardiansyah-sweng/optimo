@@ -43,8 +43,6 @@ class Optimizers
                 echo (new UniformFactory())->initializingUniform($optimizer);
             }
         }
-
-        print_r($population);
-        $population = [];
+        //return $population;
     }
 }

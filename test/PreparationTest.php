@@ -12,7 +12,9 @@ class PreparationTest extends TestCase
 
         $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
         $result = $prep->getVariableAndParameter();
+        echo "\n";
         print_r($result);
+        echo "\n";
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
     }
@@ -21,18 +23,10 @@ class PreparationTest extends TestCase
     {
         $optimizerAlgorithm = ['ucpso','cpso'];
         $functionToOptimized = ['agile','cocomo'];
-        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
+        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'seeds');
         
         $result = $prep->setupIsAllForAll();
         $this->assertTrue($result);
-
-        $optimizerAlgorithm = ['ucpso'];
-        $functionToOptimized = ['agile', 'cocomo'];
-        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
-
-        $result = $prep->setupIsAllForAll();
-        $this->assertNull($result);
-
     }
 
     function test_setupIsAllForOne()
@@ -43,38 +37,52 @@ class PreparationTest extends TestCase
         $result = $prep->setupIsAllForOne();
         ($result);
         $this->assertTrue($result);
-
-        $optimizerAlgorithm = ['ucpso'];
-        $functionToOptimized = ['agile'];
-        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
-        $result = $prep->setupIsAllForOne();
-        ($result);
-        $this->assertNull($result);
     }
 
     function test_setupIsOneForOne()
     {
-        $optimizerAlgorithm = ['ucpso'];
+        $optimizerAlgorithm = ['ga'];
         $functionToOptimized = ['agile'];
         $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
         $result = $prep->setupIsOneForOne();
         ($result);
         $this->assertTrue($result);
-
-        $optimizerAlgorithm = ['ucpso', 'cpso'];
-        $functionToOptimized = ['agile'];
-        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
-        $result = $prep->setupIsOneForOne();
-        ($result);
-        $this->assertNull($result);
     }
 
-    function test_setup()
+    function test_setup_oneOptimizerOneFunction()
     {
-        $optimizerAlgorithms = ['pso'];
-        $functionToOptimized = ['f1','f2','agile'];
+        $optimizerAlgorithms = ['ga'];
+        $functionsToOptimized = ['f13'];
 
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionToOptimized, 'random');
-        print_r($prep->setup());die;
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        print_r($prep->setup());
+    }
+
+    function test_setup_oneOptimizerAllFunctions()
+    {
+        $optimizerAlgorithms = ['ga'];
+        $functionsToOptimized = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','agile','cocomo','ucp'];
+
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        print_r($prep->setup());
+    }
+
+    function test_setup_allOptimizerOneFunction()
+    {
+        $optimizerAlgorithms = ['ga','pso','rao'];
+        $functionsToOptimized = ['ucp'];
+
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        print_r($prep->setup());
+    }
+
+    function test_setup_allOptimizerAllFunctions()
+    {
+        $optimizerAlgorithms = ['ga','pso', 'rao'];
+        $functionsToOptimized = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','agile','cocomo'];
+
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
+        print_r($prep->setup());
+        die;
     }
 }
