@@ -8,6 +8,7 @@ class Initializer
     private $variableRanges;
     private $populationSize;
     private $variableType;
+    public $dimension;
 
     function __construct($optimizerAlgorithms, $functionsToOptimized, $variableRanges, $populationSize, $variableType)
     {

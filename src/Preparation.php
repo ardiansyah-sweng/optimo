@@ -114,17 +114,17 @@ class Preparation
 
         ## One Optimizer for One Function
         if ($this->setupIsOneForOne()) {
-            $optimizer = new Initializer(
+            $initializer = new Initializer(
                 $this->optimizerAlgorithms, 
                 $this->functionsToOptimized, 
                 $variables[0]['ranges'], 
                 $parameters[0]['populationSize'], 
                 $this->variableType
             );
-            //return $optimizer->generateInitialPopulation();
             $optimizer = new Optimizers;
             $optimizer->algorithm = $this->optimizerAlgorithms[0];
-            $optimizer->updating();
+            $optimizer->function = $this->functionsToOptimized[0];
+            $optimizer->updating($initializer->generateInitialPopulation());
         }
     }
 }

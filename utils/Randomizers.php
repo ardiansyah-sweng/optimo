@@ -11,8 +11,14 @@ class Randomizers
 
     static function randomVariableValueByRange($variableRanges)
     {
-        foreach ($variableRanges as $range){
-            $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
+        foreach ($variableRanges as $range) {
+            if (count($variableRanges) > 1) {
+                $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
+            } else {
+                for ($i = 0; $i < 30; $i++) {
+                    $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
+                }
+            }
         }
         return $ret;
     }
@@ -24,6 +30,6 @@ class Randomizers
 
     static function getRandomIndexOfIndividu($popSize)
     {
-        return rand (0, $popSize-1);
+        return rand(0, $popSize - 1);
     }
 }

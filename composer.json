@@ -6,7 +6,8 @@
         },
         "classmap":[
             "src",
-            "utils"
+            "utils",
+            "Functions"
         ]
     },
     "authors": [
