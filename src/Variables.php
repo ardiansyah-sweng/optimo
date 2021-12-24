@@ -1,14 +1,18 @@
 <?php
 
-interface Variables
+interface VariablesInterface
 {
-    function getVariables();
+    function getVariables($experimentType);
 }
 
-class F_1_3_4_6 implements Variables
+class F_1_3_4_6 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range100';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -18,10 +22,14 @@ class F_1_3_4_6 implements Variables
     }
 }
 
-class F2 implements Variables
+class F2 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range10';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -31,10 +39,14 @@ class F2 implements Variables
     }
 }
 
-class F5 implements Variables
+class F5 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range30';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -44,10 +56,14 @@ class F5 implements Variables
     }
 }
 
-class F7 implements Variables
+class F7 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range1Koma28';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -57,10 +73,14 @@ class F7 implements Variables
     }
 }
 
-class F8 implements Variables
+class F8 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range500';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -70,10 +90,14 @@ class F8 implements Variables
     }
 }
 
-class F9 implements Variables
+class F9 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range5Koma12';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -83,10 +107,14 @@ class F9 implements Variables
     }
 }
 
-class F10 implements Variables
+class F10 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range32';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -96,10 +124,14 @@ class F10 implements Variables
     }
 }
 
-class F11 implements Variables
+class F11 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range600';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -109,10 +141,14 @@ class F11 implements Variables
     }
 }
 
-class F_12_13 implements Variables
+class F_12_13 implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\TestFunctions\Range50';
+        }
+
         return [
             'numOfVariables' => 30,
             'ranges' => [
@@ -122,10 +158,14 @@ class F_12_13 implements Variables
     }
 }
 
-class UCP implements Variables
+class UCP implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\EffortEstimation\Seeds\ucp';
+        }
+
         return [
             'numOfVariables' => 3,
             'ranges' => [
@@ -137,10 +177,14 @@ class UCP implements Variables
     }
 }
 
-class COCOMO implements Variables
+class COCOMO implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\EffortEstimation\Seeds\cocomo';
+        }
+
         return [
             'numOfVariables' => 2,
             'ranges' => [
@@ -151,10 +195,14 @@ class COCOMO implements Variables
     }
 }
 
-class Agile implements Variables
+class Agile implements VariablesInterface
 {
-    function getVariables()
+    function getVariables($experimentType)
     {
+        if ($experimentType){
+            return 'Dataset\EffortEstimation\Seeds\agile';
+        }
+
         return [
             'numOfVariables' => 13,
             'ranges' => [
@@ -177,7 +225,7 @@ class Agile implements Variables
 }
 
 
-class VariablesFactory
+class Variables
 {
     function initializeVariableFactory($functionToOptimized)
     {

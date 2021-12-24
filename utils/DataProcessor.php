@@ -1,6 +1,5 @@
 <?php
-
-namespace DataProcessor;
+require 'vendor/autoload.php';
 
 interface DataProcessorInterface
 {
@@ -141,7 +140,7 @@ class ReadSeedsFileProcessor implements DataprocessorInterface
  * Dataset processor selection
  *
  */
-class DataprocessorFactory
+class DataProcessor
 {
     public function initializeDataprocessor($processorType, $popSize)
     {

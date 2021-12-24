@@ -3,46 +3,21 @@ require 'vendor/autoload.php';
 
 class Optimizers
 {
-    private $optimizerAlgorithms;
-    private $functionsToOptimized;
+    public $algorithm;
+    public $parameters;
     private $variableRanges;
     private $populationSize;
     private $variableType;
 
-    function __construct($optimizerAlgorithms, $functionsToOptimized, $variableRanges, $populationSize, $variableType)
+
+    function updating()
     {
-        $this->optimizerAlgorithms = $optimizerAlgorithms;
-        $this->functionsToOptimized = $functionsToOptimized;
-        $this->populationSize = $populationSize;
-        $this->variableRanges = $variableRanges;
-        $this->variableType = $variableType;
+        print_r($this->algorithm);
+        $parameters = (new LocalParameterFactory())
+                ->initializingLocalParameter($this->algorithm)
+                ->getLocalParameter();
+        echo "\n";
+        print_r($parameters);
     }
 
-    function createIndividu()
-    {
-        # variable type: random OR seed
-        if ($this->variableType === 'random') {
-            return (new Randomizers())::randomVariableValueByRange($this->variableRanges);
-        }
-
-        if ($this->variableType === 'seeds') {
-            return 'seeds';
-        }
-    }
-
-    function generateInitialPopulation()
-    {
-        # initial population based on optimizer algorithm
-        for ($i = 0; $i < $this->populationSize; $i++) {
-            $population[] = $this->createIndividu();
-        }
-
-        # for uniform swarm initialization
-        foreach ($this->optimizerAlgorithms as $optimizer) {
-            if ($optimizer === 'ucpso' || $optimizer === 'mucpso') {
-                echo (new UniformFactory())->initializingUniform($optimizer);
-            }
-        }
-        return $population;
-    }
 }
