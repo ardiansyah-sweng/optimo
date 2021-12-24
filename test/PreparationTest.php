@@ -43,7 +43,7 @@ class PreparationTest extends TestCase
     {
         $optimizerAlgorithm = ['ga'];
         $functionToOptimized = ['agile'];
-        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'random');
+        $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'seeds');
         $result = $prep->setupIsOneForOne();
         ($result);
         $this->assertTrue($result);
@@ -52,9 +52,9 @@ class PreparationTest extends TestCase
     function test_setup_oneOptimizerOneFunction()
     {
         $optimizerAlgorithms = ['ga'];
-        $functionsToOptimized = ['f13'];
+        $functionsToOptimized = ['f1'];
 
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         print_r($prep->setup());
     }
 

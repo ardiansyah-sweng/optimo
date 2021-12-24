@@ -8,7 +8,7 @@ class DirectoryScanner
     {
         $files = array_diff(scandir($this->pathToDirectory), array('.', '..'));
         foreach ($files as $fileName) {
-            $ret[] = $this->pathToDirectory . '' . $fileName;
+            $ret[] = $this->pathToDirectory . '/' . $fileName;
         }
         return $ret;
     }

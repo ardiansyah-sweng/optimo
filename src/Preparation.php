@@ -18,9 +18,9 @@ class Preparation
     function getVariableAndParameter():array
     {
         foreach ($this->functionsToOptimized as $function) {
-            $variables[] = (new VariablesFactory())
+            $variables[] = (new Variables())
                 ->initializeVariableFactory($function)
-                ->getVariables();
+                ->getVariables('');
         }
         foreach ($this->optimizerAlgorithms as $optimizer) {
             $parameters[] = (new LocalParameterFactory())
@@ -70,14 +70,14 @@ class Preparation
         if ($this->setupIsAllForAll()) {
             foreach ($parameters as $parameter) {
                 foreach ($variables as $variable) {
-                    $optimizer = new Optimizers(
+                    $optimizer = new Initializer(
                         $this->optimizerAlgorithms,
                         $this->functionsToOptimized,
                         $variable['ranges'],
                         $parameters[0]['populationSize'],
                         $this->variableType
                     );
-                    
+
                 }
             }
         }
@@ -85,7 +85,7 @@ class Preparation
         ## All Optimizer for One Function
         if ($this->setupIsAllForOne()) {
             foreach ($parameters as $parameter) {
-                $optimizer = new Optimizers(
+                $optimizer = new Initializer(
                     $this->optimizerAlgorithms,
                     $this->functionsToOptimized,
                     $variables[0]['ranges'],
@@ -100,7 +100,7 @@ class Preparation
         ## One Optimizer for All Functions
         if ($this->setupIsOneForAll()) {
             foreach ($variables as $variable) {
-                $optimizer = new Optimizers(
+                $optimizer = new Initializer(
                     $this->optimizerAlgorithms,
                     $this->functionsToOptimized,
                     $variable['ranges'],
@@ -114,14 +114,17 @@ class Preparation
 
         ## One Optimizer for One Function
         if ($this->setupIsOneForOne()) {
-            $optimizer = new Optimizers(
+            $optimizer = new Initializer(
                 $this->optimizerAlgorithms, 
                 $this->functionsToOptimized, 
                 $variables[0]['ranges'], 
                 $parameters[0]['populationSize'], 
                 $this->variableType
             );
-            return $optimizer->generateInitialPopulation();
+            //return $optimizer->generateInitialPopulation();
+            $optimizer = new Optimizers;
+            $optimizer->algorithm = $this->optimizerAlgorithms[0];
+            $optimizer->updating();
         }
     }
 }
