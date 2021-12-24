@@ -61,18 +61,12 @@ class Preparation
         }
     }
 
-    // function variableIsMoreThanTwo($numOfVariable)
-    // {
-    //     if ($numOfVariable > 2){
-    //         return true;
-    //     }
-    // }
-
     function setup()
     {
         $parameters = $this->getVariableAndParameter()['parameter'];
         $variables = $this->getVariableAndParameter()['variable'];
 
+        # All Optimizer for All Functions
         if ($this->setupIsAllForAll()) {
             foreach ($parameters as $parameter) {
                 foreach ($variables as $variable) {
@@ -83,7 +77,7 @@ class Preparation
                         $parameters[0]['populationSize'],
                         $this->variableType
                     );
-                    $optimizer->generateInitialPopulation();
+                    
                 }
             }
         }
@@ -98,8 +92,9 @@ class Preparation
                     $parameter['populationSize'],
                     $this->variableType
                 );
-                return $optimizer->generateInitialPopulation();
+                $ret[] = $optimizer->generateInitialPopulation();
             }
+            return $ret;
         }
 
         ## One Optimizer for All Functions
@@ -112,8 +107,9 @@ class Preparation
                     $parameters[0]['populationSize'],
                     $this->variableType
                 );
-                return $optimizer->generateInitialPopulation();
+                $ret[] = $optimizer->generateInitialPopulation();
             }
+            return $ret;
         }
 
         ## One Optimizer for One Function
