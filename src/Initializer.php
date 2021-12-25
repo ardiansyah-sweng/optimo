@@ -8,15 +8,17 @@ class Initializer
     private $variableRanges;
     private $populationSize;
     private $variableType;
+    private $experimentType;
     public $dimension;
 
-    function __construct($optimizerAlgorithms, $functionsToOptimized, $variableRanges, $populationSize, $variableType)
+    function __construct($optimizerAlgorithms, $functionsToOptimized, $variableRanges, $populationSize, $variableType, $experimentType)
     {
         $this->optimizerAlgorithms = $optimizerAlgorithms;
         $this->functionsToOptimized = $functionsToOptimized;
         $this->populationSize = $populationSize;
         $this->variableRanges = $variableRanges;
         $this->variableType = $variableType;
+        $this->experimentType = $experimentType;
     }
 
     function generateInitialPopulation()
@@ -38,6 +40,14 @@ class Initializer
                 $dataProcessor = new DataProcessor;
                 $result = $dataProcessor->initializeDataprocessor('seeds', $this->populationSize);
                 $population = $result->processingData($seedFiles[1]);
+
+                if ($this->experimentType === 'evaluation'){
+                    $population=[];
+                    foreach($seedFiles as $seedFile){
+                        $population[] = $result->processingData($seedFile);
+                    }
+                    return $population;
+                }
             }   
         }
 

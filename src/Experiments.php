@@ -9,17 +9,17 @@ interface Experiments
 
 class Normal implements Experiments
 {
-    function executeExperiment($algorithm, $population, $function, $popSize)
+    function run($algorithm, $population, $function, $popSize)
     {
         $stop = new Stopper;
 
-        for ($iter = 0; $iter < 250; $iter++){
+        for ($iter = 0; $iter < 250; $iter++) {
 
-            $minFitness = min(array_column($population,'fitness'));
-            $indexIndividu = array_search($minFitness, array_column($population,'fitness'));
+            $minFitness = min(array_column($population, 'fitness'));
+            $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
             // jika fitness kurang dari sama dengan 0
-            if ($minFitness <= 0){
+            if ($minFitness <= 0) {
                 return $population[$indexIndividu];
             }
 
@@ -28,7 +28,7 @@ class Normal implements Experiments
             $stop->numOfLastResult = 10;
             $lastResults[] = $population[$indexIndividu]['fitness'];
 
-            if ($stop->evaluation($iter, $lastResults)){
+            if ($stop->evaluation($iter, $lastResults)) {
                 break;
             }
 
@@ -37,9 +37,15 @@ class Normal implements Experiments
             $algo = (new Algorithms())->initilizingAlgorithm($algorithm);
             $population = $algo->execute($lastPopulation, $function, $popSize);
         }
+
         $minFitness = min(array_column($bests, 'fitness'));
         $indexIndividu = array_search($minFitness, array_column($bests, 'fitness'));
         return $bests[$indexIndividu];
+    }
+
+    function executeExperiment($algorithm, $population, $function, $popSize)
+    {
+        return $this->run($algorithm, $population, $function, $popSize);
     }
 }
 
@@ -55,7 +61,7 @@ class Evaluation extends Normal implements Experiments
 {
     function executeExperiment($algorithm, $population, $function, $popSize)
     {
-        return "evaluation";
+        return $this->run($algorithm, $population, $function, $popSize)['fitness'];
     }
 }
 

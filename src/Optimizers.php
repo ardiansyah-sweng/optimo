@@ -21,7 +21,7 @@ class Optimizers
             ];
         }
         $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize);
-        print_r($experiment);
+        return $experiment;
         $pops = [];
     }
 }

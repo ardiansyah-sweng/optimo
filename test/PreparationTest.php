@@ -53,9 +53,8 @@ class PreparationTest extends TestCase
     {
         $optimizerAlgorithms = ['ga'];
         $functionsToOptimized = ['f13'];
-        //$experimentType = ['evaluation', 'convergence', 'normal'];
 
-        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();die;
     }
 
@@ -64,8 +63,8 @@ class PreparationTest extends TestCase
         $optimizerAlgorithms = ['ga'];
         $functionsToOptimized = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','agile','cocomo','ucp'];
 
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
-        print_r($prep->setup());
+        $prep = new Preparation('nr', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep->setup();
     }
 
     function test_setup_allOptimizerOneFunction()
