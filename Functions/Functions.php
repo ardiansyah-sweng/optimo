@@ -1,8 +1,8 @@
 <?php
 require 'vendor/autoload.php';
 
-use Functions\TestFunctions\UnimodalFunctionsFactory as Unimodal;
-use Functions\TestFunctions\MultimodalFunctionsFactory as Multimodal;
+//use Functions\TestFunctions\UnimodalFunctionsFactory as Unimodal;
+//use Functions\TestFunctions\MultimodalFunctionsFactory as Multimodal;
 
 interface FunctionsInterface
 {
@@ -13,7 +13,7 @@ class FunctionF1 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -21,7 +21,7 @@ class FunctionF2 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -29,7 +29,7 @@ class FunctionF3 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -37,7 +37,7 @@ class FunctionF4 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -45,7 +45,7 @@ class FunctionF5 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -53,7 +53,7 @@ class FunctionF6 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -61,7 +61,7 @@ class FunctionF7 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Unimodal())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
     }
 }
 
@@ -69,7 +69,7 @@ class FunctionF8 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
     }
 }
 
@@ -77,7 +77,7 @@ class FunctionF9 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
     }
 }
 
@@ -85,7 +85,7 @@ class FunctionF10 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
     }
 }
 
@@ -93,7 +93,7 @@ class FunctionF11 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
     }
 }
 
@@ -101,7 +101,7 @@ class FunctionF12 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
     }
 }
 
@@ -109,7 +109,7 @@ class FunctionF13 implements FunctionsInterface
 {
     function runFunction($population, $functionType)
     {
-        return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
     }
 }
 

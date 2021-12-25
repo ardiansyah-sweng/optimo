@@ -1,8 +1,8 @@
 <?php
 
-namespace Functions\TestFunctions;
+//namespace Functions\TestFunctions;
 
-use Utils\Randomizers;
+//use Utils\Randomizers;
 
 interface MultimodalFunctionsInterface
 {

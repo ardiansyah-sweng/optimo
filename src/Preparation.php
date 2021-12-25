@@ -125,6 +125,7 @@ class Preparation
             $optimizer->algorithm = $this->optimizerAlgorithms[0];
             $optimizer->function = $this->functionsToOptimized[0];
             $optimizer->experimentType = $this->experimentType;
+            $optimizer->popsize = $parameters[0]['populationSize'];
             $res = $optimizer->updating($initializer->generateInitialPopulation());
             //print_r($res);
         }

@@ -7,6 +7,7 @@ class Optimizers
     public $parameters;
     public $function;
     public $experimentType;
+    public $popsize;
 
     function updating($initialPopulation)
     {
@@ -19,7 +20,8 @@ class Optimizers
                 'individu' => $individu
             ];
         }
-
-        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function);
+        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize);
+        print_r($experiment);
+        $pops = [];
     }
 }
