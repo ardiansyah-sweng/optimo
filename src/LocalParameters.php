@@ -24,8 +24,8 @@ class PSO implements LocalParameter
     {
         return [
             'parameterName' => 'psoParameter',
-            'maxIteration' => 1000,
-            'populationSize' => 100,
+            'maxIteration' => 250,
+            'populationSize' => 30,
             'c1' => 2,
             'c2' => 2,
             'inertiaMax' => 0.9,

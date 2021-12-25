@@ -139,7 +139,7 @@ class Preparation
 
             if ($this->experimentType === 'normal') {
                 $res = $optimizer->updating($initializer->generateInitialPopulation());
-                print_r($res);
+                //print_r($res);
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'random') {

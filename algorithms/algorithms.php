@@ -77,23 +77,66 @@ class Genetic implements AlgorithmInterface
 
 class ParticleSwarmOptimizer implements AlgorithmInterface
 {
+    function __construct($iter)
+    {
+        $this->iter = $iter;
+    }
+
+    function createInitialVelocities($population)
+    {
+        foreach ($population as $individu){
+            foreach ($individu['individu'] as $key2 => $var){
+                $velocities[] = $var * (new Randomizers())->randomZeroToOneFraction();
+            }
+            $ret[] = $velocities;
+            $velocities = [];
+        }
+        return $ret;
+    }
+
     function execute($population, $function, $popSize)
     {
         $local = new LocalParameterFactory;
         $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
-        //print_r($parameters);
+        
+        $r1 = (new Randomizers())->randomZeroToOneFraction();
+        $r2 = (new Randomizers())->randomZeroToOneFraction();
+
+        // 1. Calculate inertia weight
+        $inertia = $parameters['inertiaMax'] - (( $parameters['inertiaMax'] - $parameters['inertiaMin'] * $this->iter) / $parameters['maxIteration']);
+
+        // 2. Calculate velocity
+        $pBests = $population;
+        $minFitness = min(array_column($population, 'fitness'));
+        $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
+        $gBest = $population[$indexIndividu];
+
+        $velocities = $this->createInitialVelocities($population);
+        foreach ($population as $key1 => $individu){
+            foreach ($individu['individu'] as $key2 => $var){
+                $vels[] = ($inertia * $velocities[$key1][$key2]) + 
+                (
+                    ($parameters['c1'] * $r1) * ($pBests[$key1]['individu'][$key2] - $var) + ($parameters['c2'] * $r2) * ($gBest['individu'][$key2] - $var)
+                );
+            }
+            $temps[] = $vels;
+            $vels = [];
+        }
+        print_r($temps);die;
+
+        echo $inertia;die;
     }
 }
 
 class Algorithms
 {
-    function initilizingAlgorithm($type)
+    function initilizingAlgorithm($type, $iter)
     {
         if ($type === 'ga') {
             return new Genetic;
         }
         if ($type === 'pso') {
-            return new ParticleSwarmOptimizer;
+            return new ParticleSwarmOptimizer($iter);
         }
     }
 }
