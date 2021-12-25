@@ -52,10 +52,11 @@ class PreparationTest extends TestCase
     function test_setup_oneOptimizerOneFunction()
     {
         $optimizerAlgorithms = ['ga'];
-        $functionsToOptimized = ['ucp'];
+        $functionsToOptimized = ['f1'];
+        //$experimentType = ['evaluation', 'convergence', 'normal'];
 
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
-        print_r($prep->setup());die;
+        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep->setup();die;
     }
 
     function test_setup_oneOptimizerAllFunctions()

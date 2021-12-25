@@ -6,30 +6,20 @@ class Optimizers
     public $algorithm;
     public $parameters;
     public $function;
-    private $populationSize;
-    private $variableType;
-
+    public $experimentType;
 
     function updating($initialPopulation)
     {
-        print_r($this->algorithm);
-        $parameters = (new LocalParameterFactory())
-                ->initializingLocalParameter($this->algorithm)
-                ->getLocalParameter();
-        echo "\n";
-        print_r($parameters);
-        echo "\n";
-        print_r($initialPopulation);
-        echo "\n";
-
-        foreach ($initialPopulation as $population){
+        $pops = [];
+        foreach ($initialPopulation as $individu) {
             $result = (new Functions())->initializingFunction($this->function);
-            $fitness = $result->runFunction($population, $this->function);
+            $fitness = $result->runFunction($individu, $this->function);
             $pops[] = [
                 'fitness' => $fitness,
-                'individu' => $population
+                'individu' => $individu
             ];
         }
-        return $pops;
+
+        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function);
     }
 }
