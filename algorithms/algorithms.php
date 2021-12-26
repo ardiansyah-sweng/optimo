@@ -84,8 +84,8 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
     function createInitialVelocities($population)
     {
-        foreach ($population as $individu){
-            foreach ($individu['individu'] as $key2 => $var){
+        foreach ($population as $individu) {
+            foreach ($individu['individu'] as $var) {
                 $velocities[] = $var * (new Randomizers())->randomZeroToOneFraction();
             }
             $ret[] = $velocities;
@@ -94,37 +94,69 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         return $ret;
     }
 
-    function execute($population, $function, $popSize)
+    function updateVelocity($individu, $velocities, $pBest, $gBest)
     {
         $local = new LocalParameterFactory;
         $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
-        
+
         $r1 = (new Randomizers())->randomZeroToOneFraction();
         $r2 = (new Randomizers())->randomZeroToOneFraction();
 
         // 1. Calculate inertia weight
-        $inertia = $parameters['inertiaMax'] - (( $parameters['inertiaMax'] - $parameters['inertiaMin'] * $this->iter) / $parameters['maxIteration']);
+        $inertia = $parameters['inertiaMax'] - (($parameters['inertiaMax'] - $parameters['inertiaMin'] * $this->iter) / $parameters['maxIteration']);
 
-        // 2. Calculate velocity
-        $pBests = $population;
+        foreach ($individu as $key => $var) {
+            $ret[] = ($inertia * $velocities[$key]) +
+                (
+                    ($parameters['c1'] * $r1) * ($pBest[$key] - $var) +
+                    ($parameters['c2'] * $r2) * ($gBest[$key] - $var)
+                );
+        }
+        return $ret;
+    }
+
+    function execute($population, $function, $popSize)
+    {
         $minFitness = min(array_column($population, 'fitness'));
         $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
         $gBest = $population[$indexIndividu];
 
-        $velocities = $this->createInitialVelocities($population);
-        foreach ($population as $key1 => $individu){
-            foreach ($individu['individu'] as $key2 => $var){
-                $vels[] = ($inertia * $velocities[$key1][$key2]) + 
-                (
-                    ($parameters['c1'] * $r1) * ($pBests[$key1]['individu'][$key2] - $var) + ($parameters['c2'] * $r2) * ($gBest['individu'][$key2] - $var)
-                );
+        if ($this->iter === 0) {
+            $velocities = $this->createInitialVelocities($population);
+            $pBest = $population;
+        } else {
+            foreach ($population as $pop){
+                $velocities[] = $pop['velocities'];
             }
-            $temps[] = $vels;
-            $vels = [];
         }
-        print_r($temps);die;
 
-        echo $inertia;die;
+        // 1. Update velocity
+        foreach ($population as $key => $particles) {
+            $vels[] = $this->updateVelocity($particles['individu'], $velocities[$key], $pBest[$key]['individu'], $gBest['individu']);
+        }
+
+        // 2. Update individu
+        foreach ($vels as $key1 => $vel) {
+            foreach ($vel as $key2 => $velValue) {
+                $vars[] = $velValue + $population[$key1]['individu'][$key2];
+            }
+            $individu[] = $vars;
+            $vars = [];
+        }
+
+        // 3. Update population
+        foreach ($individu as $key => $vars) {
+            $result = (new Functions())->initializingFunction($function);
+            $fitness = $result->runFunction($vars, $function);
+            $pops[] = [
+                'fitness' => $fitness,
+                'individu' => $vars,
+                'velocities' => $vels[$key],
+                'pBest' => $pBest[$key]
+            ];
+        }
+        //print_r($pops);
+        return $pops;
     }
 }
 
