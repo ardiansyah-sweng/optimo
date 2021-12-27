@@ -107,7 +107,7 @@ class Preparation
 
         ## One Optimizer for All Functions
         if ($this->setupIsOneForAll()) {
-            foreach ($variables as $key=> $variable) {
+            foreach ($variables as $key => $variable) {
                 $initializer = new Initializer(
                     $this->optimizerAlgorithms,
                     $this->functionsToOptimized,
@@ -123,13 +123,22 @@ class Preparation
                 $optimizer->popsize = $parameters[0]['populationSize'];
                 echo $optimizer->function;
                 echo "\n";
+
                 if ($this->experimentType === 'normal') {
                     $res = $optimizer->updating($initializer->generateInitialPopulation());
                     print_r($res);
                 }
+
+                if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
+                    $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
+                    $this->saveToFile($pathToResult, array($optimizer->function));
+                    for ($i = 0; $i < 30; $i++) {
+                        $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);
+
+                        $this->saveToFile($pathToResult, array($res));
+                    }
+                }
             }
-            die;
-            //return $ret;
         }
 
         ## One Optimizer for One Function
@@ -154,19 +163,21 @@ class Preparation
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'random') {
+                $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
+                $this->saveToFile($pathToResult, array($optimizer->function, 'random'));
                 for ($i = 0; $i < 30; $i++) {
                     $res = $optimizer->updating($initializer->generateInitialPopulation());
-                    echo ($res);
-                    echo "\n";
+
+                    $this->saveToFile($pathToResult, array($res));
                 }
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
-                 $pathToResult = (new Paths())->initializePath($this->optimizerAlgorithms[0]);
+                $pathToResult = (new Paths())->initializePath($this->optimizerAlgorithms[0]);
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
                 for ($i = 0; $i < 30; $i++) {
                     $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);
-                    
+
                     $this->saveToFile($pathToResult, array($res));
                 }
             }
