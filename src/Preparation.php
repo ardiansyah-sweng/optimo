@@ -83,7 +83,8 @@ class Preparation
                         $variable['ranges'],
                         $parameters[0]['populationSize'],
                         $this->variableType,
-                        $this->experimentType
+                        $this->experimentType,
+                        $variables['numOfVariables']
                     );
                 }
             }
@@ -98,7 +99,8 @@ class Preparation
                     $variables[0]['ranges'],
                     $parameter['populationSize'],
                     $this->variableType,
-                    $this->experimentType
+                    $this->experimentType,
+                    $variables['numOfVariables']
                 );
                 $ret[] = $optimizer->generateInitialPopulation();
             }
@@ -114,7 +116,8 @@ class Preparation
                     $variables[0]['ranges'],
                     $parameters[0]['populationSize'],
                     $this->variableType,
-                    $this->experimentType
+                    $this->experimentType,
+                    $variable['numOfVariables']
                 );
                 $optimizer = new Optimizers;
                 $optimizer->algorithm = $this->optimizerAlgorithms[0];
@@ -149,7 +152,8 @@ class Preparation
                 $variables[0]['ranges'],
                 $parameters[0]['populationSize'],
                 $this->variableType,
-                $this->experimentType
+                $this->experimentType,
+                $variables[0]['numOfVariables']
             );
             $optimizer = new Optimizers;
             $optimizer->algorithm = $this->optimizerAlgorithms[0];
