@@ -34,17 +34,21 @@ class PSO implements LocalParameter
     }
 }
 
-class CPSO extends PSO implements LocalParameter
+class UCPSO extends PSO implements LocalParameter
 {
     function getLocalParameter()
     {
         $pso = new PSO;
         return [
             'parameterName' => 'cpsoParameter',
-            // 'psoParameter' => $pso->getLocalParameter(),
             'chaotic1' => 'singer',
             'chaotic2' => 'sine',
-            'populationSize' => $pso->getLocalParameter()['populationSize'] 
+            'populationSize' => $pso->getLocalParameter()['populationSize'],
+            'maxIteration' => $pso->getLocalParameter()['maxIteration'],
+            'c1' => $pso->getLocalParameter()['c1'],
+            'c2' => $pso->getLocalParameter()['c2'],
+            'inertiaMax' => $pso->getLocalParameter()['inertiaMax'],
+            'inertiaMin' => $pso->getLocalParameter()['inertiaMin']
         ];
     }
 }
@@ -68,7 +72,7 @@ class LocalParameterFactory
         $optimizerTypes = [
             ['optimizer' => 'ga', 'select' => new GA],
             ['optimizer' => 'pso', 'select' => new PSO],
-            ['optimizer' => 'cpso', 'select' => new CPSO],
+            ['optimizer' => 'ucpso', 'select' => new UCPSO],
             ['optimizer' => 'rao', 'select' => new Rao]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));

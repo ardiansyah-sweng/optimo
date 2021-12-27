@@ -117,11 +117,11 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
     function execute($population, $function, $popSize)
     {
-        $minFitness = min(array_column($population, 'fitness'));
-        $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
-        $gBest = $population[$indexIndividu];
-
         if ($this->iter === 0) {
+            $minFitness = min(array_column($population, 'fitness'));
+            $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
+            $gBest = $population[$indexIndividu];
+
             $velocities = $this->createInitialVelocities($population);
             // 0. Push velocities into population
             foreach ($population as $key => $particles){
@@ -145,6 +145,10 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
                 $individu['pBest'] = $individu[1];
                 unset($individu[1]);
             }
+        } else {
+            $minFitness = min(array_column($population, 'pBest'));
+            $indexIndividu = array_search($minFitness, array_column($population, 'pBest'));
+            $gBest = $population[$indexIndividu];
         }
 
         // 2. Update velocity
@@ -183,6 +187,14 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
     }
 }
 
+class UniformCPSO implements AlgorithmInterface
+{
+    function execute($population, $function, $popSize)
+    {
+        
+    }
+}
+
 class Algorithms
 {
     function initilizingAlgorithm($type, $iter)
@@ -192,6 +204,9 @@ class Algorithms
         }
         if ($type === 'pso') {
             return new ParticleSwarmOptimizer($iter);
+        }
+        if ($type === 'ucpso'){
+            return new UniformCPSO;
         }
     }
 }
