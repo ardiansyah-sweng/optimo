@@ -11,16 +11,14 @@ class Normal implements Experiments
 {
     function run($algorithm, $population, $function, $popSize)
     {
+        print_r($population);die;
         $stop = new Stopper;
 
         for ($iter = 0; $iter < 5; $iter++) {
 
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
-
-            // echo "\n";
-            // echo $iter.' '. $minFitness;
-            
+           
             // jika fitness kurang dari sama dengan 0
             if ($minFitness <= 0) {
                 return $population[$indexIndividu];
