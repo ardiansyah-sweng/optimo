@@ -29,7 +29,7 @@ class Paths
             return (new GAPath())->getPathToResult();
         }
         if ($type === 'pso') {
-            return (new GAPath())->getPathToResult();
+            return (new PSOPath())->getPathToResult();
         }
     }
 }

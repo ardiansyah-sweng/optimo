@@ -123,40 +123,63 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
         if ($this->iter === 0) {
             $velocities = $this->createInitialVelocities($population);
-            $pBest = $population;
-        } else {
-            foreach ($population as $pop){
-                $velocities[] = $pop['velocities'];
+            // 0. Push velocities into population
+            foreach ($population as $key => $particles){
+                $particles[] = $velocities[$key];
+                $population[$key] = $particles;
+            }
+            foreach ($population as &$individu) {
+                $individu['velocities'] = $individu[0];
+                unset($individu[0]);
+            }
+            
+            // 1. Prepare initial pBest
+            foreach ($population as $key => $particles) {
+                $particles[] = [
+                    'fitness' => $particles['fitness'],
+                    'individu' => $particles['individu']
+                ];
+                $population[$key] = $particles;
+            }
+            foreach ($population as &$individu) {
+                $individu['pBest'] = $individu[1];
+                unset($individu[1]);
             }
         }
 
-        // 1. Update velocity
+        // 2. Update velocity
         foreach ($population as $key => $particles) {
-            $vels[] = $this->updateVelocity($particles['individu'], $velocities[$key], $pBest[$key]['individu'], $gBest['individu']);
+            $vels[] = $this->updateVelocity($particles['individu'], $particles['velocities'], $particles['pBest']['individu'], $gBest['individu']);
         }
 
-        // 2. Update individu
+        // 2. Update particles
         foreach ($vels as $key1 => $vel) {
             foreach ($vel as $key2 => $velValue) {
                 $vars[] = $velValue + $population[$key1]['individu'][$key2];
             }
-            $individu[] = $vars;
+            $updatedParticles[] = $vars;
             $vars = [];
         }
 
         // 3. Update population
-        foreach ($individu as $key => $vars) {
+        foreach ($updatedParticles as $key => $variables) {
             $result = (new Functions())->initializingFunction($function);
-            $fitness = $result->runFunction($vars, $function);
+            $fitness = $result->runFunction($variables, $function);
             $pops[] = [
                 'fitness' => $fitness,
-                'individu' => $vars,
-                'velocities' => $vels[$key],
-                'pBest' => $pBest[$key]
+                'individu' => $variables
             ];
         }
-        //print_r($pops);
-        return $pops;
+
+        // 4. Update pBest
+        foreach ($population as $key => $particles){
+            if ($particles['fitness'] > $pops[$key]['fitness']){
+                $population[$key]['pBest']['fitness'] = $pops[$key]['fitness'];
+                $population[$key]['pBest']['individu'] = $pops[$key]['individu'];
+            }
+        }
+
+        return $population;
     }
 }
 

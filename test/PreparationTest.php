@@ -52,19 +52,19 @@ class PreparationTest extends TestCase
     function test_setup_oneOptimizerOneFunction()
     {
         $optimizerAlgorithms = ['pso'];
-        $functionsToOptimized = ['f1'];
+        $functionsToOptimized = ['f13'];
 
-        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();die;
     }
 
     function test_setup_oneOptimizerAllFunctions()
     {
         $optimizerAlgorithms = ['ga'];
-        $functionsToOptimized = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13','agile','cocomo','ucp'];
+        $functionsToOptimized = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11','f12','f13'];
 
-        $prep = new Preparation('nr', $optimizerAlgorithms, $functionsToOptimized, 'random');
-        $prep->setup();
+        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep->setup();die;
     }
 
     function test_setup_allOptimizerOneFunction()

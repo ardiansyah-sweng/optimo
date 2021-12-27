@@ -18,8 +18,9 @@ class Normal implements Experiments
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
-            //echo $iter.' '. $minFitness; echo "\n";
-
+            // echo "\n";
+            // echo $iter.' '. $minFitness;
+            
             // jika fitness kurang dari sama dengan 0
             if ($minFitness <= 0) {
                 return $population[$indexIndividu];
@@ -36,6 +37,7 @@ class Normal implements Experiments
 
             $lastPopulation = $population;
             $population = null;
+
             $algo = (new Algorithms())->initilizingAlgorithm($algorithm, $iter);
             $population = $algo->execute($lastPopulation, $function, $popSize);
         }
