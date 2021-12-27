@@ -5,19 +5,23 @@ class Optimizers
 {
     public $algorithm;
     public $parameters;
-    private $variableRanges;
-    private $populationSize;
-    private $variableType;
+    public $function;
+    public $experimentType;
+    public $popsize;
 
-
-    function updating()
+    function updating($initialPopulation)
     {
-        print_r($this->algorithm);
-        $parameters = (new LocalParameterFactory())
-                ->initializingLocalParameter($this->algorithm)
-                ->getLocalParameter();
-        echo "\n";
-        print_r($parameters);
+        $pops = [];
+        foreach ($initialPopulation as $individu) {
+            $result = (new Functions())->initializingFunction($this->function);
+            $fitness = $result->runFunction($individu, $this->function);
+            $pops[] = [
+                'fitness' => $fitness,
+                'individu' => $individu
+            ];
+        }
+        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize);
+        return $experiment;
+        $pops = [];
     }
-
 }

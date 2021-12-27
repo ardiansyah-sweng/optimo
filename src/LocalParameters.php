@@ -11,7 +11,7 @@ class GA implements LocalParameter
     {
         return [
             'parameterName' => 'gaParameter',
-            'populationSize' => 30,
+            'populationSize' => 50,
             'cr'=>0.9,
             'mr'=>0.01
         ];
@@ -25,7 +25,7 @@ class PSO implements LocalParameter
         return [
             'parameterName' => 'psoParameter',
             'maxIteration' => 1000,
-            'populationSize' => 100,
+            'populationSize' => 50,
             'c1' => 2,
             'c2' => 2,
             'inertiaMax' => 0.9,
@@ -56,7 +56,7 @@ class Rao implements LocalParameter
         return [
             'parameterName' => 'raoParameter',
             'maxIteration' => 1000,
-            'populationSize' => 100
+            'populationSize' => 50
         ];
     }
 }

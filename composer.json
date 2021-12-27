@@ -6,7 +6,10 @@
         },
         "classmap":[
             "src",
-            "utils"
+            "utils",
+            "Functions",
+            "algorithms",
+            "results"
         ]
     },
     "authors": [
