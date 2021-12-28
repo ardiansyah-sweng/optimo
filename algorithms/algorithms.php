@@ -187,11 +187,17 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
     }
 }
 
-class UniformCPSO implements AlgorithmInterface
+class UniformCPSO extends ParticleSwarmOptimizer implements AlgorithmInterface
 {
+    function __construct($iter)
+    {
+        $this->iter = $iter;
+    }
+
     function execute($population, $function, $popSize)
     {
-        
+        $pso = new ParticleSwarmOptimizer($this->iter);
+        return $pso->execute($population, $function, $popSize);
     }
 }
 
@@ -206,7 +212,7 @@ class Algorithms
             return new ParticleSwarmOptimizer($iter);
         }
         if ($type === 'ucpso'){
-            return new UniformCPSO;
+            return new UniformCPSO($iter);
         }
     }
 }

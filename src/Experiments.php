@@ -11,7 +11,6 @@ class Normal implements Experiments
 {
     function run($algorithm, $population, $function, $popSize)
     {
-        print_r($population);die;
         $stop = new Stopper;
 
         for ($iter = 0; $iter < 5; $iter++) {
