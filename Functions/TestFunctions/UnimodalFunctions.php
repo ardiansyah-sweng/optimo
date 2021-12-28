@@ -1,9 +1,5 @@
 <?php
 
-//namespace Functions\TestFunctions;
-
-//use Utils\Randomizers;
-
 interface UnimodalFunctionsInterface
 {
     function unimodal($variables);

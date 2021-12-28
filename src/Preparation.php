@@ -135,7 +135,6 @@ class Preparation
                     $this->saveToFile($pathToResult, array($optimizer->function));
                     for ($i = 0; $i < 30; $i++) {
                         $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);
-
                         $this->saveToFile($pathToResult, array($res));
                     }
                 }

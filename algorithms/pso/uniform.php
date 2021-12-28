@@ -55,7 +55,7 @@ class UniformInitialization
 
         // 2. Bangkitkan nilai acak sebanyak ukuran populasi
         if ($this->generateType === 'random') {
-            for ($i = 0; $i < $this->popSize; $i++) {
+            for ($i = 1; $i <= $this->popSize; $i++) {
                 $R[$i] = $this->randomVariables($this->variableRanges);
             }
         }
@@ -70,9 +70,11 @@ class UniformInitialization
             $adjustedUniformVariables = $this->adjustingUniformVariables($uniformVariables, $this->variableRanges);
 
             if (($key - 1) == 0) {
-                return $X1;
+                $ret[] = $X1;
+            } else {
+                $ret[] = $adjustedUniformVariables;
             }
-            return $adjustedUniformVariables;
         }
+        return $ret;
     }
 }
