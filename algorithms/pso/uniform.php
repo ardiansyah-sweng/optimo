@@ -24,12 +24,12 @@ class UniformInitialization
         return $ret;
     }
 
-    function createUniformVariable($X1, $r, $popSize, $variableRanges)
+    function createUniformVariable($X1, $r, $variableRanges)
     {
         for ($i = 0; $i < $this->numOfVariable; $i++) {
             foreach ($variableRanges as $range){
-                $uniformVariables[$i] = $X1[$i] + $r[$i] / $popSize * ($range['upperBound'] - $range['lowerBound']);
-            }
+                $uniformVariables[] = $X1[$i] + floatval($r[$i]) / $this->popSize * ($range['upperBound'] - $range['lowerBound']);
+           }
         }
         return $uniformVariables;
     }
@@ -50,6 +50,8 @@ class UniformInitialization
 
     function initializingPopulation()
     {
+        $R = [];
+        
         // 1. Bangkitkan satu nilai acak dari rentang variabel
         $X1 = $this->randomVariables($this->variableRanges);
 
@@ -61,11 +63,11 @@ class UniformInitialization
         }
 
         if ($this->generateType === 'seeds') {
-            $R[] = $this->population;
+            $R = $this->population;
         }
 
         foreach ($R as $key => $r) {
-            $uniformVariables = $this->createUniformVariable($X1, $r, $this->popSize, $this->variableRanges);
+            $uniformVariables = $this->createUniformVariable($X1, $r, $this->variableRanges);
 
             $adjustedUniformVariables = $this->adjustingUniformVariables($uniformVariables, $this->variableRanges);
 

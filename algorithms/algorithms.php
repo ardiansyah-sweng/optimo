@@ -77,16 +77,18 @@ class Genetic implements AlgorithmInterface
 
 class ParticleSwarmOptimizer implements AlgorithmInterface
 {
-    function __construct($iter)
+    function __construct($iter, $algorithm)
     {
         $this->iter = $iter;
+        $this->algorithm = $algorithm;
+
     }
 
     function createInitialVelocities($population)
     {
         foreach ($population as $individu) {
             foreach ($individu['individu'] as $var) {
-                $velocities[] = $var * (new Randomizers())->randomZeroToOneFraction();
+                $velocities[] = floatval($var) * (new Randomizers())->randomZeroToOneFraction();
             }
             $ret[] = $velocities;
             $velocities = [];
@@ -94,7 +96,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         return $ret;
     }
 
-    function updateVelocity($individu, $velocities, $pBest, $gBest)
+    function updateVelocity($individu, $velocities, $pBest, $gBest, $I)
     {
         $local = new LocalParameterFactory;
         $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
@@ -105,11 +107,20 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         // 1. Calculate inertia weight
         $inertia = $parameters['inertiaMax'] - (($parameters['inertiaMax'] - $parameters['inertiaMin'] * $this->iter) / $parameters['maxIteration']);
 
+        if ($this->algorithm === 'ucpso'){
+            $rankBasedInertia = new RankBased($I);
+            $parameterSet = [
+                'inertiaMax' => $parameters['inertiaMax'],
+                'inertiaMin' => $parameters['inertiaMin']
+            ];
+            $rankBasedInertia->inertiaWeighting($parameterSet, $this->iter, $parameters['maxIteration']);
+        }
+
         foreach ($individu as $key => $var) {
             $ret[] = ($inertia * $velocities[$key]) +
                 (
-                    ($parameters['c1'] * $r1) * ($pBest[$key] - $var) +
-                    ($parameters['c2'] * $r2) * ($gBest[$key] - $var)
+                    ($parameters['c1'] * $r1) * (floatval($pBest[$key]) - floatval($var)) +
+                    ($parameters['c2'] * $r2) * (floatval($gBest[$key]) - floatval($var))
                 );
         }
         return $ret;
@@ -117,6 +128,9 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
     function execute($population, $function, $popSize)
     {
+        $local = new LocalParameterFactory;
+        $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
+
         if ($this->iter === 0) {
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
@@ -145,21 +159,29 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
                 $individu['pBest'] = $individu[1];
                 unset($individu[1]);
             }
+
+            // Rank Based inertia chaotic value (cosine)
+            $I = 0;
+
         } else {
             $minFitness = min(array_column($population, 'pBest'));
             $indexIndividu = array_search($minFitness, array_column($population, 'pBest'));
             $gBest = $population[$indexIndividu];
+            
+            //updated I
+            $rankBasedInertia = new RankBased($population[0]['I']);
+            $I = $rankBasedInertia->aConstant($parameters['maxIteration']);
         }
 
         // 2. Update velocity
         foreach ($population as $key => $particles) {
-            $vels[] = $this->updateVelocity($particles['individu'], $particles['velocities'], $particles['pBest']['individu'], $gBest['individu']);
+            $vels[] = $this->updateVelocity($particles['individu'], $particles['velocities'], $particles['pBest']['individu'], $gBest['individu'], $I);
         }
 
         // 2. Update particles
         foreach ($vels as $key1 => $vel) {
             foreach ($vel as $key2 => $velValue) {
-                $vars[] = $velValue + $population[$key1]['individu'][$key2];
+                $vars[] = $velValue + floatval($population[$key1]['individu'][$key2]);
             }
             $updatedParticles[] = $vars;
             $vars = [];
@@ -177,10 +199,16 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
         // 4. Update pBest
         foreach ($population as $key => $particles){
+            $particles[] = $I;
+            $population[$key] = $particles;
             if ($particles['fitness'] > $pops[$key]['fitness']){
                 $population[$key]['pBest']['fitness'] = $pops[$key]['fitness'];
                 $population[$key]['pBest']['individu'] = $pops[$key]['individu'];
             }
+        }
+        foreach ($population as &$individu) {
+            $individu['I'] = $individu[2];
+            unset($individu[2]);
         }
 
         return $population;
@@ -189,14 +217,15 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
 class UniformCPSO extends ParticleSwarmOptimizer implements AlgorithmInterface
 {
-    function __construct($iter)
+    function __construct($iter, $algorithm)
     {
         $this->iter = $iter;
+        $this->algorithm = $algorithm;
     }
 
     function execute($population, $function, $popSize)
     {
-        $pso = new ParticleSwarmOptimizer($this->iter);
+        $pso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
         return $pso->execute($population, $function, $popSize);
     }
 }
@@ -209,10 +238,10 @@ class Algorithms
             return new Genetic;
         }
         if ($type === 'pso') {
-            return new ParticleSwarmOptimizer($iter);
+            return new ParticleSwarmOptimizer($iter, $type);
         }
         if ($type === 'ucpso'){
-            return new UniformCPSO($iter);
+            return new UniformCPSO($iter, $type);
         }
     }
 }

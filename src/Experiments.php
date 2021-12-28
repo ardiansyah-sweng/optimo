@@ -13,7 +13,7 @@ class Normal implements Experiments
     {
         $stop = new Stopper;
 
-        for ($iter = 0; $iter < 5; $iter++) {
+        for ($iter = 0; $iter < 1000; $iter++) {
 
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
