@@ -25,7 +25,7 @@ class UCPSOPath implements PathToResultInterface
 {
     function getPathToResult()
     {
-        return 'results/pso.txt';
+        return 'results/ucpso.txt';
     }
 }
 

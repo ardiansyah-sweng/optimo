@@ -49,9 +49,7 @@ class UniformInitialization
     }
 
     function initializingPopulation()
-    {
-        $R = [];
-        
+    {       
         // 1. Bangkitkan satu nilai acak dari rentang variabel
         $X1 = $this->randomVariables($this->variableRanges);
 
