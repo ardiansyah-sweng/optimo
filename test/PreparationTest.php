@@ -54,7 +54,7 @@ class PreparationTest extends TestCase
         $optimizerAlgorithms = ['ucpso'];
         $functionsToOptimized = ['f1'];
 
-        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();die;
     }
 

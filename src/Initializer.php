@@ -47,13 +47,8 @@ class Initializer
                 $result = $dataProcessor->initializeDataprocessor('seeds', $this->populationSize);
                 $population = $result->processingData($seedFiles[1]);
 
-                echo $this->variableType;
-                echo "\n";
-
                 $uniform = new UniformInitialization($this->variableRanges, $this->populationSize, $this->variableType, $population, $this->numOfVariable);
                 $uniform->initializingPopulation();
-
-                die;
 
                 if ($this->experimentType === 'evaluation') {
                     $population = [];
