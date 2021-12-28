@@ -90,7 +90,7 @@ class UnimodalF5 implements UnimodalFunctionsInterface
     {
         foreach ($variables as $key => $variable) {
             if ($key < (count($variables) - 1)) {
-                $results[] = 100 * pow($variables[$key + 1] - pow($variable, 2), 2) + pow($variable - 1, 2);
+                $results[] = 100 * pow(floatval($variables[$key + 1]) - pow(floatval($variable), 2), 2) + pow(floatval($variable) - 1, 2);
             }
         }
         return array_sum($results);
@@ -101,7 +101,7 @@ class UnimodalF6 implements UnimodalFunctionsInterface
     function unimodal($variables)
     {
         foreach ($variables as $variable) {
-            $results[] = pow(($variable + 0.5), 2);
+            $results[] = pow((floatval($variable) + 0.5), 2);
         }
         return array_sum($results);
     }
@@ -112,7 +112,7 @@ class UnimodalF7 implements UnimodalFunctionsInterface
     {
         foreach ($variables as $key => $variable){
             $key = $key + 1;
-            $results[] = $key * pow($variable, 4) + (new Randomizers())->randomZeroToOneFraction();
+            $results[] = $key * pow(floatval($variable), 4) + (new Randomizers())->randomZeroToOneFraction();
         }
         return array_sum($results);
     }

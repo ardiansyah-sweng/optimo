@@ -19,6 +19,7 @@ class MultimodalF8 implements MultimodalFunctionsInterface
     function multimodal($variables)
     {
         foreach ($variables as $variable) {
+            $variable = floatval($variable);
             $results[] = -$variable * sin(sqrt(abs($variable)));
         }
         return array_sum($results);
@@ -35,6 +36,7 @@ class MultimodalF9 implements MultimodalFunctionsInterface
     function multimodal($variables)
     {
         foreach ($variables as $variable) {
+            $variable = floatval($variable);
             $results[] = pow($variable, 2) - 10 * cos(2 * pi() * $variable) + 10;
         }
         return array_sum($results);
@@ -51,6 +53,7 @@ class MultimodalF10 implements MultimodalFunctionsInterface
     function multimodal($variables)
     {
         foreach ($variables as $variable){
+            $variable = floatval($variable);
             $results1[] = pow($variable, 2);
             $results2[] = cos(2 * pi() * $variable );
         }
@@ -68,6 +71,7 @@ class MultimodalF11 implements MultimodalFunctionsInterface
     function multimodal($variables)
     {
         foreach ($variables as $key => $variable) {
+            $variable = floatval($variable);
             $key = $key + 1;
             $results1[] = pow($variable, 2);
             $results2[] = cos( ($variable/(sqrt($key))) ) + 1;
@@ -86,11 +90,12 @@ class MultimodalF12 implements MultimodalFunctionsInterface
 {
     function y($variable)
     {
-        return 1 + ( ($variable + 1)/4 );
+        return 1 + ( (floatval($variable) + 1)/4 );
     }
 
     function u($variable, $a, $k, $m)
     {
+        $variable = floatval($variable);
         $one = $k * pow( ($variable - $a), $m) * $variable;
         $two = $k * pow( ( -$variable - $a ), $m) * $variable;
 
@@ -111,6 +116,7 @@ class MultimodalF12 implements MultimodalFunctionsInterface
         $k = 100;
         $m = 4;
         foreach ($variables as $key => $variable) {
+            $variable = floatval($variable);
             if ($key < count($variables)-1){
                 $results1[] = pow($this->y($variable), 2) * ( 1 + 10 * pow( sin( (pi() * $this->y($variables[$key+1]) ) ),2 ) );
                 $results2[] = $this->u($variable, $a, $k, $m);
@@ -130,6 +136,12 @@ class MultimodalF13 implements MultimodalFunctionsInterface
 {
     function multimodal($variables)
     {
+        foreach ($variables as $variable){
+            $vars[] = floatval($variable);
+        }
+        $variables = [];
+        $variables = $vars;
+
         $u = new MultimodalF12;
         $a = 5;
         $k = 100;

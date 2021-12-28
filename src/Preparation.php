@@ -124,12 +124,10 @@ class Preparation
                 $optimizer->function = $this->functionsToOptimized[$key];
                 $optimizer->experimentType = $this->experimentType;
                 $optimizer->popsize = $parameters[0]['populationSize'];
-                echo $optimizer->function;
-                echo "\n";
+
 
                 if ($this->experimentType === 'normal') {
                     $res = $optimizer->updating($initializer->generateInitialPopulation());
-                    print_r($res);
                 }
 
                 if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
@@ -178,6 +176,7 @@ class Preparation
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
                 $pathToResult = (new Paths())->initializePath($this->optimizerAlgorithms[0]);
+                echo $pathToResult;die;
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
                 for ($i = 0; $i < 30; $i++) {
                     $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);

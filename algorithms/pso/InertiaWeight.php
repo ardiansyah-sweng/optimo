@@ -18,18 +18,18 @@ class LinearDecreasing implements InertiaWeightInterface
  */
 class RankBased implements InertiaWeightInterface
 {
-    function __construct($chaoticValue)
+    function __construct($chaoticValue, $population, $particles, $popSize)
     {
-    //     $this->particles = $particles;
-    //     $this->particle = $particle;
-    //     $this->popSize = $popSize;
+        $this->population = $population;
+        $this->particles = $particles;
         $this->chaoticValue = $chaoticValue;
+        $this->popSize = $popSize;
     }
 
     function RIW()
     {
-        array_multisort(array_column($this->particles, 'ae'), SORT_ASC, $this->particles);
-        $rank = array_search($this->particle['ae'], array_column($this->particles, 'ae'));
+        array_multisort(array_column($this->population, 'fitness'), SORT_ASC, $this->population);
+        $rank = array_search($this->particles['fitness'], array_column($this->population, 'fitness'));
         $b = 1;
         if ($rank <= ($this->popSize / 4)) {
             $b = 2 / 3;
