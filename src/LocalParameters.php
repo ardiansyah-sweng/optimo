@@ -34,7 +34,7 @@ class PSO implements LocalParameter
     }
 }
 
-class UCPSO extends PSO implements LocalParameter
+class UCPSO implements LocalParameter
 {
     function getLocalParameter()
     {
@@ -73,6 +73,7 @@ class LocalParameterFactory
             ['optimizer' => 'ga', 'select' => new GA],
             ['optimizer' => 'pso', 'select' => new PSO],
             ['optimizer' => 'ucpso', 'select' => new UCPSO],
+            ['optimizer' => 'mypso1', 'select' => new UCPSO],
             ['optimizer' => 'rao', 'select' => new Rao]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));

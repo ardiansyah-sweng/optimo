@@ -29,6 +29,14 @@ class UCPSOPath implements PathToResultInterface
     }
 }
 
+class MyPSO1Path implements PathToResultInterface
+{
+    function getPathToResult()
+    {
+        return 'results/mypso1.txt';
+    }
+}
+
 class Paths
 {
     function initializePath($type)
@@ -41,6 +49,9 @@ class Paths
         }
         if ($type === 'ucpso') {
             return (new UCPSOPath())->getPathToResult();
+        }
+        if ($type === 'mypso1') {
+            return (new MyPSO1Path())->getPathToResult();
         }
     }
 }

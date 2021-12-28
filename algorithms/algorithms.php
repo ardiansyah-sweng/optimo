@@ -81,7 +81,6 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
     {
         $this->iter = $iter;
         $this->algorithm = $algorithm;
-
     }
 
     function createInitialVelocities($population)
@@ -131,7 +130,8 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         $local = new LocalParameterFactory;
         if ($this->algorithm === 'pso'){
             $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
-        } else {
+        }
+        if ($this->algorithm === 'ucpso') { 
             $parameters = $local->initializingLocalParameter('ucpso')->getLocalParameter();
         }
 
@@ -221,7 +221,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
     }
 }
 
-class UniformCPSO extends ParticleSwarmOptimizer implements AlgorithmInterface
+class UniformCPSO implements AlgorithmInterface
 {
     function __construct($iter, $algorithm)
     {
@@ -233,6 +233,15 @@ class UniformCPSO extends ParticleSwarmOptimizer implements AlgorithmInterface
     {
         $pso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
         return $pso->execute($population, $function, $popSize);
+    }
+}
+
+## UCPSO + SpBest
+class MyPSO1 implements AlgorithmInterface
+{
+    function execute($population, $function, $popSize)
+    {
+        echo 'mypso1';die;
     }
 }
 
@@ -248,6 +257,9 @@ class Algorithms
         }
         if ($type === 'ucpso'){
             return new UniformCPSO($iter, $type);
+        }
+        if ($type === 'mypso1'){
+            return new MyPSO1;
         }
     }
 }
