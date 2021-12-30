@@ -1,0 +1,13 @@
+UCPSO+spbest
+
+spso+spbest
+
+r1=r2=chebyshev,        inertia=rankbased,  chaoticmap=chebyshev,       initialpop=uniform, pbest
+
+r1=singer, r2=sine,     inertia=chaotic,    chaoticmap=singer           intialpop=spso, pbest, gbest
+
+r1=chebyshev, r2=spso,  inertia=rankBased,  chaoticmap=cosine           intialpop=uniform, spbest, gbest
+
+r1=singer, r2=sine,     inertia=chaotic,    chaoticmap=singer           intialpop=spso, pbest, gbest
+
+r1=singer, r2=sine,     inertia=ldw,        chaoticmap=intialpop=spso,  spbest, gbest

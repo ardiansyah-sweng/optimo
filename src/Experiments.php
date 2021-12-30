@@ -41,6 +41,7 @@ class Normal implements Experiments
 
         $minFitness = min(array_column($bests, 'fitness'));
         $indexIndividu = array_search($minFitness, array_column($bests, 'fitness'));
+        
         return $bests[$indexIndividu];
     }
 

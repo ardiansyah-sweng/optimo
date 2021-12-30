@@ -45,9 +45,9 @@ class Initializer
 
                 $dataProcessor = new DataProcessor;
                 $result = $dataProcessor->initializeDataprocessor('seeds', $this->populationSize);
-                $population = $result->processingData($seedFiles[1]);
+                $population = $result->processingData($seedFiles[0]);
 
-                if ($this->experimentType === 'evaluation' && $this->optimizerAlgorithms[0] !== 'ucpso') {
+                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2')) {
                     $population = [];
                     foreach ($seedFiles as $seedFile) {
                         $population[] = $result->processingData($seedFile);
@@ -55,7 +55,7 @@ class Initializer
                     return $population;
                 }
 
-                if ($this->experimentType === 'evaluation' && $this->optimizerAlgorithms[0] === 'ucpso') {
+                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'ucpso' || $this->optimizerAlgorithms[0] === 'mypso1' || $this->optimizerAlgorithms[0] === 'mypso3')) {
                     $population = [];
                     foreach ($seedFiles as $seedFile) {
                         $pops = $result->processingData($seedFile);
@@ -66,7 +66,6 @@ class Initializer
                 }
             }
         }
-
         return $population;
     }
 }

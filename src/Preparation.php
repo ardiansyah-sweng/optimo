@@ -175,7 +175,7 @@ class Preparation
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
                 $pathToResult = (new Paths())->initializePath($this->optimizerAlgorithms[0]);
-                echo $pathToResult;die;
+
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
                 for ($i = 0; $i < 30; $i++) {
                     $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);

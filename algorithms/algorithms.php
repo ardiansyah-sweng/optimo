@@ -1,5 +1,7 @@
 <?php
 
+use Utils\ChaoticFactory;
+
 interface AlgorithmInterface
 {
     function execute($population, $function, $popSize);
@@ -95,7 +97,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         return $ret;
     }
 
-    function updateVelocity($individu, $velocities, $pBest, $gBest, $I, $population, $particles)
+    function updateVelocity($individu, $velocities, $pBest, $gBest, $population, $particles, $chaoticValue)
     {
         $local = new LocalParameterFactory;
         $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
@@ -103,11 +105,16 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         $r1 = (new Randomizers())->randomZeroToOneFraction();
         $r2 = (new Randomizers())->randomZeroToOneFraction();
 
+        if ($this->algorithm === 'mypso3') {
+            $r1 = $chaoticValue;
+            $r2 = $chaoticValue;
+        }
+        
         // 1. Calculate inertia weight
         $inertia = $parameters['inertiaMax'] - (($parameters['inertiaMax'] - $parameters['inertiaMin'] * $this->iter) / $parameters['maxIteration']);
 
-        if ($this->algorithm === 'ucpso'){
-            $rankBasedInertia = new RankBased($I, $population, $particles, $parameters['populationSize']);
+        if ($this->algorithm === 'ucpso' || $this->algorithm === 'mypso1' || $this->algorithm === 'mypso3') {
+            $rankBasedInertia = new RankBased($chaoticValue, $population, $particles, $parameters['populationSize']);
             $parameterSet = [
                 'inertiaMax' => $parameters['inertiaMax'],
                 'inertiaMin' => $parameters['inertiaMin']
@@ -128,10 +135,10 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
     function execute($population, $function, $popSize)
     {
         $local = new LocalParameterFactory;
-        if ($this->algorithm === 'pso'){
+        if ($this->algorithm === 'pso' || $this->algorithm === 'mypso2' || $this->algorithm === 'mypso3') {
             $parameters = $local->initializingLocalParameter('pso')->getLocalParameter();
         }
-        if ($this->algorithm === 'ucpso') { 
+        if ($this->algorithm === 'ucpso' || $this->algorithm === 'mypso1') {
             $parameters = $local->initializingLocalParameter('ucpso')->getLocalParameter();
         }
 
@@ -142,7 +149,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
             $velocities = $this->createInitialVelocities($population);
             // 0. Push velocities into population
-            foreach ($population as $key => $particles){
+            foreach ($population as $key => $particles) {
                 $particles[] = $velocities[$key];
                 $population[$key] = $particles;
             }
@@ -150,7 +157,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
                 $individu['velocities'] = $individu[0];
                 unset($individu[0]);
             }
-            
+
             // 1. Prepare initial pBest
             foreach ($population as $key => $particles) {
                 $particles[] = [
@@ -166,20 +173,36 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
             // Rank Based inertia chaotic value (cosine)
             $I = 0;
+            $chaotic = new ChaoticFactory;
+            $chaoticValue = $chaotic->initializeChaotic('cosines', $this->iter, $I)->chaotic($parameters['maxIteration']);
+
+            // r1 chaotic gauss
+            if ($this->algorithm === 'mypso3') {
+                $chaoticValue = 0.7;
+            }
 
         } else {
             $minFitness = min(array_column($population, 'pBest'));
             $indexIndividu = array_search($minFitness, array_column($population, 'pBest'));
             $gBest = $population[$indexIndividu];
-            
+
             //updated I
             $rankBasedInertia = new RankBased($population[0]['I'], $population, '', $popSize);
             $I = $rankBasedInertia->aConstant($parameters['maxIteration']);
+
+            $chaotic = new ChaoticFactory;
+
+            if ($this->algorithm === 'ucpso' || $this->algorithm ==='mypso1'){
+                $chaoticValue = $chaotic->initializeChaotic('cosine', $this->iter, $I)->chaotic($parameters['maxIteration']);
+            }
+            if ($this->algorithm === 'mypso3') {
+                $chaoticValue = $chaotic->initializeChaotic('chebyshev', $this->iter, $I)->chaotic($population[0]['chaoticValue']);
+            }
         }
 
         // 2. Update velocity
         foreach ($population as $key => $particles) {
-            $vels[] = $this->updateVelocity($particles['individu'], $particles['velocities'], $particles['pBest']['individu'], $gBest['individu'], $I, $population, $particles);
+            $vels[] = $this->updateVelocity($particles['individu'], $particles['velocities'], $particles['pBest']['individu'], $gBest['individu'],  $population, $particles, $chaoticValue);
         }
 
         // 2. Update particles
@@ -202,19 +225,27 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         }
 
         // 4. Update pBest
-        foreach ($population as $key => $particles){
+        foreach ($population as $key => $particles) {
             $particles[] = $I;
+            $particles[] = $chaoticValue;
             $population[$key] = $particles;
-            if ($particles['fitness'] > $pops[$key]['fitness']){
+            if ($particles['fitness'] > $pops[$key]['fitness']) {
                 $population[$key]['pBest']['fitness'] = $pops[$key]['fitness'];
                 $population[$key]['pBest']['individu'] = $pops[$key]['individu'];
             }
         }
-        if ($this->iter === 0){
+        if ($this->iter === 0) {
             foreach ($population as &$individu) {
                 $individu['I'] = $individu[2];
+                $individu['chaoticValue'] = $individu[3];
                 unset($individu[2]);
-            }    
+                unset($individu[3]);
+            }
+        }
+
+        if ($this->algorithm === 'mypso1' || $this->algorithm === 'mypso2') {
+            $spbest = new SPBest;
+            return $spbest->getSPBest($population);
         }
 
         return $population;
@@ -239,9 +270,48 @@ class UniformCPSO implements AlgorithmInterface
 ## UCPSO + SpBest
 class MyPSO1 implements AlgorithmInterface
 {
+    function __construct($iter, $algorithm)
+    {
+        $this->iter = $iter;
+        $this->algorithm = $algorithm;
+    }
+
     function execute($population, $function, $popSize)
     {
-        echo 'mypso1';die;
+        $mypso = new UniformCPSO($this->iter, $this->algorithm);
+        return $mypso->execute($population, $function, $popSize);
+    }
+}
+
+## PSO + SpBest
+class MyPSO2 implements AlgorithmInterface
+{
+    function __construct($iter, $algorithm)
+    {
+        $this->iter = $iter;
+        $this->algorithm = $algorithm;
+    }
+
+    function execute($population, $function, $popSize)
+    {
+        $mypso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
+        return $mypso->execute($population, $function, $popSize);
+    }
+}
+
+## PSO + Chaotic r1
+class MyPSO3 implements AlgorithmInterface
+{
+    function __construct($iter, $algorithm)
+    {
+        $this->iter = $iter;
+        $this->algorithm = $algorithm;
+    }
+
+    function execute($population, $function, $popSize)
+    {
+        $mypso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
+        return $mypso->execute($population, $function, $popSize);
     }
 }
 
@@ -255,11 +325,17 @@ class Algorithms
         if ($type === 'pso') {
             return new ParticleSwarmOptimizer($iter, $type);
         }
-        if ($type === 'ucpso'){
+        if ($type === 'ucpso') {
             return new UniformCPSO($iter, $type);
         }
-        if ($type === 'mypso1'){
-            return new MyPSO1;
+        if ($type === 'mypso1') {
+            return new MyPSO1($iter, $type);
+        }
+        if ($type === 'mypso2') {
+            return new MyPSO2($iter, $type);
+        }
+        if ($type === 'mypso3') {
+            return new MyPSO3($iter, $type);
         }
     }
 }
