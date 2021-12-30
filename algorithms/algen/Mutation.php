@@ -56,6 +56,13 @@ class Mutation
                 $ret[] = $selectedChromosomes;
             }
         }
+        $temp = $ret;
+        $ret = [];
+
+        foreach ($temp as $key => $variables){
+            $ret[$key]['individu'] = (new ExcessLimit())->cutVariableLimit($function, $variables['individu']);
+        }
+
         return $ret;
     }
 }

@@ -69,6 +69,10 @@ class Evaluation extends Normal implements Experiments
 
 class ExperimentFactory
 {
+    function __construct()
+    {
+        
+    }
     function initializeExperiment($type, $algorithm, $population, $function, $popSize)
     {
         if ($type === 'normal') {

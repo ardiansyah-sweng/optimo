@@ -12,8 +12,12 @@ class Optimizers
     function updating($initialPopulation)
     {
         $pops = [];
+        // 1. read test dataset
+        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
+        
         foreach ($initialPopulation as $individu) {
-            $result = (new Functions())->initializingFunction($this->function);
+            $result = (new Functions())->initializingFunction($this->function, $testDataset[0]);
             $fitness = $result->runFunction($individu, $this->function);
             $pops[] = [
                 'fitness' => $fitness,

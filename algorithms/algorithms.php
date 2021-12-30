@@ -11,8 +11,11 @@ class Genetic implements AlgorithmInterface
 {
     function RouletteWheelSelection($offsprings, $function, $popSize)
     {
+        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
+
         foreach ($offsprings as $individu) {
-            $result = (new Functions())->initializingFunction($function);
+            $result = (new Functions())->initializingFunction($function, $testDataset[0]);
             $fitness = $result->runFunction($individu, $function);
             $population[] = [
                 'fitness' => $fitness,
@@ -56,7 +59,7 @@ class Genetic implements AlgorithmInterface
 
         $genSize = count($population[0]['individu']);
         $cutPointIndex = rand(0, $genSize - 1);
-        $crossover = new Crossover($parameters['populationSize'], $cutPointIndex, $genSize);
+        $crossover = new Crossover($parameters['populationSize'], $cutPointIndex, $genSize, $function);
         $crossover->crossoverRate = $parameters['cr'];
         $offsprings = $crossover->runCrossover($population);
 
@@ -215,8 +218,11 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         }
 
         // 3. Update population
+        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
+
         foreach ($updatedParticles as $key => $variables) {
-            $result = (new Functions())->initializingFunction($function);
+            $result = (new Functions())->initializingFunction($function, $testDataset[0]);
             $fitness = $result->runFunction($variables, $function);
             $pops[] = [
                 'fitness' => $fitness,

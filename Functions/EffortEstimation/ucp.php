@@ -2,6 +2,11 @@
 
 class UseCasePoints
 {
+    function __construct($productivityFactor)
+    {
+        $this->productivityFactor = $productivityFactor;
+    }
+
     function getTestDataValue($testData)
     {
         return [
@@ -25,7 +30,6 @@ class UseCasePoints
         $UUCW = array_sum($useCases);
         $UUCP = $UUCW + $testData['uaw'];
         $UCP = $UUCP * $testData['tcf'] * $testData['ecf'];
-        $estimatedEffort = $UCP * $this->productivityFactor;
-        return $estimatedEffort;
+        return $UCP * $this->productivityFactor;
     }
 }
