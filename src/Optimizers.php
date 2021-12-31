@@ -9,22 +9,19 @@ class Optimizers
     public $experimentType;
     public $popsize;
 
-    function updating($initialPopulation)
+    function updating($initialPopulation, $testData)
     {
-        $pops = [];
-        // 1. read test dataset
-        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
-        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
-        
+        $pops = [];        
         foreach ($initialPopulation as $individu) {
-            $result = (new Functions())->initializingFunction($this->function, $testDataset[0]);
+            $result = (new Functions())->initializingFunction($this->function, $testData);
             $fitness = $result->runFunction($individu, $this->function);
             $pops[] = [
                 'fitness' => $fitness,
                 'individu' => $individu
             ];
         }
-        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize);
+
+        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
         return $experiment;
         $pops = [];
     }

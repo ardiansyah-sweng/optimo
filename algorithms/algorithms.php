@@ -9,13 +9,15 @@ interface AlgorithmInterface
 
 class Genetic implements AlgorithmInterface
 {
+    function __construct($testData)
+    {
+        $this->testData = $testData;    
+    }
+
     function RouletteWheelSelection($offsprings, $function, $popSize)
     {
-        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
-        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
-
         foreach ($offsprings as $individu) {
-            $result = (new Functions())->initializingFunction($function, $testDataset[0]);
+            $result = (new Functions())->initializingFunction($function, $this->testData);
             $fitness = $result->runFunction($individu, $function);
             $population[] = [
                 'fitness' => $fitness,
@@ -218,11 +220,8 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         }
 
         // 3. Update population
-        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
-        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
-
         foreach ($updatedParticles as $key => $variables) {
-            $result = (new Functions())->initializingFunction($function, $testDataset[0]);
+            $result = (new Functions())->initializingFunction($function, '');
             $fitness = $result->runFunction($variables, $function);
             $pops[] = [
                 'fitness' => $fitness,
@@ -323,10 +322,10 @@ class MyPSO3 implements AlgorithmInterface
 
 class Algorithms
 {
-    function initilizingAlgorithm($type, $iter)
+    function initilizingAlgorithm($type, $iter, $testData)
     {
         if ($type === 'ga') {
-            return new Genetic;
+            return new Genetic($testData);
         }
         if ($type === 'pso') {
             return new ParticleSwarmOptimizer($iter, $type);

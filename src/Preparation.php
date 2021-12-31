@@ -127,14 +127,14 @@ class Preparation
 
 
                 if ($this->experimentType === 'normal') {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation());
+                    $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
                 }
 
                 if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
                     $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
                     $this->saveToFile($pathToResult, array($optimizer->function));
                     for ($i = 0; $i < 30; $i++) {
-                        $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);
+                        $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
                         $this->saveToFile($pathToResult, array($res));
                     }
                 }
@@ -159,7 +159,18 @@ class Preparation
             $optimizer->popsize = $parameters[0]['populationSize'];
 
             if ($this->experimentType === 'normal') {
-                $res = $optimizer->updating($initializer->generateInitialPopulation());
+                if ($optimizer->function === 'ucp'){
+                    $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+                    $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
+                    foreach ($testDataset as $key => $testData){
+                        $estimatedEfforts = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
+                        $absoluteErrors[] = abs($estimatedEfforts['fitness'] - $testData['actualEffort']);
+                        if ($key > 2){break;}
+                    }
+                    $res = array_sum($absoluteErrors) / count($absoluteErrors);
+                } else {
+                    $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
+                }
                 print_r($res);
             }
 
@@ -167,7 +178,7 @@ class Preparation
                 $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
                 $this->saveToFile($pathToResult, array($optimizer->function, 'random'));
                 for ($i = 0; $i < 30; $i++) {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation());
+                    $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
 
                     $this->saveToFile($pathToResult, array($res));
                 }
@@ -178,7 +189,7 @@ class Preparation
 
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
                 for ($i = 0; $i < 30; $i++) {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation()[$i]);
+                    $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
 
                     $this->saveToFile($pathToResult, array($res));
                 }

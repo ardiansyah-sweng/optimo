@@ -7,28 +7,14 @@ class UseCasePoints
         $this->productivityFactor = $productivityFactor;
     }
 
-    function getTestDataValue($testData)
-    {
-        return [
-            $testData['simple'],
-            $testData['average'],
-            $testData['complex']
-        ];
-    }
-
-    function calculateUseCase($variableValues, $testDataValues)
-    {
-        foreach ($variableValues as $key => $variableValue) {
-            $ret[] = floatval($variableValue) * floatval($testDataValues[$key]);
-        }
-        return $ret;
-    }
-
     function estimating($variableValues, $testData)
     {
-        $useCases = $this->calculateUseCase($variableValues, $this->getTestDataValue($testData));
-        $UUCW = array_sum($useCases);
-        $UUCP = $UUCW + $testData['uaw'];
+        $simple = $variableValues[0] * floatval($testData['simple']);
+        $average = $variableValues[1] * floatval($testData['average']);
+        $complex = $variableValues[2] * floatval($testData['complex']);
+        $UUCW =  $simple + $average + $complex;
+        // $UUCW = $this->calculateUseCase($variableValues, $testData);
+        $UUCP = floatval($UUCW) + $testData['uaw'];
         $UCP = $UUCP * $testData['tcf'] * $testData['ecf'];
         return $UCP * $this->productivityFactor;
     }
