@@ -84,10 +84,11 @@ class Genetic implements AlgorithmInterface
 
 class ParticleSwarmOptimizer implements AlgorithmInterface
 {
-    function __construct($iter, $algorithm)
+    function __construct($iter, $algorithm, $testData)
     {
         $this->iter = $iter;
         $this->algorithm = $algorithm;
+        $this->testData = $testData;
     }
 
     function createInitialVelocities($population)
@@ -328,7 +329,7 @@ class Algorithms
             return new Genetic($testData);
         }
         if ($type === 'pso') {
-            return new ParticleSwarmOptimizer($iter, $type);
+            return new ParticleSwarmOptimizer($iter, $type, $testData);
         }
         if ($type === 'ucpso') {
             return new UniformCPSO($iter, $type);

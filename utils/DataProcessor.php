@@ -16,6 +16,7 @@ class AgileZiauddinProcessor implements DataprocessorInterface
         foreach ($raw_dataset as $val) {
             $data[] = explode(",", $val);
         }
+
         $columnIndexes = [0, 1, 2, 3, 4, 5, 6];
         $columns = ['effort', 'Vi', 'D', 'V', 'sprint_size', 'work_days', 'actualEffort'];
         foreach ($data as $key => $val) {
@@ -99,7 +100,7 @@ class UCPSilhavyProcessor implements DataprocessorInterface
             $data[] = $converted;
             $converted = [];
         }
-
+        //print_r($data);die;
         $columnIndexes = [0, 1, 2, 3, 4, 5, 6];
         $columns = ['simple', 'average', 'complex', 'uaw', 'tcf', 'ecf', 'actualEffort'];
         foreach ($data as $key => $val) {
