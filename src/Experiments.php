@@ -15,6 +15,14 @@ class Normal implements Experiments
 
         for ($iter = 0; $iter < 1000; $iter++) {
 
+            if ($function === 'ucp'){
+                foreach ($population as $key => $individu){
+                    $ae = abs($individu['fitness'] - $testData['actualEffort']);
+                    $individu['fitness'] = $ae;
+                    $population[$key] = $individu; 
+                }
+            }
+
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 

@@ -163,9 +163,9 @@ class Preparation
                     $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
                     $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
                     foreach ($testDataset as $key => $testData){
-                        $estimatedEfforts = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
-                        $absoluteErrors[] = abs($estimatedEfforts['fitness'] - $testData['actualEffort']);
-                        if ($key > 2){break;}
+                        $absoluteErrors[]= $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
+
+                        //if ($key > 2){break;}
                     }
                     $res = array_sum($absoluteErrors) / count($absoluteErrors);
                 } else {

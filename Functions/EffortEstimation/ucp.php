@@ -9,12 +9,14 @@ class UseCasePoints
 
     function estimating($variableValues, $testData)
     {
-        $simple = $variableValues[0] * floatval($testData['simple']);
-        $average = $variableValues[1] * floatval($testData['average']);
-        $complex = $variableValues[2] * floatval($testData['complex']);
+        //var_dump($testData);die;
+        //print_r(is_int(intval($testData['simple'])));die;
+        $simple = $variableValues[0] * $testData['simple'];
+        $average = $variableValues[1] * $testData['average'];
+        $complex = $variableValues[2] * $testData['complex'];
         $UUCW =  $simple + $average + $complex;
         // $UUCW = $this->calculateUseCase($variableValues, $testData);
-        $UUCP = floatval($UUCW) + $testData['uaw'];
+        $UUCP = $UUCW + $testData['uaw'];
         $UCP = $UUCP * $testData['tcf'] * $testData['ecf'];
         return $UCP * $this->productivityFactor;
     }
