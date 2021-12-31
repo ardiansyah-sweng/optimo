@@ -4,12 +4,12 @@ require 'vendor/autoload.php';
 
 interface Experiments
 {
-    function executeExperiment($algorithm, $population, $function, $popSize);
+    function executeExperiment($algorithm, $population, $function, $popSize, $testData);
 }
 
 class Normal implements Experiments
 {
-    function run($algorithm, $population, $function, $popSize)
+    function run($algorithm, $population, $function, $popSize, $testData)
     {
         $stop = new Stopper;
 
@@ -17,7 +17,7 @@ class Normal implements Experiments
 
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
-           
+
             // jika fitness kurang dari sama dengan 0
             if ($minFitness <= 0) {
                 return $population[$indexIndividu];
@@ -35,24 +35,25 @@ class Normal implements Experiments
             $lastPopulation = $population;
             $population = null;
 
-            $algo = (new Algorithms())->initilizingAlgorithm($algorithm, $iter);
+            $algo = (new Algorithms())->initilizingAlgorithm($algorithm, $iter, $testData);
             $population = $algo->execute($lastPopulation, $function, $popSize);
         }
 
         $minFitness = min(array_column($bests, 'fitness'));
         $indexIndividu = array_search($minFitness, array_column($bests, 'fitness'));
+
         return $bests[$indexIndividu];
     }
 
-    function executeExperiment($algorithm, $population, $function, $popSize)
+    function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
-        return $this->run($algorithm, $population, $function, $popSize);
+        return $this->run($algorithm, $population, $function, $popSize, $testData);
     }
 }
 
 class Convergence extends Normal implements Experiments
 {
-    function executeExperiment($algorithm, $population, $function, $popSize)
+    function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
         return "Convergence";
     }
@@ -60,24 +61,24 @@ class Convergence extends Normal implements Experiments
 
 class Evaluation extends Normal implements Experiments
 {
-    function executeExperiment($algorithm, $population, $function, $popSize)
+    function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
-        return $this->run($algorithm, $population, $function, $popSize)['fitness'];
+        return $this->run($algorithm, $population, $function, $popSize, $testData)['fitness'];
     }
 }
 
 class ExperimentFactory
 {
-    function initializeExperiment($type, $algorithm, $population, $function, $popSize)
+    function initializeExperiment($type, $algorithm, $population, $function, $popSize, $testData)
     {
         if ($type === 'normal') {
-            return (new Normal())->executeExperiment($algorithm, $population, $function, $popSize);
+            return (new Normal())->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'convergence') {
-            return (new Convergence())->executeExperiment($algorithm, $population, $function, $popSize);
+            return (new Convergence())->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'evaluation') {
-            return (new Evaluation())->executeExperiment($algorithm, $population, $function, $popSize);
+            return (new Evaluation())->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
     }
 }

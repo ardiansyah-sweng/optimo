@@ -14,10 +14,10 @@ class UniformInitialization
         $this->numOfVariable = $numOfVariable;
     }
 
-    function randomVariables($variableRanges):array
+    function randomVariables($variableRanges): array
     {
-        for ($i = 0; $i < $this->numOfVariable; $i++){
-            foreach ($variableRanges as $range){
+        for ($i = 0; $i < $this->numOfVariable; $i++) {
+            foreach ($variableRanges as $range) {
                 $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
             }
         }
@@ -27,9 +27,9 @@ class UniformInitialization
     function createUniformVariable($X1, $r, $variableRanges)
     {
         for ($i = 0; $i < $this->numOfVariable; $i++) {
-            foreach ($variableRanges as $range){
+            foreach ($variableRanges as $range) {
                 $uniformVariables[] = $X1[$i] + floatval($r[$i]) / $this->popSize * ($range['upperBound'] - $range['lowerBound']);
-           }
+            }
         }
         return $uniformVariables;
     }
@@ -37,7 +37,7 @@ class UniformInitialization
     function adjustingUniformVariables($uniformVariables, $variableRanges)
     {
         foreach ($uniformVariables as $key => $variable) {
-            foreach ($variableRanges as $range){
+            foreach ($variableRanges as $range) {
                 if ($variable > $range['upperBound']) {
                     $variables[$key] = $variable - ($range['upperBound'] - $range['lowerBound']);
                 } else {
@@ -49,13 +49,13 @@ class UniformInitialization
     }
 
     function initializingPopulation()
-    {       
+    {
         // 1. Bangkitkan satu nilai acak dari rentang variabel
         $X1 = $this->randomVariables($this->variableRanges);
 
         // 2. Bangkitkan nilai acak sebanyak ukuran populasi
         if ($this->generateType === 'random') {
-            for ($i = 0; $i < $this->popSize; $i++) {
+            for ($i = 1; $i <= $this->popSize; $i++) {
                 $R[$i] = $this->randomVariables($this->variableRanges);
             }
         }
@@ -70,9 +70,11 @@ class UniformInitialization
             $adjustedUniformVariables = $this->adjustingUniformVariables($uniformVariables, $this->variableRanges);
 
             if (($key - 1) == 0) {
-                return $X1;
+                $ret[] = $X1;
+            } else {
+                $ret[] = $adjustedUniformVariables;
             }
-            return $adjustedUniformVariables;
         }
+        return $ret;
     }
 }

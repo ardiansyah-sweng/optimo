@@ -6,12 +6,14 @@ class Crossover
     public $cutPointIndex;
     public $numOfGen;
     public $crossoverRate;
+    public $function;
 
-    function __construct(int $popSize, int $cutPointIndex, int $numOfGen)
+    function __construct(int $popSize, int $cutPointIndex, int $numOfGen, string $function)
     {
         $this->popSize = $popSize;
         $this->cutPointIndex = $cutPointIndex;
         $this->numOfGen = $numOfGen;
+        $this->function = $function;
     }
 
     function randomizingParents():array
@@ -73,8 +75,9 @@ class Crossover
                 }
             }
         }
-
-        return $ret;
+        
+        $evaluateVariable = new ExcessLimit;
+        return $evaluateVariable->cutVariableLimit($this->function, $ret);        
     }
    
     function runCrossover($population):array

@@ -6,125 +6,130 @@ require 'vendor/autoload.php';
 
 interface FunctionsInterface
 {
-    function runFunction($population, $functionType);
+    function runFunction(array $individu, $functionType);
 }
 
 class FunctionF1 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF2 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF3 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF4 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF5 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF6 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF7 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($population);
+        return (new UnimodalFunctionsFactory())->initializingUnimodalFunctions($functionType)->unimodal($individu);
     }
 }
 
 class FunctionF8 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction($individu, $functionType)
     {
-        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($individu);
     }
 }
 
 class FunctionF9 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($individu);
     }
 }
 
 class FunctionF10 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($individu);
     }
 }
 
 class FunctionF11 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($individu);
     }
 }
 
 class FunctionF12 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($individu);
     }
 }
 
 class FunctionF13 implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function runFunction(array $individu, $functionType)
     {
-        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($population);
+        return (new MultimodalFunctionsFactory())->initializingMultimodalFunctions($functionType)->multimodal($individu);
     }
 }
 
 class FunctionUCP implements FunctionsInterface
 {
-    function runFunction($population, $functionType)
+    function __construct($testData)
     {
-        // return (new Multimodal())->initializingMultimodalFunctions($functionType)->multimodal($population);
-        echo 'UCP belum';
+        $this->testData = $testData;
+    }
+
+    function runFunction(array $individu, $functionType)
+    {
+        $ucp = new UseCasePoints(20);
+        return $ucp->estimating($individu, $this->testData);
     }
 }
 
 class Functions
 {
-    function initializingFunction($functionType)
+    function initializingFunction($functionType, $testData)
     {
         $functionTypes = [
             ['function' => 'f1', 'select' => new FunctionF1],
@@ -140,7 +145,7 @@ class Functions
             ['function' => 'f11', 'select' => new FunctionF11],
             ['function' => 'f12', 'select' => new FunctionF12],
             ['function' => 'f13', 'select' => new FunctionF13],
-            ['function' => 'ucp', 'select' => new FunctionUCP],
+            ['function' => 'ucp', 'select' => new FunctionUCP($testData)],
         ];
         $index = array_search($functionType, array_column($functionTypes, 'function'));
         return $functionTypes[$index]['select'];

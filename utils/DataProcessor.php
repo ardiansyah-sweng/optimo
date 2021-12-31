@@ -89,6 +89,17 @@ class UCPSilhavyProcessor implements DataprocessorInterface
         foreach ($raw_dataset as $val) {
             $data[] = explode(",", $val);
         }
+
+        $temp = $data;
+        $data = [];
+        foreach ($temp as $key=>$vals){
+            foreach ($vals as $val){
+                $converted[] = floatval($val);
+            }
+            $data[] = $converted;
+            $converted = [];
+        }
+
         $columnIndexes = [0, 1, 2, 3, 4, 5, 6];
         $columns = ['simple', 'average', 'complex', 'uaw', 'tcf', 'ecf', 'actualEffort'];
         foreach ($data as $key => $val) {

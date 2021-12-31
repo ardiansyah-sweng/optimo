@@ -9,18 +9,19 @@ class Optimizers
     public $experimentType;
     public $popsize;
 
-    function updating($initialPopulation)
+    function updating($initialPopulation, $testData)
     {
-        $pops = [];
+        $pops = [];        
         foreach ($initialPopulation as $individu) {
-            $result = (new Functions())->initializingFunction($this->function);
+            $result = (new Functions())->initializingFunction($this->function, $testData);
             $fitness = $result->runFunction($individu, $this->function);
             $pops[] = [
                 'fitness' => $fitness,
                 'individu' => $individu
             ];
         }
-        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize);
+
+        $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
         return $experiment;
         $pops = [];
     }
