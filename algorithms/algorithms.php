@@ -204,6 +204,9 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
             if ($this->algorithm === 'mypso3') {
                 $chaoticValue = $chaotic->initializeChaotic('chebyshev', $this->iter, $I)->chaotic($population[0]['chaoticValue']);
             }
+            if ($this->algorithm === 'pso'){
+                $chaoticValue = null;
+            }
         }
 
         // 2. Update velocity

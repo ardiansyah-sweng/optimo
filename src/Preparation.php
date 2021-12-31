@@ -159,13 +159,11 @@ class Preparation
             $optimizer->popsize = $parameters[0]['populationSize'];
 
             if ($this->experimentType === 'normal') {
-                if ($optimizer->function === 'ucp'){
+                if ($optimizer->function === 'ucp') {
                     $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
                     $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
-                    foreach ($testDataset as $key => $testData){
-                        $absoluteErrors[]= $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
-
-                        //if ($key > 2){break;}
+                    foreach ($testDataset as $key => $testData) {
+                        $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
                     }
                     $res = array_sum($absoluteErrors) / count($absoluteErrors);
                 } else {
@@ -178,7 +176,16 @@ class Preparation
                 $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
                 $this->saveToFile($pathToResult, array($optimizer->function, 'random'));
                 for ($i = 0; $i < 30; $i++) {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
+                    if ($optimizer->function === 'ucp') {
+                        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+                        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
+                        foreach ($testDataset as $key => $testData) {
+                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
+                        }
+                        $res = array_sum($absoluteErrors) / count($absoluteErrors);
+                    } else {
+                        $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
+                    }
 
                     $this->saveToFile($pathToResult, array($res));
                 }

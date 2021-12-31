@@ -9,15 +9,63 @@ class UseCasePoints
 
     function estimating($variableValues, $testData)
     {
-        //var_dump($testData);die;
-        //print_r(is_int(intval($testData['simple'])));die;
-        $simple = $variableValues[0] * $testData['simple'];
-        $average = $variableValues[1] * $testData['average'];
-        $complex = $variableValues[2] * $testData['complex'];
-        $UUCW =  $simple + $average + $complex;
-        // $UUCW = $this->calculateUseCase($variableValues, $testData);
-        $UUCP = $UUCW + $testData['uaw'];
-        $UCP = $UUCP * $testData['tcf'] * $testData['ecf'];
-        return $UCP * $this->productivityFactor;
+        $ret = [];
+        foreach ((array) $testData as $key => $val){
+            if ($key === 'simple'){
+                $ret[] = intval($val);
+            }
+            if ($key === 'average') {
+                $ret[] = intval($val);
+            }
+            if ($key === 'complex') {
+                $ret[] = intval($val);
+            }
+            if ($key === 'uaw') {
+                $ret[] = floatval($val);
+            }
+            if ($key === 'tcf'){
+                $ret[] = floatval($val);
+            }
+            if ($key === 'ecf') {
+                $ret[] = floatval($val);
+            }
+            if ($key === 'actualEffort') {
+                $ret[] = floatval($val);
+            }
+        }
+        $tes = [];
+        foreach ($ret as $key => $val){
+            if ($key <= 2){
+                $tes[] = $variableValues[$key] * $val;
+            }
+        }
+        
+        $UUCW =  array_sum($tes);
+
+        foreach ($ret as $key => $val) {
+            if ($key == 3) {
+                $UUCP = $UUCW + $val;
+            }
+        }
+
+        foreach ($ret as $key => $val) {
+            if ($key == 4) {
+                $temp = $UUCP * $val;
+            }
+        }
+
+        $UCP = null;
+        foreach ($ret as $key => $val) {
+            if ($key == 5) {
+                $UCP = $temp * $val;
+            }
+        }
+        $estimatedEffort = $UCP * $this->productivityFactor;
+
+        foreach ($ret as $key => $val) {
+            if ($key == 6) {
+                return abs($estimatedEffort - $val);
+            }
+        }
     }
 }

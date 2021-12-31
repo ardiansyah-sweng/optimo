@@ -51,10 +51,10 @@ class PreparationTest extends TestCase
 
     function test_setup_oneOptimizerOneFunction()
     {
-        $optimizerAlgorithms = ['ga'];
+        $optimizerAlgorithms = ['pso'];
         $functionsToOptimized = ['ucp'];
 
-        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
         $prep->setup();
         die;
     }
