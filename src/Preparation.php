@@ -158,10 +158,13 @@ class Preparation
             $optimizer->experimentType = $this->experimentType;
             $optimizer->popsize = $parameters[0]['populationSize'];
 
+            $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
+
+            $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+            $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
+
             if ($this->experimentType === 'normal') {
                 if ($optimizer->function === 'ucp') {
-                    $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
-                    $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
                     foreach ($testDataset as $key => $testData) {
                         $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
                     }
@@ -173,14 +176,12 @@ class Preparation
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'random') {
-                $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
                 $this->saveToFile($pathToResult, array($optimizer->function, 'random'));
+
                 for ($i = 0; $i < 30; $i++) {
                     if ($optimizer->function === 'ucp') {
-                        $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
-                        $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
                         foreach ($testDataset as $key => $testData) {
-                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
+                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
                         }
                         $res = array_sum($absoluteErrors) / count($absoluteErrors);
                     } else {
@@ -192,12 +193,9 @@ class Preparation
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
-                $pathToResult = (new Paths())->initializePath($this->optimizerAlgorithms[0]);
-
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
                 for ($i = 0; $i < 30; $i++) {
                     $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
-
                     $this->saveToFile($pathToResult, array($res));
                 }
             }

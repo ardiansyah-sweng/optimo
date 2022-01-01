@@ -204,7 +204,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
             if ($this->algorithm === 'mypso3') {
                 $chaoticValue = $chaotic->initializeChaotic('chebyshev', $this->iter, $I)->chaotic($population[0]['chaoticValue']);
             }
-            if ($this->algorithm === 'pso'){
+            if ($this->algorithm === 'pso' || $this->algorithm === 'mypso2'){
                 $chaoticValue = null;
             }
         }
@@ -263,15 +263,16 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
 class UniformCPSO implements AlgorithmInterface
 {
-    function __construct($iter, $algorithm)
+    function __construct($iter, $algorithm, $testData)
     {
         $this->iter = $iter;
         $this->algorithm = $algorithm;
+        $this->testData = $testData;
     }
 
     function execute($population, $function, $popSize)
     {
-        $pso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
+        $pso = new ParticleSwarmOptimizer($this->iter, $this->algorithm, $this->testData);
         return $pso->execute($population, $function, $popSize);
     }
 }
@@ -279,15 +280,16 @@ class UniformCPSO implements AlgorithmInterface
 ## UCPSO + SpBest
 class MyPSO1 implements AlgorithmInterface
 {
-    function __construct($iter, $algorithm)
+    function __construct($iter, $algorithm, $tesData)
     {
         $this->iter = $iter;
         $this->algorithm = $algorithm;
+        $this->testData = $tesData;
     }
 
     function execute($population, $function, $popSize)
     {
-        $mypso = new UniformCPSO($this->iter, $this->algorithm);
+        $mypso = new UniformCPSO($this->iter, $this->algorithm, $this->testData);
         return $mypso->execute($population, $function, $popSize);
     }
 }
@@ -295,15 +297,16 @@ class MyPSO1 implements AlgorithmInterface
 ## PSO + SpBest
 class MyPSO2 implements AlgorithmInterface
 {
-    function __construct($iter, $algorithm)
+    function __construct($iter, $algorithm, $testData)
     {
         $this->iter = $iter;
         $this->algorithm = $algorithm;
+        $this->testData = $testData;
     }
 
     function execute($population, $function, $popSize)
     {
-        $mypso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
+        $mypso = new ParticleSwarmOptimizer($this->iter, $this->algorithm, $this->testData);
         return $mypso->execute($population, $function, $popSize);
     }
 }
@@ -335,13 +338,13 @@ class Algorithms
             return new ParticleSwarmOptimizer($iter, $type, $testData);
         }
         if ($type === 'ucpso') {
-            return new UniformCPSO($iter, $type);
+            return new UniformCPSO($iter, $type, $testData);
         }
         if ($type === 'mypso1') {
-            return new MyPSO1($iter, $type);
+            return new MyPSO1($iter, $type, $testData);
         }
         if ($type === 'mypso2') {
-            return new MyPSO2($iter, $type);
+            return new MyPSO2($iter, $type, $testData);
         }
         if ($type === 'mypso3') {
             return new MyPSO3($iter, $type);

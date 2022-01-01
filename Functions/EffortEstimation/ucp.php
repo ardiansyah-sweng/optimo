@@ -34,12 +34,14 @@ class UseCasePoints
             }
         }
         $tes = [];
+
+        
         foreach ($ret as $key => $val){
             if ($key <= 2){
-                $tes[] = $variableValues[$key] * $val;
+                $tes[] = floatval($variableValues[$key]) * $val;
             }
         }
-        
+
         $UUCW =  array_sum($tes);
 
         foreach ($ret as $key => $val) {
@@ -60,6 +62,7 @@ class UseCasePoints
                 $UCP = $temp * $val;
             }
         }
+
         $estimatedEffort = $UCP * $this->productivityFactor;
 
         foreach ($ret as $key => $val) {
