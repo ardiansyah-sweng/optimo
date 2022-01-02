@@ -47,7 +47,7 @@ class Initializer
                 $result = $dataProcessor->initializeDataprocessor('seeds', $this->populationSize);
                 $population = $result->processingData($seedFiles[0]);
 
-                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2')) {
+                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2' || $this->optimizerAlgorithms[0] === 'ga')) {
                     $population = [];
                     foreach ($seedFiles as $seedFile) {
                         $population[] = $result->processingData($seedFile);

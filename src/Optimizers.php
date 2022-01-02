@@ -8,6 +8,7 @@ class Optimizers
     public $function;
     public $experimentType;
     public $popsize;
+    public $variableType;
 
     function updating($initialPopulation, $testData)
     {
@@ -15,24 +16,14 @@ class Optimizers
         $result = (new Functions())->initializingFunction($this->function, $testData);
 
         foreach ($initialPopulation as $individu) {
-            if (count($individu) > 3) {
-                foreach ($individu as $variables) {
-                    $fitness = $result->runFunction($variables, $this->function);
-                    $pops[] = [
-                        'fitness' => $fitness,
-                        'individu' => $individu
-                    ];
-                }
-            } else {
-                $fitness = $result->runFunction($individu, $this->function);
-                $pops[] = [
-                    'fitness' => $fitness,
-                    'individu' => $individu
-                ];
-            }
+            $fitness = $result->runFunction($individu, $this->function);
+            $pops[] = [
+                'fitness' => $fitness,
+                'individu' => $individu
+            ];
         }
 
-        //print_r($pops);die;
+        sort($pops);
 
         $experiment = (new ExperimentFactory())->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
         return $experiment;

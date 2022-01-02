@@ -24,7 +24,7 @@ class Preparation
         }
         foreach ($this->optimizerAlgorithms as $optimizer) {
             $parameters[] = (new LocalParameterFactory())
-                ->initializingLocalParameter($optimizer)
+                ->initializingLocalParameter($optimizer, $variables[0]['numOfVariables'])
                 ->getLocalParameter();
         }
         return [
@@ -193,9 +193,17 @@ class Preparation
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
-                $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
+                $optimizer->variableType = 'seeds';
+                $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'seeds'));
                 for ($i = 0; $i < 30; $i++) {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
+                    if ($optimizer->function === 'ucp') {
+                        foreach ($testDataset as $key => $testData) {
+                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation()[$i], $testData);
+                        }
+                        $res = array_sum($absoluteErrors) / count($absoluteErrors);
+                    } else {
+                        $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
+                    }
                     $this->saveToFile($pathToResult, array($res));
                 }
             }

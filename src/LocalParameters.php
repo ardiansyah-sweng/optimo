@@ -53,28 +53,39 @@ class UCPSO implements LocalParameter
     }
 }
 
-class Rao implements LocalParameter
+class KMA implements LocalParameter
 {
+    function __construct($numOfVariabe)
+    {
+        $this->numOfVariable = $numOfVariabe;    
+    }
+
     function getLocalParameter()
     {
         return [
-            'parameterName' => 'raoParameter',
             'maxIteration' => 1000,
-            'populationSize' => 50
+            'populationSize' => 5,
+            'n2' => 200,
+            'n2Min' => 20,
+            'n2Max' => 200,
+            'p1' => 0.5,
+            'p2' => 0.5,
+            'd1' => ($this->numOfVariable - 1) / $this->numOfVariable,
+            'd2' => 0.5
         ];
     }
 }
 
 class LocalParameterFactory
 {
-    function initializingLocalParameter($optimizerType)
+    function initializingLocalParameter($optimizerType, $numOfVariable)
     {
         $optimizerTypes = [
             ['optimizer' => 'ga', 'select' => new GA],
             ['optimizer' => 'pso', 'select' => new PSO],
             ['optimizer' => 'ucpso', 'select' => new UCPSO],
             ['optimizer' => 'mypso1', 'select' => new UCPSO],
-            ['optimizer' => 'rao', 'select' => new Rao]
+            ['optimizer' => 'komodo', 'select' => new KMA($numOfVariable)]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));
         return $optimizerTypes[$index]['select'];

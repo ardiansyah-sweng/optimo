@@ -51,9 +51,9 @@ class PreparationTest extends TestCase
 
     function test_setup_oneOptimizerOneFunction()
     {
-        $optimizerAlgorithms = ['mypso2'];
-        $functionsToOptimized = ['ucp'];
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $optimizerAlgorithms = ['komodo'];
+        $functionsToOptimized = ['f1'];
+        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
         $prep->setup();
         die;
     }
@@ -65,7 +65,7 @@ class PreparationTest extends TestCase
 
         $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();
-        die;
+        die;    
     }
 
     function test_setup_allOptimizerOneFunction()

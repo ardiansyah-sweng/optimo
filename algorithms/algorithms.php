@@ -58,7 +58,7 @@ class Genetic implements AlgorithmInterface
         // 1. Crossover
         $local = new LocalParameterFactory;
         $parameters = $local->initializingLocalParameter('ga')->getLocalParameter();
-
+        //print_r($population);die;
         $genSize = count($population[0]['individu']);
         $cutPointIndex = rand(0, $genSize - 1);
         $crossover = new Crossover($parameters['populationSize'], $cutPointIndex, $genSize, $function);
@@ -202,7 +202,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
                 $chaoticValue = $chaotic->initializeChaotic('cosine', $this->iter, $I)->chaotic($parameters['maxIteration']);
             }
             if ($this->algorithm === 'mypso3') {
-                $chaoticValue = $chaotic->initializeChaotic('chebyshev', $this->iter, $I)->chaotic($population[0]['chaoticValue']);
+                $chaoticValue = $chaotic->initializeChaotic('gauss', $this->iter, $I)->chaotic($population[0]['chaoticValue']);
             }
             if ($this->algorithm === 'pso' || $this->algorithm === 'mypso2'){
                 $chaoticValue = null;
@@ -261,6 +261,16 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
     }
 }
 
+class Komodo implements AlgorithmInterface
+{
+    function execute($population, $function, $popSize)
+    {
+        print_r($population);
+        
+        die;
+    }
+}
+
 class UniformCPSO implements AlgorithmInterface
 {
     function __construct($iter, $algorithm, $testData)
@@ -314,15 +324,16 @@ class MyPSO2 implements AlgorithmInterface
 ## PSO + Chaotic r1
 class MyPSO3 implements AlgorithmInterface
 {
-    function __construct($iter, $algorithm)
+    function __construct($iter, $algorithm, $testData)
     {
         $this->iter = $iter;
         $this->algorithm = $algorithm;
+        $this->testData = $testData;
     }
 
     function execute($population, $function, $popSize)
     {
-        $mypso = new ParticleSwarmOptimizer($this->iter, $this->algorithm);
+        $mypso = new ParticleSwarmOptimizer($this->iter, $this->algorithm, $this->testData);
         return $mypso->execute($population, $function, $popSize);
     }
 }
@@ -347,7 +358,10 @@ class Algorithms
             return new MyPSO2($iter, $type, $testData);
         }
         if ($type === 'mypso3') {
-            return new MyPSO3($iter, $type);
+            return new MyPSO3($iter, $type, $testData);
+        }
+        if ($type === 'komodo'){
+            return new Komodo;
         }
     }
 }
