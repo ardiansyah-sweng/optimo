@@ -143,11 +143,17 @@ class Preparation
 
         ## One Optimizer for One Function
         if ($this->setupIsOneForOne()) {
+            if ($this->optimizerAlgorithms[0] === 'komodo'){
+                $populationSize = $parameters[0]['n1'];
+            } else {
+                $populationSize = $parameters[0]['populationSize'];
+            }
+
             $initializer = new Initializer(
                 $this->optimizerAlgorithms,
                 $this->functionsToOptimized,
                 $variables[0]['ranges'],
-                $parameters[0]['populationSize'],
+                $populationSize,
                 $this->variableType,
                 $this->experimentType,
                 $variables[0]['numOfVariables']
@@ -156,7 +162,8 @@ class Preparation
             $optimizer->algorithm = $this->optimizerAlgorithms[0];
             $optimizer->function = $this->functionsToOptimized[0];
             $optimizer->experimentType = $this->experimentType;
-            $optimizer->popsize = $parameters[0]['populationSize'];
+            $optimizer->popsize = $populationSize;
+            $optimizer->parameters = $parameters[0];
 
             $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
 

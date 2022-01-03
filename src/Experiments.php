@@ -9,6 +9,11 @@ interface Experiments
 
 class Normal implements Experiments
 {
+    function __construct($kmaParameters)
+    {
+        $this->kmaParameters = $kmaParameters;
+    }
+
     function run($algorithm, $population, $function, $popSize, $testData)
     {
         $stop = new Stopper;
@@ -35,7 +40,7 @@ class Normal implements Experiments
             $lastPopulation = $population;
             $population = null;
 
-            $algo = (new Algorithms())->initilizingAlgorithm($algorithm, $iter, $testData);
+            $algo = (new Algorithms($this->kmaParameters))->initilizingAlgorithm($algorithm, $iter, $testData);
             $population = $algo->execute($lastPopulation, $function, $popSize);
         }
 
@@ -69,16 +74,21 @@ class Evaluation extends Normal implements Experiments
 
 class ExperimentFactory
 {
+    function __construct($kmaParameters)
+    {
+        $this->kmaParameters = $kmaParameters;
+    }
+
     function initializeExperiment($type, $algorithm, $population, $function, $popSize, $testData)
     {
         if ($type === 'normal') {
-            return (new Normal())->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Normal($this->kmaParameters))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'convergence') {
-            return (new Convergence())->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Convergence($this->kmaParameters))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'evaluation') {
-            return (new Evaluation())->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Evaluation($this->kmaParameters))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
     }
 }
