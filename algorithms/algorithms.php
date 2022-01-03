@@ -305,11 +305,10 @@ class Komodo implements AlgorithmInterface
                     }
                 }
             }
-
             $w_ij[] = $w;
             $w = [];
         }
-        
+        print_r($w_ij);die;
         foreach ($HQBM as $key => $bigmale){
             foreach ($w_ij as $key1 => $vals1) {
                 foreach ($w_ij as $key2 => $vals2) {
@@ -327,7 +326,7 @@ class Komodo implements AlgorithmInterface
         }
         $HQBM = [];
         $HQBM = $newHQBM;
-        
+
         // 5. Female reproduction
         // Fixed probability 0f 0.5 (if 0 = exploitation, if 1 = exploration)
         $prob = rand() & 1;
@@ -377,6 +376,27 @@ class Komodo implements AlgorithmInterface
             $female['fitness'] = $fitness;
             $female['individu'] = $vals;
         }
+        
+        // 6. Movement of small males
+        // Randomly selecting a part of dimension with a particular probability (mlipir rate)
+        $w_ij = [];
+        $tempDim = 0;
+        foreach ($smalles as $smallMale){
+            foreach ($smallMale['individu'] as $key => $val){
+                $r1 = (new Randomizers())->randomZeroToOneFraction();
+                $r2 = (new Randomizers())->randomZeroToOneFraction();
+                if ($r2 < $this->parameters['d1']){
+                    foreach ($HQBM as $bigMale){
+                        $tempDim = $tempDim + ($r1 * ($bigMale[$key] - $val));
+                    }
+                } else {
+                    $tempDim = 0;
+                }
+            }
+            $w_ij[] = $tempDim;
+            $tempDim = 0;
+        }
+        print_r($w_ij);die;
         die;
     }
 }
