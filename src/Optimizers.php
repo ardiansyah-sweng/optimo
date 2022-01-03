@@ -9,6 +9,7 @@ class Optimizers
     public $experimentType;
     public $popsize;
     public $variableType;
+    public $variableRanges;
 
     function updating($initialPopulation, $testData)
     {
@@ -25,7 +26,7 @@ class Optimizers
 
         sort($pops);
 
-        $experiment = (new ExperimentFactory($this->parameters))->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
+        $experiment = (new ExperimentFactory($this->parameters, $this->variableRanges))->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
         return $experiment;
     }
 }
