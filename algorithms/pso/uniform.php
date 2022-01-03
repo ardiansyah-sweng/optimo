@@ -5,20 +5,25 @@
  */
 class UniformInitialization
 {
-    function __construct(array $variableRanges, int $popSize, string $generateType, array $population, int $numOfVariable)
+    function __construct(array $variableRanges, int $popSize, string $generateType, array $population, int $numOfVariable, string $function)
     {
         $this->variableRanges = $variableRanges;
         $this->popSize = $popSize;
         $this->generateType = $generateType;
         $this->population = $population;
         $this->numOfVariable = $numOfVariable;
+        $this->function = $function;
     }
 
     function randomVariables($variableRanges): array
     {
         for ($i = 0; $i < $this->numOfVariable; $i++) {
-            foreach ($variableRanges as $range) {
-                $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
+            if ($this->function === 'ucp') {
+                $ret[] = mt_rand($variableRanges[$i]['lowerBound'] * 100, $variableRanges[$i]['upperBound'] * 100) / 100;
+            } else {
+                foreach ($variableRanges as $range) {
+                    $ret[] = mt_rand($range['lowerBound'] * 100, $range['upperBound'] * 100) / 100;
+                }
             }
         }
         return $ret;
@@ -27,9 +32,18 @@ class UniformInitialization
     function createUniformVariable($X1, $r, $variableRanges)
     {
         for ($i = 0; $i < $this->numOfVariable; $i++) {
-            foreach ($variableRanges as $range) {
-                $uniformVariables[] = $X1[$i] + floatval($r[$i]) / $this->popSize * ($range['upperBound'] - $range['lowerBound']);
+            if ($this->function === 'ucp') {
+                $uniformVariables[] = $X1[$i] + floatval($r[$i]) / $this->popSize * ($variableRanges[$i]['upperBound'] - $variableRanges[$i]['lowerBound']);
+            } else {
+                foreach ($variableRanges as $range) {
+                    $uniformVariables[] = $X1[$i] + floatval($r[$i]) / $this->popSize * ($range['upperBound'] - $range['lowerBound']);
+                }
             }
+        }
+
+        if ($this->function === 'ucp') {
+            $evaluateVariable = new ExcessLimit;
+            return $evaluateVariable->cutVariableLimit($this->function, $uniformVariables);
         }
         return $uniformVariables;
     }
@@ -45,6 +59,12 @@ class UniformInitialization
                 }
             }
         }
+
+        if ($this->function === 'ucp') {
+            $evaluateVariable = new ExcessLimit;
+            return $evaluateVariable->cutVariableLimit($this->function, $variables);
+        }
+
         return $variables;
     }
 
@@ -75,6 +95,7 @@ class UniformInitialization
                 $ret[] = $adjustedUniformVariables;
             }
         }
+        
         return $ret;
     }
 }

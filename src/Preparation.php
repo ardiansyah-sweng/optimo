@@ -24,7 +24,7 @@ class Preparation
         }
         foreach ($this->optimizerAlgorithms as $optimizer) {
             $parameters[] = (new LocalParameterFactory())
-                ->initializingLocalParameter($optimizer)
+                ->initializingLocalParameter($optimizer, $variables[0]['numOfVariables'])
                 ->getLocalParameter();
         }
         return [
@@ -143,11 +143,17 @@ class Preparation
 
         ## One Optimizer for One Function
         if ($this->setupIsOneForOne()) {
+            if ($this->optimizerAlgorithms[0] === 'komodo'){
+                $populationSize = $parameters[0]['n1'];
+            } else {
+                $populationSize = $parameters[0]['populationSize'];
+            }
+
             $initializer = new Initializer(
                 $this->optimizerAlgorithms,
                 $this->functionsToOptimized,
                 $variables[0]['ranges'],
-                $parameters[0]['populationSize'],
+                $populationSize,
                 $this->variableType,
                 $this->experimentType,
                 $variables[0]['numOfVariables']
@@ -156,16 +162,18 @@ class Preparation
             $optimizer->algorithm = $this->optimizerAlgorithms[0];
             $optimizer->function = $this->functionsToOptimized[0];
             $optimizer->experimentType = $this->experimentType;
-            $optimizer->popsize = $parameters[0]['populationSize'];
+            $optimizer->popsize = $populationSize;
+            $optimizer->parameters = $parameters[0];
+
+            $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
+
+            $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+            $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
 
             if ($this->experimentType === 'normal') {
-                if ($optimizer->function === 'ucp'){
-                    $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
-                    $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
-                    foreach ($testDataset as $key => $testData){
-                        $absoluteErrors[]= $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
-
-                        //if ($key > 2){break;}
+                if ($optimizer->function === 'ucp') {
+                    foreach ($testDataset as $key => $testData) {
+                        $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
                     }
                     $res = array_sum($absoluteErrors) / count($absoluteErrors);
                 } else {
@@ -175,22 +183,34 @@ class Preparation
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'random') {
-                $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
                 $this->saveToFile($pathToResult, array($optimizer->function, 'random'));
+
                 for ($i = 0; $i < 30; $i++) {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
+                    if ($optimizer->function === 'ucp') {
+                        foreach ($testDataset as $key => $testData) {
+                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
+                        }
+                        $res = array_sum($absoluteErrors) / count($absoluteErrors);
+                    } else {
+                        $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
+                    }
 
                     $this->saveToFile($pathToResult, array($res));
                 }
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
-                $pathToResult = (new Paths())->initializePath($this->optimizerAlgorithms[0]);
-
-                $this->saveToFile($pathToResult, array($this->functionsToOptimized[0]));
+                $optimizer->variableType = 'seeds';
+                $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'seeds'));
                 for ($i = 0; $i < 30; $i++) {
-                    $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
-
+                    if ($optimizer->function === 'ucp') {
+                        foreach ($testDataset as $key => $testData) {
+                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation()[$i], $testData);
+                        }
+                        $res = array_sum($absoluteErrors) / count($absoluteErrors);
+                    } else {
+                        $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
+                    }
                     $this->saveToFile($pathToResult, array($res));
                 }
             }

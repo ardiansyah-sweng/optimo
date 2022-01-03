@@ -26,11 +26,11 @@ class Initializer
     {
         # initial population based on optimizer algorithm
         if ($this->variableType === 'random') {
-            for ($i = 0; $i < $this->populationSize; $i++) {
-                if ($this->optimizerAlgorithms[0] === 'ucpso') {
-                    $uniform = new UniformInitialization($this->variableRanges, $this->populationSize, $this->variableType, [], $this->numOfVariable);
-                    $population[] = $uniform->initializingPopulation();
-                } else {
+            if ($this->optimizerAlgorithms[0] === 'ucpso') {
+                $uniform = new UniformInitialization($this->variableRanges, $this->populationSize, $this->variableType, [], $this->numOfVariable, $this->functionsToOptimized[0]);
+                $population = $uniform->initializingPopulation();
+            } else {
+                for ($i = 0; $i < $this->populationSize; $i++) {
                     $population[] = (new Randomizers())::randomVariableValueByRange($this->variableRanges);
                 }
             }
@@ -47,7 +47,7 @@ class Initializer
                 $result = $dataProcessor->initializeDataprocessor('seeds', $this->populationSize);
                 $population = $result->processingData($seedFiles[0]);
 
-                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2')) {
+                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2' || $this->optimizerAlgorithms[0] === 'ga')) {
                     $population = [];
                     foreach ($seedFiles as $seedFile) {
                         $population[] = $result->processingData($seedFile);
@@ -59,13 +59,14 @@ class Initializer
                     $population = [];
                     foreach ($seedFiles as $seedFile) {
                         $pops = $result->processingData($seedFile);
-                        $uniform = new UniformInitialization($this->variableRanges, $this->populationSize, $this->variableType, $pops, $this->numOfVariable);
+                        $uniform = new UniformInitialization($this->variableRanges, $this->populationSize, $this->variableType, $pops, $this->numOfVariable, $this->functionsToOptimized[0]);
                         $population[] = $uniform->initializingPopulation();
                     }
                     return $population;
                 }
             }
         }
+
         return $population;
     }
 }
