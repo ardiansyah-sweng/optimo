@@ -164,6 +164,7 @@ class Preparation
             $optimizer->experimentType = $this->experimentType;
             $optimizer->popsize = $populationSize;
             $optimizer->parameters = $parameters[0];
+            $optimizer->variableRanges = $variables[0]['ranges'];
 
             $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
 

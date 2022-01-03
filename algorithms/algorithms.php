@@ -262,14 +262,18 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
 class Komodo implements AlgorithmInterface
 {
-    function __construct($parameters)
+    function __construct($parameters, $variableRanges)
     {
         $this->parameters = $parameters;
+        $this->variableRanges = $variableRanges;
     }
 
     function execute($population, $function, $popSize)
     {
         ## FIRST PHASE
+        // 0. The winner big male komodo
+        $winnerBM = $population[0];
+
         // 1. high quality big males (HQBM)
         $numOfHQBM = floor((1 - $this->parameters['p1']) * $this->parameters['n1']);
         foreach ($population as $key => $individu) {
@@ -318,10 +322,61 @@ class Komodo implements AlgorithmInterface
                     }
                 }
             } 
-            $ret[] = $k;
+            $newHQBM[] = $k;
             $k = [];
         }
+        $HQBM = [];
+        $HQBM = $newHQBM;
         
+        // 5. Female reproduction
+        // Fixed probability 0f 0.5 (if 0 = exploitation, if 1 = exploration)
+        $prob = rand() & 1;
+        if ($prob === 0) {
+            // 5.1. Sexual Reproduction (produce two offsprings)
+            //      k_il_new = r1 * k_il + (1 - r1) * k_jl
+            //      k_jl_new = r1 * k_jl + (1 - r1) * k_il
+            //      k_il & k_jl = dimensi ke-l dari komodo big-male terbaik dengan komodo female
+            for ($i=0; $i <= 1; $i++){
+                foreach ($winnerBM['individu'] as $key => $val){
+                    $r1 = (new Randomizers())->randomZeroToOneFraction();
+                    $offspring[] = $r1 * $val + (1 - $r1) * $female['individu'][$key];
+                }
+                $offsprings[] = $offspring;
+                $offspring = [];
+            }
+            $tempOffsprings = $offsprings;
+            $offsprings = [];
+            foreach ($tempOffsprings as $key => $variables) {
+                $result = (new Functions())->initializingFunction($function, '');
+                $fitness = $result->runFunction($variables, $function);
+                $offsprings[] = [
+                    'fitness' => $fitness,
+                    'individu' => $variables
+                ];
+            }
+
+            // 5.2. update the female
+            sort($offsprings);
+            if ($female['fitness'] > $offsprings[0]['fitness']){
+                $female = $offsprings[0];
+            }
+        } 
+        if ($prob === 1) {
+            // 5.3. exploration by doing asexual reproduction (parthenogenesis)
+            // 5.3.1 appending a small value to teach female dimension
+            //       k_ij_new = k_ij + (2r - 1)alpha|ub_j - lb_j|
+            //       alpha = the radius of parthenogenesis (0.1)
+            $alpha = 0.1;
+            foreach ($female['individu'] as $val){
+                $r = (new Randomizers())->randomZeroToOneFraction();
+                $vals[] = $val + ( (2*$r) - 1) * $alpha * abs($this->variableRanges[0]['upperBound'] - $this->variableRanges[0]['lowerBound']); 
+            }
+            $result = (new Functions())->initializingFunction($function, '');
+            $fitness = $result->runFunction($vals, $function);
+            $female = [];
+            $female['fitness'] = $fitness;
+            $female['individu'] = $vals;
+        }
         die;
     }
 }
@@ -395,9 +450,10 @@ class MyPSO3 implements AlgorithmInterface
 
 class Algorithms
 {
-    function __construct($kmaParameters)
+    function __construct($kmaParameters, $kmaVarRanges)
     {
         $this->kmaParameters = $kmaParameters;
+        $this->kmaVarRanges = $kmaVarRanges;
     }
 
     function initilizingAlgorithm($type, $iter, $testData)
@@ -421,7 +477,7 @@ class Algorithms
             return new MyPSO3($iter, $type, $testData);
         }
         if ($type === 'komodo') {
-            return new Komodo($this->kmaParameters);
+            return new Komodo($this->kmaParameters, $this->kmaVarRanges);
         }
     }
 }

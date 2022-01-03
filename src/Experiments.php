@@ -9,9 +9,10 @@ interface Experiments
 
 class Normal implements Experiments
 {
-    function __construct($kmaParameters)
+    function __construct($kmaParameters, $variableRanges)
     {
         $this->kmaParameters = $kmaParameters;
+        $this->kmaVarRanges = $variableRanges;
     }
 
     function run($algorithm, $population, $function, $popSize, $testData)
@@ -40,7 +41,7 @@ class Normal implements Experiments
             $lastPopulation = $population;
             $population = null;
 
-            $algo = (new Algorithms($this->kmaParameters))->initilizingAlgorithm($algorithm, $iter, $testData);
+            $algo = (new Algorithms($this->kmaParameters, $this->kmaVarRanges))->initilizingAlgorithm($algorithm, $iter, $testData);
             $population = $algo->execute($lastPopulation, $function, $popSize);
         }
 
@@ -74,21 +75,22 @@ class Evaluation extends Normal implements Experiments
 
 class ExperimentFactory
 {
-    function __construct($kmaParameters)
+    function __construct($kmaParameters, $variableRanges)
     {
         $this->kmaParameters = $kmaParameters;
+        $this->kmaVarRanges = $variableRanges;
     }
 
     function initializeExperiment($type, $algorithm, $population, $function, $popSize, $testData)
     {
         if ($type === 'normal') {
-            return (new Normal($this->kmaParameters))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Normal($this->kmaParameters, $this->kmaVarRanges))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'convergence') {
-            return (new Convergence($this->kmaParameters))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Convergence($this->kmaParameters, $this->kmaVarRanges))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'evaluation') {
-            return (new Evaluation($this->kmaParameters))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Evaluation($this->kmaParameters, $this->kmaVarRanges))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
     }
 }
