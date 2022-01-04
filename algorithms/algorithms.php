@@ -268,6 +268,31 @@ class Komodo implements AlgorithmInterface
         $this->variableRanges = $variableRanges;
     }
 
+    function W_ij($bigMaleI, $bigMaleJ)
+    {
+        $r1 = (new Randomizers())->randomZeroToOneFraction();
+        $r2 = (new Randomizers())->randomZeroToOneFraction();
+        if ($bigMaleJ['fitness'] < $bigMaleI || $r2 < 0.5) {
+            foreach ($bigMaleJ['individu'] as $key => $val) {
+                $w_ij[] = $r1 * ($val - $bigMaleI['individu'][$key]);
+            }
+        } else {
+            foreach ($bigMaleI['individu'] as $key => $val) {
+                $w_ij[] = $r1 * ($val - $bigMaleJ['individu'][$key]);
+            }
+        }
+
+        return $w_ij;
+    }
+
+    function updatePosition($currentBigMale, $W_ij)
+    {
+        foreach ($currentBigMale['individu'] as $key => $val) {
+            $newPositions[] = $val + $W_ij[$key];
+        }
+        return $newPositions;
+    }
+
     function execute($population, $function, $popSize)
     {
         ## FIRST PHASE
@@ -278,7 +303,7 @@ class Komodo implements AlgorithmInterface
         $numOfHQBM = floor((1 - $this->parameters['p1']) * $this->parameters['n1']);
         foreach ($population as $key => $individu) {
             if ($key < $numOfHQBM) {
-                $HQBM[] = $individu;
+                $bigMales[] = $individu;
             }
         }
 
@@ -286,46 +311,51 @@ class Komodo implements AlgorithmInterface
         $female = $population[$numOfHQBM];
 
         // 3. Small males
-        $smalles = array_slice($population, $numOfHQBM+1);
+        $smalles = array_slice($population, $numOfHQBM + 1);
 
         // 4. Movement of big males
-        foreach ($HQBM as $key1 => $bigMale1){
-            $r1 = (new Randomizers())->randomZeroToOneFraction();
-            $r2 = (new Randomizers())->randomZeroToOneFraction();
-            foreach ($HQBM as $key2 => $bigMale2){
-                if ($key1 !== $key2){
-                    if ($bigMale2['fitness'] < $bigMale1['fitness'] || $r2 < 0.5){
-                        foreach ($bigMale2['individu'] as $key3 => $individu){
-                            $w[] = $r1 * ($individu - $bigMale1['individu'][$key3]);
-                        }
-                    } else {
-                        foreach ($bigMale2['individu'] as $key3 => $individu) {
-                            $w[] = $r1 * ($bigMale1['individu'][$key3] - $individu);
-                        }
-                    }
+        $w_ij = [];
+        $lastBigmales = $bigMales;
+        $bigMales = [];
+
+        $result = (new Functions())->initializingFunction($function, '');
+        foreach ($lastBigmales as $key1 => $bigMaleI) {
+            foreach ($lastBigmales as $key2 => $bigMaleJ) {
+                if ($key1 !== $key2) {
+                    $w_ij[] = $this->W_ij($bigMaleI, $bigMaleJ);
                 }
             }
-            $w_ij[] = $w;
-            $w = [];
-        }
-        print_r($w_ij);die;
-        foreach ($HQBM as $key => $bigmale){
-            foreach ($w_ij as $key1 => $vals1) {
-                foreach ($w_ij as $key2 => $vals2) {
-                    if ($key1 !== $key2) {
-                        foreach ($vals1 as $key3 => $val) {
-                            $k[] = $bigmale['individu'][$key3] + $val + $vals2[$key3];
-                        }
-                    } else {
-                        break;
-                    }
+
+            ## n = 5, q = 2 dulu ya guys...
+            if (count($w_ij) === 1){
+                foreach ($w_ij as $vals) {
+                    $newPositions = $this->updatePosition($bigMaleI, $vals);
+                    $fitness = $result->runFunction($newPositions, $function);
+                    $bigMales[] = [
+                        'fitness' => $fitness,
+                        'individu' => $vals
+                    ];
                 }
-            } 
-            $newHQBM[] = $k;
-            $k = [];
+            }
+
+            ## n = 5, q = 2 dulu ya guys...
+            if (count($w_ij) === 2){
+               for ($i = 0; $i < count($w_ij[0]); $i++){
+                    $sumRows[] = $w_ij[0][$i] + $w_ij[1][$i];
+               }
+                $newPositions = $this->updatePosition($bigMaleI, $sumRows);
+                $fitness = $result->runFunction($newPositions, $function);
+                $bigMales[] = [
+                    'fitness' => $fitness,
+                    'individu' => $sumRows
+                ];
+               $sumRows = [];
+            }
+            $w_ij = [];
         }
-        $HQBM = [];
-        $HQBM = $newHQBM;
+        sort($bigMales);
+        print_r($bigMales);die;
+        die;
 
         // 5. Female reproduction
         // Fixed probability 0f 0.5 (if 0 = exploitation, if 1 = exploration)
@@ -335,8 +365,8 @@ class Komodo implements AlgorithmInterface
             //      k_il_new = r1 * k_il + (1 - r1) * k_jl
             //      k_jl_new = r1 * k_jl + (1 - r1) * k_il
             //      k_il & k_jl = dimensi ke-l dari komodo big-male terbaik dengan komodo female
-            for ($i=0; $i <= 1; $i++){
-                foreach ($winnerBM['individu'] as $key => $val){
+            for ($i = 0; $i <= 1; $i++) {
+                foreach ($winnerBM['individu'] as $key => $val) {
                     $r1 = (new Randomizers())->randomZeroToOneFraction();
                     $offspring[] = $r1 * $val + (1 - $r1) * $female['individu'][$key];
                 }
@@ -356,19 +386,19 @@ class Komodo implements AlgorithmInterface
 
             // 5.2. update the female
             sort($offsprings);
-            if ($female['fitness'] > $offsprings[0]['fitness']){
+            if ($female['fitness'] > $offsprings[0]['fitness']) {
                 $female = $offsprings[0];
             }
-        } 
+        }
         if ($prob === 1) {
             // 5.3. exploration by doing asexual reproduction (parthenogenesis)
             // 5.3.1 appending a small value to teach female dimension
             //       k_ij_new = k_ij + (2r - 1)alpha|ub_j - lb_j|
             //       alpha = the radius of parthenogenesis (0.1)
             $alpha = 0.1;
-            foreach ($female['individu'] as $val){
+            foreach ($female['individu'] as $val) {
                 $r = (new Randomizers())->randomZeroToOneFraction();
-                $vals[] = $val + ( (2*$r) - 1) * $alpha * abs($this->variableRanges[0]['upperBound'] - $this->variableRanges[0]['lowerBound']); 
+                $vals[] = $val + ((2 * $r) - 1) * $alpha * abs($this->variableRanges[0]['upperBound'] - $this->variableRanges[0]['lowerBound']);
             }
             $result = (new Functions())->initializingFunction($function, '');
             $fitness = $result->runFunction($vals, $function);
@@ -376,17 +406,19 @@ class Komodo implements AlgorithmInterface
             $female['fitness'] = $fitness;
             $female['individu'] = $vals;
         }
-        
+
+        print_r($female);die;
+
         // 6. Movement of small males
         // Randomly selecting a part of dimension with a particular probability (mlipir rate)
         $w_ij = [];
         $tempDim = 0;
-        foreach ($smalles as $smallMale){
-            foreach ($smallMale['individu'] as $key => $val){
+        foreach ($smalles as $smallMale) {
+            foreach ($smallMale['individu'] as $key => $val) {
                 $r1 = (new Randomizers())->randomZeroToOneFraction();
                 $r2 = (new Randomizers())->randomZeroToOneFraction();
-                if ($r2 < $this->parameters['d1']){
-                    foreach ($HQBM as $bigMale){
+                if ($r2 < $this->parameters['d1']) {
+                    foreach ($HQBM as $bigMale) {
                         $tempDim = $tempDim + ($r1 * ($bigMale[$key] - $val));
                     }
                 } else {
@@ -396,7 +428,8 @@ class Komodo implements AlgorithmInterface
             $w_ij[] = $tempDim;
             $tempDim = 0;
         }
-        print_r($w_ij);die;
+        print_r($w_ij);
+        die;
         die;
     }
 }

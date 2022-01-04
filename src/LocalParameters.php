@@ -64,7 +64,7 @@ class KMA implements LocalParameter
     {
         return [
             'maxIteration' => 1000,
-            'n1' => 6,
+            'n1' => 5,
             'n2' => 200,
             'n2Min' => 20,
             'n2Max' => 200,
