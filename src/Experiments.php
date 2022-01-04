@@ -19,7 +19,7 @@ class Normal implements Experiments
     {
         $stop = new Stopper;
 
-        for ($iter = 0; $iter < 1000; $iter++) {
+        for ($iter = 0; $iter < 10; $iter++) {
 
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
@@ -32,7 +32,12 @@ class Normal implements Experiments
             // jika fitness lebih besar dari 0
             $bests[] = $population[$indexIndividu];
             $stop->numOfLastResult = 10;
-            $lastResults[] = $population[$indexIndividu]['fitness'];
+            
+            if (count($population[$indexIndividu]) === 1){
+                $lastResults[] = $population[0][$indexIndividu]['fitness'];
+            } else {
+                $lastResults[] = $population[$indexIndividu]['fitness'];
+            }
 
             if ($stop->evaluation($iter, $lastResults)) {
                 break;
@@ -69,7 +74,11 @@ class Evaluation extends Normal implements Experiments
 {
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
-        return $this->run($algorithm, $population, $function, $popSize, $testData)['fitness'];
+        $result = $this->run($algorithm, $population, $function, $popSize, $testData);
+        if (count($result) === 1){
+            return $result[0]['fitness'];
+        } 
+        return $result['fitness'];
     }
 }
 

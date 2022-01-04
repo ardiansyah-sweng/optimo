@@ -110,20 +110,26 @@ class Preparation
         ## One Optimizer for All Functions
         if ($this->setupIsOneForAll()) {
             foreach ($variables as $key => $variable) {
+                if ($this->optimizerAlgorithms[0] === 'komodo') {
+                    $populationSize = $parameters[0]['n1'];
+                } else {
+                    $populationSize = $parameters[0]['populationSize'];
+                }
+
                 $initializer = new Initializer(
                     $this->optimizerAlgorithms,
                     $this->functionsToOptimized,
                     $variables[0]['ranges'],
-                    $parameters[0]['populationSize'],
+                    $populationSize,
                     $this->variableType,
                     $this->experimentType,
-                    $variable['numOfVariables']
+                    $variables[0]['numOfVariables']
                 );
                 $optimizer = new Optimizers;
                 $optimizer->algorithm = $this->optimizerAlgorithms[0];
-                $optimizer->function = $this->functionsToOptimized[$key];
+                $optimizer->function = $this->functionsToOptimized[0];
                 $optimizer->experimentType = $this->experimentType;
-                $optimizer->popsize = $parameters[0]['populationSize'];
+                $optimizer->popsize = $populationSize;
 
 
                 if ($this->experimentType === 'normal') {
