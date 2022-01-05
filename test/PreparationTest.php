@@ -52,8 +52,8 @@ class PreparationTest extends TestCase
     function test_setup_oneOptimizerOneFunction()
     {
         $optimizerAlgorithms = ['komodo'];
-        $functionsToOptimized = ['f8'];
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
+        $functionsToOptimized = ['ucp'];
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
         $prep->setup();
         die;
     }

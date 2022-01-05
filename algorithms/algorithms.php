@@ -358,10 +358,16 @@ class Komodo implements AlgorithmInterface
         // 4. Movement of big males
         $w_ij = [];
         $lastBigmales = $bigMales;
+
         $bigMales = [];
         $evaluateVariable = new ExcessLimit;
        
-        $result = (new Functions())->initializingFunction($function, '');
+        if ($function === 'ucp'){
+            $result = (new Functions())->initializingFunction($function, $this->testData);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '');
+        }
+
         foreach ($lastBigmales as $key1 => $bigMaleI) {
             foreach ($lastBigmales as $key2 => $bigMaleJ) {
                 if ($key1 !== $key2) {
@@ -372,13 +378,15 @@ class Komodo implements AlgorithmInterface
             if (count($w_ij) === 1) {
                 foreach ($w_ij as $vals) {
                     $newPositions = $this->updatePosition($bigMaleI, $vals);
-                    $fitness = $result->runFunction($newPositions, $function);
 
                     if ($function === 'ucp'){
-                        $tempVar = $vals;
-                        $vals = [];
-                        $vals = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                        $tempVar = $newPositions;
+                        $newPositions = [];
+                        $newPositions = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                        $tempVar = [];
                     }
+
+                    $fitness = $result->runFunction($newPositions, $function);
 
                     $bigMales[] = [
                         'fitness' => $fitness,
@@ -391,8 +399,6 @@ class Komodo implements AlgorithmInterface
                 for ($i = 0; $i < count($w_ij[0]); $i++) {
                     $sumRows[] = $w_ij[0][$i] + $w_ij[1][$i];
                 }
-                $newPositions = $this->updatePosition($bigMaleI, $sumRows);
-                $fitness = $result->runFunction($newPositions, $function);
 
                 if ($function === 'ucp'){
                     $tempVar = $sumRows;
@@ -400,6 +406,9 @@ class Komodo implements AlgorithmInterface
                     $sumRows = $evaluateVariable->cutVariableLimit($function, $tempVar); 
                 }
 
+                $newPositions = $this->updatePosition($bigMaleI, $sumRows);
+                $fitness = $result->runFunction($newPositions, $function);
+                //print_r($newPositions);
                 $bigMales[] = [
                     'fitness' => $fitness,
                     'individu' => $sumRows
@@ -441,10 +450,11 @@ class Komodo implements AlgorithmInterface
             foreach ($tempOffsprings as $key => $variables) {
                 if ($function === 'ucp'){
                     $result = (new Functions())->initializingFunction($function, $this->testData);
-                    
+
                     $tempVar = $variables;
                     $variables = [];
-                    $variables = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                    $variables = $evaluateVariable->cutVariableLimit($function, $tempVar);
+                    $tempVar = []; 
                 } else {
                     $result = (new Functions())->initializingFunction($function, '');
                 }
@@ -507,8 +517,13 @@ class Komodo implements AlgorithmInterface
                     $w_ij = $this->W_ij_SmallMale($smallMaleI, $smallMaleJ);
                 }
             }
-
             $newPositions = $this->updatePositionSmall($smallMaleI, $w_ij);
+            if ($function === 'ucp'){
+                $tempVars = $newPositions;
+                $newPositions = [];
+                $newPositions = $evaluateVariable->cutVariableLimit($function, $tempVars);
+            }
+
             $fitness = $result->runFunction($newPositions, $function);
             $smalles[] = [
                 'fitness' => $fitness,
@@ -521,6 +536,7 @@ class Komodo implements AlgorithmInterface
 
         $population = array_merge($bigMales, $female, $smalles);
         sort($population);
+        
 
         return $population;
     }

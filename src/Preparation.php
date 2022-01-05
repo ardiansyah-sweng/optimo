@@ -186,7 +186,7 @@ class Preparation
                 if ($optimizer->function === 'ucp') {
                     foreach ($testDataset as $testData) {
                         $ae = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
-                        print_r($ae);echo"\n";
+
                         if (count($ae) === 1){
                             $absoluteErrors[] = $ae[0]['fitness'];
                         } else {
