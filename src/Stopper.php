@@ -24,6 +24,26 @@ class Stopper
         }
     }
 
+    function evaluationKMA($iter, $analitics)
+    {
+        if ($iter >= ($this->numOfLastResult - 1)) {
+            $residual = count($analitics) - $this->numOfLastResult;
+
+            if ($residual === 0 && ($analitics[1] - $analitics[0]) < 0) {
+                return true;
+            }
+
+            if ($residual > 0) {
+                for ($i = 0; $i < $residual; $i++) {
+                    array_shift($analitics);
+                }
+                if ($analitics[1] - $analitics[0] < 0) {
+                    return true;
+                }
+            }
+        }
+    }
+
     function improvementUnderCertainPercentage($baseline, $iter, $analitics)
     {
         // for ($i = 0; $i < 10; $i++){

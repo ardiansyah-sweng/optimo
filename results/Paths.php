@@ -22,6 +22,9 @@ class Paths
         if ($type === 'mypso3') {
             return 'results/mypso3.txt';
         }
+        if ($type === 'komodo') {
+            return 'results/komodo.txt';
+        }
 
     }
 }

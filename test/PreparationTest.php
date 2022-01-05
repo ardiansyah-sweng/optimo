@@ -60,7 +60,7 @@ class PreparationTest extends TestCase
 
     function test_setup_oneOptimizerAllFunctions()
     {
-        $optimizerAlgorithms = ['mypso3'];
+        $optimizerAlgorithms = ['komodo'];
         $functionsToOptimized = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13'];
 
         $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');

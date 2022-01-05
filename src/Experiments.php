@@ -19,8 +19,9 @@ class Normal implements Experiments
     {
         $stop = new Stopper;
 
-        for ($iter = 0; $iter < 1000; $iter++) {
-
+        for ($iter = 0; $iter < 500; $iter++) {
+            echo count($population);
+            echo"\n";
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
@@ -31,11 +32,25 @@ class Normal implements Experiments
 
             // jika fitness lebih besar dari 0
             $bests[] = $population[$indexIndividu];
-            $stop->numOfLastResult = 10;
-            $lastResults[] = $population[$indexIndividu]['fitness'];
+            $stop->numOfLastResult = 2;
+            
+            if (count($population[$indexIndividu]) === 1){
+                $lastResults[] = $population[0][$indexIndividu]['fitness'];
+            } else {
+                $lastResults[] = $population[$indexIndividu]['fitness'];
+            }
 
-            if ($stop->evaluation($iter, $lastResults)) {
+            if ($stop->evaluation($iter, $lastResults) && $algorithm !== 'komodo') {
                 break;
+            }
+            if ($stop->evaluationKMA($iter, $lastResults) == TRUE && $algorithm === 'komodo') {
+                $popSize = $popSize - 5;
+                if ($popSize === 0){
+                    break;
+                }
+            }
+            if ($stop->evaluationKMA($iter, $lastResults) == FALSE && $algorithm === 'komodo') {
+                $popSize = $popSize + 5;
             }
 
             $lastPopulation = $population;
@@ -69,7 +84,11 @@ class Evaluation extends Normal implements Experiments
 {
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
-        return $this->run($algorithm, $population, $function, $popSize, $testData)['fitness'];
+        $result = $this->run($algorithm, $population, $function, $popSize, $testData);
+        if (count($result) === 1){
+            return $result[0]['fitness'];
+        } 
+        return $result['fitness'];
     }
 }
 
