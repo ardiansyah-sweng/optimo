@@ -184,8 +184,14 @@ class Preparation
 
             if ($this->experimentType === 'normal') {
                 if ($optimizer->function === 'ucp') {
-                    foreach ($testDataset as $key => $testData) {
-                        $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData)['fitness'];
+                    foreach ($testDataset as $testData) {
+                        $ae = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
+                        print_r($ae);echo"\n";
+                        if (count($ae) === 1){
+                            $absoluteErrors[] = $ae[0]['fitness'];
+                        } else {
+                            $absoluteErrors[] = $ae['fitness'];
+                        }
                     }
                     $res = array_sum($absoluteErrors) / count($absoluteErrors);
                 } else {
