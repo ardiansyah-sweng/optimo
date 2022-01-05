@@ -52,8 +52,8 @@ class PreparationTest extends TestCase
     function test_setup_oneOptimizerOneFunction()
     {
         $optimizerAlgorithms = ['komodo'];
-        $functionsToOptimized = ['f3'];
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $functionsToOptimized = ['f1'];
+        $prep = new Preparation('normal', $optimizerAlgorithms, $functionsToOptimized, 'random');
         $prep->setup();
         die;
     }
@@ -63,7 +63,7 @@ class PreparationTest extends TestCase
         $optimizerAlgorithms = ['komodo'];
         $functionsToOptimized = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13'];
 
-        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'random');
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();
         die;    
     }

@@ -109,13 +109,14 @@ class Preparation
 
         ## One Optimizer for All Functions
         if ($this->setupIsOneForAll()) {
-            foreach ($variables as $key => $variable) {
-                if ($this->optimizerAlgorithms[0] === 'komodo') {
-                    $populationSize = $parameters[0]['n1'];
-                } else {
-                    $populationSize = $parameters[0]['populationSize'];
-                }
 
+            if ($this->optimizerAlgorithms[0] === 'komodo') {
+                $populationSize = $parameters[0]['n1'];
+            } else {
+                $populationSize = $parameters[0]['populationSize'];
+            }
+
+            foreach ($variables as $key => $variable) {
                 $initializer = new Initializer(
                     $this->optimizerAlgorithms,
                     $this->functionsToOptimized,
@@ -123,25 +124,29 @@ class Preparation
                     $populationSize,
                     $this->variableType,
                     $this->experimentType,
-                    $variables[0]['numOfVariables']
+                    $variable['numOfVariables']
                 );
                 $optimizer = new Optimizers;
                 $optimizer->algorithm = $this->optimizerAlgorithms[0];
-                $optimizer->function = $this->functionsToOptimized[0];
                 $optimizer->experimentType = $this->experimentType;
                 $optimizer->popsize = $populationSize;
+                $optimizer->parameters = $parameters[0];
+                $optimizer->variableRanges = $variables[0]['ranges'];
 
+                $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
 
                 if ($this->experimentType === 'normal') {
                     $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
                 }
 
                 if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
-                    $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
-                    $this->saveToFile($pathToResult, array($optimizer->function));
-                    for ($i = 0; $i < 30; $i++) {
-                        $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
-                        $this->saveToFile($pathToResult, array($res));
+                    foreach ($this->functionsToOptimized as $function) {
+                        $optimizer->function = $function;
+                        $this->saveToFile($pathToResult, array($function));
+                        for ($i = 0; $i < 30; $i++) {
+                            $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
+                            $this->saveToFile($pathToResult, array($res));
+                        }
                     }
                 }
             }
@@ -149,7 +154,7 @@ class Preparation
 
         ## One Optimizer for One Function
         if ($this->setupIsOneForOne()) {
-            if ($this->optimizerAlgorithms[0] === 'komodo'){
+            if ($this->optimizerAlgorithms[0] === 'komodo') {
                 $populationSize = $parameters[0]['n1'];
             } else {
                 $populationSize = $parameters[0]['populationSize'];

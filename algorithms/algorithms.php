@@ -350,16 +350,9 @@ class Komodo implements AlgorithmInterface
 
         // 2. Female
         $female[] = $population[$numOfHQBM];
-        // echo "\n";
-        // print_r($population[$numOfHQBM]);
-        // echo "\n";
-
 
         // 3. Small males
         $smalles = array_slice($population, $numOfHQBM + 1);
-
-        // echo ' AWAL--> Bigmales: ' . count($bigMales) . ' ' . 'female: ' . count($female) . ' ' . 'Small: ' . count($smalles);
-        // echo "\n \n";
 
         // 4. Movement of big males
         $w_ij = [];
@@ -374,7 +367,6 @@ class Komodo implements AlgorithmInterface
                 }
             }
 
-            ## n = 5, q = 2 dulu ya guys...
             if (count($w_ij) === 1) {
                 foreach ($w_ij as $vals) {
                     $newPositions = $this->updatePosition($bigMaleI, $vals);
@@ -386,7 +378,6 @@ class Komodo implements AlgorithmInterface
                 }
             }
 
-            ## n = 5, q = 2 dulu ya guys...
             if (count($w_ij) === 2) {
                 for ($i = 0; $i < count($w_ij[0]); $i++) {
                     $sumRows[] = $w_ij[0][$i] + $w_ij[1][$i];
