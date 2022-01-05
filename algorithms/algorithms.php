@@ -262,10 +262,11 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
 
 class Komodo implements AlgorithmInterface
 {
-    function __construct($parameters, $variableRanges)
+    function __construct($parameters, $variableRanges, $testData)
     {
         $this->parameters = $parameters;
         $this->variableRanges = $variableRanges;
+        $this->testData = $testData;
     }
 
     function W_ij($bigMaleI, $bigMaleJ)
@@ -280,7 +281,7 @@ class Komodo implements AlgorithmInterface
         $r2 = (new Randomizers())->randomZeroToOneFraction();
         if ($bigMaleJ['fitness'] < $bigMaleI || $r2 < 0.5) {
             foreach ($bigMaleJ['individu'] as $key => $val) {
-                $w_ij[] = $r1 * ($val - $bigMaleI['individu'][$key]);
+                $w_ij[] = $r1 * (floatval($val) - floatval($bigMaleI['individu'][$key]));
             }
         } else {
             foreach ($bigMaleI['individu'] as $key => $val) {
@@ -304,7 +305,7 @@ class Komodo implements AlgorithmInterface
         $r2 = (new Randomizers())->randomZeroToOneFraction();
         if ($r2 < $this->parameters['d1']) {
             foreach ($smallMaleJ['individu'] as $key => $valJ) {
-                $temp[] = $r1 * ($valJ - $smallMaleI['individu'][$key]);
+                $temp[] = $r1 * (floatval($valJ) - floatval($smallMaleI['individu'][$key]));
             }
             $w_ij = array_sum($temp);
         } else {
@@ -320,7 +321,7 @@ class Komodo implements AlgorithmInterface
         }
 
         foreach ($currentBigMale['individu'] as $key => $val) {
-            $newPositions[] = $val + $W_ij[$key];
+            $newPositions[] = floatval($val) + floatval($W_ij[$key]);
         }
         return $newPositions;
     }
@@ -328,7 +329,7 @@ class Komodo implements AlgorithmInterface
     function updatePositionSmall($currentSmallMale, $W_ij)
     {
         foreach ($currentSmallMale['individu'] as $val) {
-            $newPositions[] = $val + $W_ij;
+            $newPositions[] = floatval($val) + $W_ij;
         }
         return $newPositions;
     }
@@ -339,7 +340,7 @@ class Komodo implements AlgorithmInterface
         ## FIRST PHASE
         // 0. The winner big male komodo
         $winnerBM = $population[0];
-        print_r($this->parameters);
+
         // 1. high quality big males (HQBM)
         $numOfHQBM = floor((1 - $this->parameters['p1']) * $this->parameters['n1']);
         foreach ($population as $key => $individu) {
@@ -358,7 +359,8 @@ class Komodo implements AlgorithmInterface
         $w_ij = [];
         $lastBigmales = $bigMales;
         $bigMales = [];
-
+        $evaluateVariable = new ExcessLimit;
+       
         $result = (new Functions())->initializingFunction($function, '');
         foreach ($lastBigmales as $key1 => $bigMaleI) {
             foreach ($lastBigmales as $key2 => $bigMaleJ) {
@@ -371,6 +373,13 @@ class Komodo implements AlgorithmInterface
                 foreach ($w_ij as $vals) {
                     $newPositions = $this->updatePosition($bigMaleI, $vals);
                     $fitness = $result->runFunction($newPositions, $function);
+
+                    if ($function === 'ucp'){
+                        $tempVar = $vals;
+                        $vals = [];
+                        $vals = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                    }
+
                     $bigMales[] = [
                         'fitness' => $fitness,
                         'individu' => $vals
@@ -384,6 +393,13 @@ class Komodo implements AlgorithmInterface
                 }
                 $newPositions = $this->updatePosition($bigMaleI, $sumRows);
                 $fitness = $result->runFunction($newPositions, $function);
+
+                if ($function === 'ucp'){
+                    $tempVar = $sumRows;
+                    $sumRows = [];
+                    $sumRows = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                }
+
                 $bigMales[] = [
                     'fitness' => $fitness,
                     'individu' => $sumRows
@@ -394,8 +410,8 @@ class Komodo implements AlgorithmInterface
             if (count($w_ij) > 2) {
                 echo count($w_ij) . ' Not available yet...';
                 die;
-            }
-
+            } 
+            
             $w_ij = [];
         }
         sort($bigMales);
@@ -414,7 +430,7 @@ class Komodo implements AlgorithmInterface
             for ($i = 0; $i <= 1; $i++) {
                 foreach ($winnerBM['individu'] as $key => $val) {
                     $r1 = (new Randomizers())->randomZeroToOneFraction();
-                    $offspring[] = $r1 * $val + (1 - $r1) * $female[0]['individu'][$key];
+                    $offspring[] = $r1 * floatval($val) + (1 - $r1) * floatval($female[0]['individu'][$key]);
                 }
                 $offsprings[] = $offspring;
                 $offspring = [];
@@ -423,7 +439,16 @@ class Komodo implements AlgorithmInterface
             $tempOffsprings = $offsprings;
             $offsprings = [];
             foreach ($tempOffsprings as $key => $variables) {
-                $result = (new Functions())->initializingFunction($function, '');
+                if ($function === 'ucp'){
+                    $result = (new Functions())->initializingFunction($function, $this->testData);
+                    
+                    $tempVar = $variables;
+                    $variables = [];
+                    $variables = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                } else {
+                    $result = (new Functions())->initializingFunction($function, '');
+                }
+
                 $fitness = $result->runFunction($variables, $function);
                 $offsprings[] = [
                     'fitness' => $fitness,
@@ -451,9 +476,17 @@ class Komodo implements AlgorithmInterface
             $alpha = 0.1;
             foreach ($female[0]['individu'] as $key => $val) {
                 $r = (new Randomizers())->randomZeroToOneFraction();
-                $results[] = $val + ((2 * $r) - 1) * $alpha * abs($this->variableRanges[0]['upperBound'] - $this->variableRanges[0]['lowerBound']);
+                $results[] = floatval($val) + ((2 * $r) - 1) * $alpha * abs($this->variableRanges[0]['upperBound'] - $this->variableRanges[0]['lowerBound']);
             }
-            $result = (new Functions())->initializingFunction($function, '');
+            if ($function === 'ucp'){
+                $result = (new Functions())->initializingFunction($function, $this->testData);
+                                    
+                $tempVar = $results;
+                $results = [];
+                $results = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+            } else {
+                $result = (new Functions())->initializingFunction($function, '');
+            }
             $fitness = $result->runFunction($results, $function);
             $female = [];
             $female[] = [
@@ -589,7 +622,7 @@ class Algorithms
             return new MyPSO3($iter, $type, $testData);
         }
         if ($type === 'komodo') {
-            return new Komodo($this->kmaParameters, $this->kmaVarRanges);
+            return new Komodo($this->kmaParameters, $this->kmaVarRanges, $testData);
         }
     }
 }
