@@ -18,6 +18,8 @@ class Optimizers
 
         foreach ($initialPopulation as $individu) {
             $fitness = $result->runFunction($individu, $this->function);
+            // echo $fitness;
+            // echo "\n";
             $pops[] = [
                 'fitness' => $fitness,
                 'individu' => $individu
@@ -27,6 +29,7 @@ class Optimizers
         sort($pops);
 
         $experiment = (new ExperimentFactory($this->parameters, $this->variableRanges))->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
+
         return $experiment;
     }
 }
