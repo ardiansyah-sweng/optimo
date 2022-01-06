@@ -19,7 +19,7 @@ class Normal implements Experiments
     {
         $stop = new Stopper;
 
-        for ($iter = 0; $iter < 500; $iter++) {
+        for ($iter = 0; $iter < 1000; $iter++) {
 
             $minFitness = min(array_column($population, 'fitness'));
 
@@ -32,7 +32,7 @@ class Normal implements Experiments
 
             // jika fitness lebih besar dari 0
             $bests[] = $population[$indexIndividu];
-            $stop->numOfLastResult = 2;
+            $stop->numOfLastResult = 3;
             
             if (count($population[$indexIndividu]) === 1){
                 $lastResults[] = $population[0][$indexIndividu]['fitness'];
@@ -43,18 +43,33 @@ class Normal implements Experiments
             if ($stop->evaluation($iter, $lastResults) && $algorithm !== 'komodo') {
                 break;
             }
-            if ($stop->evaluationKMA($iter, $lastResults) == TRUE && $algorithm === 'komodo') {
-                $popSize = $popSize - 5;
-                if ($popSize === 0){
-                    break;
-                }
-            }
-            if ($stop->evaluationKMA($iter, $lastResults) == FALSE && $algorithm === 'komodo') {
-                $popSize = $popSize + 5;
-            }
 
             $lastPopulation = $population;
             $population = null;
+            sort($lastPopulation);
+
+            if ($stop->evaluationKMA($iter, $lastResults) === 'dec' && $algorithm === 'komodo') {
+                for ($i = 0; $i < 5; $i++){
+                    array_pop($lastPopulation);
+                }
+
+                if (count($lastPopulation) === 0){
+                    break;
+                }
+            }
+
+            if ($stop->evaluationKMA($iter, $lastResults) === 'add' && $algorithm === 'komodo') {
+                for ($i = 0; $i < 5; $i++){
+                    $additionalVars = (new Randomizers())::randomVariableValueByRange($this->kmaVarRanges);
+                    $result = (new Functions())->initializingFunction($function, '');
+                    $fitness = $result->runFunction($additionalVars, $function);
+                    $additionalIndividus[] = [
+                        'fitness' => $fitness,
+                        'individu' => $additionalVars
+                    ];
+                }
+                $lastPopulation = array_merge($lastPopulation, $additionalIndividus);
+            }
 
             $algo = (new Algorithms($this->kmaParameters, $this->kmaVarRanges))->initilizingAlgorithm($algorithm, $iter, $testData);
             $population = $algo->execute($lastPopulation, $function, $popSize);

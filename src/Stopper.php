@@ -29,16 +29,25 @@ class Stopper
         if ($iter >= ($this->numOfLastResult - 1)) {
             $residual = count($analitics) - $this->numOfLastResult;
 
-            if ($residual === 0 && ($analitics[1] - $analitics[0]) < 0) {
-                return true;
+            $fitnessDiff1 = abs($analitics[0] - $analitics[1]) / $analitics[0];
+            $fitnessDiff2 = abs($analitics[1] - $analitics[2]) / $analitics[1];
+
+            if ($residual === 0 && ($fitnessDiff1 > 0 && $fitnessDiff2 > 0)) {
+                return 'dec';
             }
+            if ($residual === 0 && ($fitnessDiff1 == 0 && $fitnessDiff2 == 0)) {
+                return 'add';
+            } 
 
             if ($residual > 0) {
                 for ($i = 0; $i < $residual; $i++) {
                     array_shift($analitics);
                 }
-                if ($analitics[1] - $analitics[0] < 0) {
-                    return true;
+                if (($fitnessDiff1 > 0 && $fitnessDiff2 > 0)) {
+                    return 'dec';
+                }
+                if (($fitnessDiff1 == 0 && $fitnessDiff2 == 0)) {
+                    return 'dec';
                 }
             }
         }
