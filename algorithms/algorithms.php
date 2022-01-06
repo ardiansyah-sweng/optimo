@@ -542,6 +542,35 @@ class Komodo implements AlgorithmInterface
     }
 }
 
+class Reptile implements AlgorithmInterface
+{
+    function __construct($parameters, $iter)
+    {
+        $this->parameters = $parameters;
+        $this->iter = $iter;
+        // $this->testData = $testData;
+    }
+    
+    function execute($population, $function, $popSize)
+    {
+        // 1. Find the best solution so far
+        $bestReptile = $population[0];
+
+        // 2. Update ES (evolutionary sense)
+        $ES = (new EvolutionarySense())->es($this->parameters['maxIteration']);
+
+        // 3. 
+
+        if ($this->iter <= ($this->parameters['maxIteration'] / 4)){
+            echo 'high';            
+        }
+        if ($this->iter <= 2 * ($this->parameters['maxIteration'] / 4) && $this->iter > ($this->parameters['maxIteration'] / 4)) {
+            echo 'belly';
+        }
+        die;
+    }
+}
+
 class UniformCPSO implements AlgorithmInterface
 {
     function __construct($iter, $algorithm, $testData)
@@ -611,9 +640,9 @@ class MyPSO3 implements AlgorithmInterface
 
 class Algorithms
 {
-    function __construct($kmaParameters, $kmaVarRanges)
+    function __construct($parameters, $kmaVarRanges)
     {
-        $this->kmaParameters = $kmaParameters;
+        $this->parameters = $parameters;
         $this->kmaVarRanges = $kmaVarRanges;
     }
 
@@ -638,7 +667,10 @@ class Algorithms
             return new MyPSO3($iter, $type, $testData);
         }
         if ($type === 'komodo') {
-            return new Komodo($this->kmaParameters, $this->kmaVarRanges, $testData);
+            return new Komodo($this->parameters, $this->kmaVarRanges, $testData);
+        }
+        if ($type === 'reptile') {
+            return new Reptile($this->parameters, $iter);
         }
     }
 }

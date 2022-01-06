@@ -35,7 +35,7 @@ class Stopper
             if ($residual === 0 && ($fitnessDiff1 > 0 && $fitnessDiff2 > 0)) {
                 return 'dec';
             }
-            if ($residual === 0 && ($fitnessDiff1 == 0 && $fitnessDiff2 == 0)) {
+            if ($residual === 0 && ($fitnessDiff1 === 0 && $fitnessDiff2 === 0)) {
                 return 'add';
             } 
 
@@ -46,7 +46,7 @@ class Stopper
                 if (($fitnessDiff1 > 0 && $fitnessDiff2 > 0)) {
                     return 'dec';
                 }
-                if (($fitnessDiff1 == 0 && $fitnessDiff2 == 0)) {
+                if (($fitnessDiff1 === 0 && $fitnessDiff2 === 0)) {
                     return 'dec';
                 }
             }

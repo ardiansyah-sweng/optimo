@@ -11,7 +11,7 @@ class GA implements LocalParameter
     {
         return [
             'parameterName' => 'gaParameter',
-            'populationSize' => 50,
+            'populationSize' => 30,
             'cr'=>0.9,
             'mr'=>0.01
         ];
@@ -25,7 +25,7 @@ class PSO implements LocalParameter
         return [
             'parameterName' => 'psoParameter',
             'maxIteration' => 1000,
-            'populationSize' => 50,
+            'populationSize' => 100,
             'c1' => 2,
             'c2' => 2,
             'inertiaMax' => 0.9,
@@ -76,6 +76,27 @@ class KMA implements LocalParameter
     }
 }
 
+/**
+ * Abualigah L, Elaziz MA, Sumari P, Geem ZW, Gandomi AH. Reptile Search Algorithm (RSA): A nature-inspired meta-heuristic optimizer. Expert Syst Appl [Internet]. 2022 Apr;191(November):116158. Available from: https://doi.org/10.1016/j.eswa.2021.116158
+ */
+class RSA implements LocalParameter
+{
+    function __construct($numOfVariabe)
+    {
+        $this->numOfVariable = $numOfVariabe;
+    }
+
+    function getLocalParameter()
+    {
+        return [
+            'maxIteration' => 1000,
+            'populationSize' => 30,
+            'alpha' => 0.1,
+            'beta' => 0.1 
+        ];
+    }
+}
+
 class LocalParameterFactory
 {
     function initializingLocalParameter($optimizerType, $numOfVariable)
@@ -85,7 +106,8 @@ class LocalParameterFactory
             ['optimizer' => 'pso', 'select' => new PSO],
             ['optimizer' => 'ucpso', 'select' => new UCPSO],
             ['optimizer' => 'mypso1', 'select' => new UCPSO],
-            ['optimizer' => 'komodo', 'select' => new KMA($numOfVariable)]
+            ['optimizer' => 'komodo', 'select' => new KMA($numOfVariable)],
+            ['optimizer' => 'reptile', 'select' => new RSA($numOfVariable)]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));
         return $optimizerTypes[$index]['select'];

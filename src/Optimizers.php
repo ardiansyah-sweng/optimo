@@ -18,8 +18,6 @@ class Optimizers
 
         foreach ($initialPopulation as $individu) {
             $fitness = $result->runFunction($individu, $this->function);
-            // echo $fitness;
-            // echo "\n";
             $pops[] = [
                 'fitness' => $fitness,
                 'individu' => $individu
