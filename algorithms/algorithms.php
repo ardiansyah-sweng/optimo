@@ -544,10 +544,11 @@ class Komodo implements AlgorithmInterface
 
 class Reptile implements AlgorithmInterface
 {
-    function __construct($parameters, $iter)
+    function __construct($parameters, $iter, $varRanges)
     {
         $this->parameters = $parameters;
         $this->iter = $iter;
+        $this->varRanges = $varRanges;
         // $this->testData = $testData;
     }
     
@@ -559,7 +560,9 @@ class Reptile implements AlgorithmInterface
         // 2. Update ES (evolutionary sense)
         $ES = (new EvolutionarySense())->es($this->parameters['maxIteration']);
 
-        // 3. 
+        // 3. Update eta
+        $eta = (new HuntingOperator($this->varRanges[0]))->eta($bestReptile, $population);
+        print_r($eta);die;
 
         if ($this->iter <= ($this->parameters['maxIteration'] / 4)){
             echo 'high';            
@@ -670,7 +673,7 @@ class Algorithms
             return new Komodo($this->parameters, $this->kmaVarRanges, $testData);
         }
         if ($type === 'reptile') {
-            return new Reptile($this->parameters, $iter);
+            return new Reptile($this->parameters, $iter, $this->kmaVarRanges);
         }
     }
 }
