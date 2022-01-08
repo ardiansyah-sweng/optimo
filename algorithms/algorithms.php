@@ -544,12 +544,12 @@ class Komodo implements AlgorithmInterface
 
 class Reptile implements AlgorithmInterface
 {
-    function __construct($parameters, $iter, $varRanges)
+    function __construct($parameters, $iter, $varRanges, $testData)
     {
         $this->parameters = $parameters;
         $this->iter = $iter;
         $this->varRanges = $varRanges;
-        // $this->testData = $testData;
+        $this->testData = $testData;
     }
     
     function execute($population, $function, $popSize)
@@ -560,17 +560,53 @@ class Reptile implements AlgorithmInterface
         // 2. Update ES (evolutionary sense)
         $ES = (new EvolutionarySense())->es($this->parameters['maxIteration']);
 
-        // 3. Update eta
-        $eta = (new HuntingOperator($this->varRanges[0]))->eta($bestReptile, $population);
-        print_r($eta);die;
+        // 3. Update
+        $huntingOperator = new HuntingOperator($this->varRanges[0]);        
+        $eta = $huntingOperator->eta($bestReptile, $population);
 
+        // 4. Update Reduce function
+        $reduction = (new HuntingOperator($this->varRanges[0]))->reduce($bestReptile, $population);
+
+        // 5. High walking
         if ($this->iter <= ($this->parameters['maxIteration'] / 4)){
-            echo 'high';            
+            $positions = (new WalkingMovementStrategy())->highWalking($bestReptile, $eta, $reduction);
         }
-        if ($this->iter <= 2 * ($this->parameters['maxIteration'] / 4) && $this->iter > ($this->parameters['maxIteration'] / 4)) {
-            echo 'belly';
+
+        // 5. Belly walking
+        else if ($this->iter <= 2 * ($this->parameters['maxIteration'] / 4) && $this->iter > ($this->parameters['maxIteration'] / 4)) {
+            $positions = (new WalkingMovementStrategy())->bellyWalking($bestReptile, $population, $ES);
         }
-        die;
+
+        // 5. Hunting coordination
+        else if ($this->iter <= 3 * ($this->parameters['maxIteration'] / 4) && $this->iter > 2 * ($this->parameters['maxIteration']) / 4 ){
+            $percentageDiff = $huntingOperator->percentageDiffefence($bestReptile, $population);
+            $positions = (new WalkingMovementStrategy())->huntingCoordination($bestReptile, $percentageDiff);
+        }
+
+        // 5. Hunting cooperation
+        else {
+            $positions = (new WalkingMovementStrategy())->huntingCooperation($bestReptile, $eta, $reduction);
+        }
+
+        // $lastPopulation = $population;
+        // $population = [];
+
+        if ($function === 'ucp') {
+            $result = (new Functions())->initializingFunction($function, $this->testData);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '');
+        }
+        
+        $population = [];
+        foreach ($positions as $position){
+            $population[] = [
+                'fitness' => $result->runFunction($position, $function),
+                'individu' => $position
+            ];
+        }
+         
+        sort($population);
+        return $population;
     }
 }
 
@@ -673,7 +709,7 @@ class Algorithms
             return new Komodo($this->parameters, $this->kmaVarRanges, $testData);
         }
         if ($type === 'reptile') {
-            return new Reptile($this->parameters, $iter, $this->kmaVarRanges);
+            return new Reptile($this->parameters, $iter, $this->kmaVarRanges, $testData);
         }
     }
 }

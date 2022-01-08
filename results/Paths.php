@@ -25,6 +25,8 @@ class Paths
         if ($type === 'komodo') {
             return 'results/komodo.txt';
         }
-
+        if ($type === 'reptile') {
+            return 'results/reptile.txt';
+        }
     }
 }
