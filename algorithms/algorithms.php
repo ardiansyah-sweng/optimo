@@ -294,7 +294,7 @@ class Komodo implements AlgorithmInterface
 
     function W_ij_SmallMale($smallMaleI, $smallMaleJ)
     {
-        if (count($smallMaleI) === 1){
+        if (count($smallMaleI) === 1) {
             $smallMaleI = $smallMaleI[0];
         }
         if (count($smallMaleJ) === 1) {
@@ -316,7 +316,7 @@ class Komodo implements AlgorithmInterface
 
     function updatePosition($currentBigMale, $W_ij)
     {
-        if (count($currentBigMale) === 1){
+        if (count($currentBigMale) === 1) {
             $currentBigMale = $currentBigMale[0];
         }
 
@@ -361,8 +361,8 @@ class Komodo implements AlgorithmInterface
 
         $bigMales = [];
         $evaluateVariable = new ExcessLimit;
-       
-        if ($function === 'ucp'){
+
+        if ($function === 'ucp') {
             $result = (new Functions())->initializingFunction($function, $this->testData);
         } else {
             $result = (new Functions())->initializingFunction($function, '');
@@ -379,10 +379,10 @@ class Komodo implements AlgorithmInterface
                 foreach ($w_ij as $vals) {
                     $newPositions = $this->updatePosition($bigMaleI, $vals);
 
-                    if ($function === 'ucp'){
+                    if ($function === 'ucp') {
                         $tempVar = $newPositions;
                         $newPositions = [];
-                        $newPositions = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                        $newPositions = $evaluateVariable->cutVariableLimit($function, $tempVar);
                         $tempVar = [];
                     }
 
@@ -400,10 +400,10 @@ class Komodo implements AlgorithmInterface
                     $sumRows[] = $w_ij[0][$i] + $w_ij[1][$i];
                 }
 
-                if ($function === 'ucp'){
+                if ($function === 'ucp') {
                     $tempVar = $sumRows;
                     $sumRows = [];
-                    $sumRows = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                    $sumRows = $evaluateVariable->cutVariableLimit($function, $tempVar);
                 }
 
                 $newPositions = $this->updatePosition($bigMaleI, $sumRows);
@@ -419,8 +419,8 @@ class Komodo implements AlgorithmInterface
             if (count($w_ij) > 2) {
                 echo count($w_ij) . ' Not available yet...';
                 die;
-            } 
-            
+            }
+
             $w_ij = [];
         }
         sort($bigMales);
@@ -429,7 +429,7 @@ class Komodo implements AlgorithmInterface
         // Fixed probability 0f 0.5 (if 0 = exploitation, if 1 = exploration)
         $prob = rand() & 1;
         if ($prob === 0) {
-            if (count($winnerBM) === 1){
+            if (count($winnerBM) === 1) {
                 $winnerBM = $winnerBM[0];
             }
             // 5.1. Sexual Reproduction (produce two offsprings)
@@ -448,13 +448,13 @@ class Komodo implements AlgorithmInterface
             $tempOffsprings = $offsprings;
             $offsprings = [];
             foreach ($tempOffsprings as $key => $variables) {
-                if ($function === 'ucp'){
+                if ($function === 'ucp') {
                     $result = (new Functions())->initializingFunction($function, $this->testData);
 
                     $tempVar = $variables;
                     $variables = [];
                     $variables = $evaluateVariable->cutVariableLimit($function, $tempVar);
-                    $tempVar = []; 
+                    $tempVar = [];
                 } else {
                     $result = (new Functions())->initializingFunction($function, '');
                 }
@@ -476,7 +476,7 @@ class Komodo implements AlgorithmInterface
                 $female[] = $offsprings[0];
             } else {
                 $female[] = $lastFemale;
-            }           
+            }
         }
         if ($prob === 1) {
             // 5.3. exploration by doing asexual reproduction (parthenogenesis)
@@ -488,12 +488,12 @@ class Komodo implements AlgorithmInterface
                 $r = (new Randomizers())->randomZeroToOneFraction();
                 $results[] = floatval($val) + ((2 * $r) - 1) * $alpha * abs($this->variableRanges[0]['upperBound'] - $this->variableRanges[0]['lowerBound']);
             }
-            if ($function === 'ucp'){
+            if ($function === 'ucp') {
                 $result = (new Functions())->initializingFunction($function, $this->testData);
-                                    
+
                 $tempVar = $results;
                 $results = [];
-                $results = $evaluateVariable->cutVariableLimit($function, $tempVar); 
+                $results = $evaluateVariable->cutVariableLimit($function, $tempVar);
             } else {
                 $result = (new Functions())->initializingFunction($function, '');
             }
@@ -518,7 +518,7 @@ class Komodo implements AlgorithmInterface
                 }
             }
             $newPositions = $this->updatePositionSmall($smallMaleI, $w_ij);
-            if ($function === 'ucp'){
+            if ($function === 'ucp') {
                 $tempVars = $newPositions;
                 $newPositions = [];
                 $newPositions = $evaluateVariable->cutVariableLimit($function, $tempVars);
@@ -536,9 +536,125 @@ class Komodo implements AlgorithmInterface
 
         $population = array_merge($bigMales, $female, $smalles);
         sort($population);
-        
+
 
         return $population;
+    }
+}
+
+class Reptile implements AlgorithmInterface
+{
+    function __construct($parameters, $iter, $varRanges, $testData)
+    {
+        $this->parameters = $parameters;
+        $this->iter = $iter;
+        $this->varRanges = $varRanges;
+        $this->testData = $testData;
+    }
+
+    function execute($population, $function, $popSize)
+    {
+        // 1. Find the best solution so far
+        $bestReptile = $population[0];
+
+        // 2. Update ES (evolutionary sense)
+        $ES = (new EvolutionarySense())->es($this->parameters['maxIteration']);
+
+        // 3. Update
+        $huntingOperator = new HuntingOperator($this->varRanges[0]);
+        $eta = $huntingOperator->eta($bestReptile, $population);
+
+        // 4. Update Reduce function
+        $reduction = (new HuntingOperator($this->varRanges[0]))->reduce($bestReptile, $population);
+
+        // 5. High walking
+        if ($this->iter <= ($this->parameters['maxIteration'] / 4)) {
+            $positions = (new WalkingMovementStrategy())->highWalking($bestReptile, $eta, $reduction);
+        }
+
+        // 5. Belly walking
+        else if ($this->iter <= 2 * ($this->parameters['maxIteration'] / 4) && $this->iter > ($this->parameters['maxIteration'] / 4)) {
+            $positions = (new WalkingMovementStrategy())->bellyWalking($bestReptile, $population, $ES);
+        }
+
+        // 5. Hunting coordination
+        else if ($this->iter <= 3 * ($this->parameters['maxIteration'] / 4) && $this->iter > 2 * ($this->parameters['maxIteration']) / 4) {
+            $percentageDiff = $huntingOperator->percentageDiffefence($bestReptile, $population);
+            $positions = (new WalkingMovementStrategy())->huntingCoordination($bestReptile, $percentageDiff);
+        }
+
+        // 5. Hunting cooperation
+        else {
+            $positions = (new WalkingMovementStrategy())->huntingCooperation($bestReptile, $eta, $reduction);
+        }
+
+        if ($function === 'ucp') {
+            $result = (new Functions())->initializingFunction($function, $this->testData);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '');
+        }
+
+        $population = [];
+        foreach ($positions as $position) {
+            $population[] = [
+                'fitness' => $result->runFunction($position, $function),
+                'individu' => $position
+            ];
+        }
+
+        sort($population);
+        return $population;
+    }
+}
+
+class Wolf implements AlgorithmInterface
+{
+    function __construct($parameters, $iter, $varRanges, $testData)
+    {
+        $this->parameters = $parameters;
+        $this->iter = $iter;
+        $this->varRanges = $varRanges;
+        $this->testData = $testData;
+    }
+
+    function execute($population, $function, $popSize)
+    {
+        $alphaWolf = $population[0];
+        $betaWolf = $population[1];
+        $deltaWolf = $population[2];
+        $omegaWolf = array_slice($population, 3);
+
+        // 1. Encircling prey
+        $a = 2 - (2 * $this->iter) / $this->parameters['maxIteration'];
+        
+        $A_alphaWolf = $alphaWolf['individu'];
+        $A_betaWolf = $betaWolf['individu'];
+        $A_deltaWolf = $deltaWolf['individu'];
+
+        $alphaWolfPositions = (new PreyHunting($this->varRanges))->hunting($alphaWolf, $omegaWolf, $A_alphaWolf, $a);
+        $betaWolfPositions = (new PreyHunting($this->varRanges))->hunting($betaWolf, $omegaWolf, $A_betaWolf, $a);
+        $deltaWolfPositions = (new PreyHunting($this->varRanges))->hunting($deltaWolf, $omegaWolf, $A_deltaWolf, $a);
+
+        if ($function === 'ucp') {
+            $result = (new Functions())->initializingFunction($function, $this->testData);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '');
+        }
+
+        $population = [];
+        foreach ($alphaWolfPositions as $key1 => $position) {
+            foreach ($position as $key2 => $val) {
+                $positions[] = ($val + $betaWolfPositions[$key1][$key2] + $deltaWolfPositions[$key1][$key2]) / 3;
+            }
+            $population[] = [
+                'fitness' => $result->runFunction($positions, $function),
+                'individu' => $positions
+            ];
+            $positions = [];
+        }
+        sort($population);
+        print_r($population);
+        die;
     }
 }
 
@@ -611,9 +727,9 @@ class MyPSO3 implements AlgorithmInterface
 
 class Algorithms
 {
-    function __construct($kmaParameters, $kmaVarRanges)
+    function __construct($parameters, $kmaVarRanges)
     {
-        $this->kmaParameters = $kmaParameters;
+        $this->parameters = $parameters;
         $this->kmaVarRanges = $kmaVarRanges;
     }
 
@@ -638,7 +754,13 @@ class Algorithms
             return new MyPSO3($iter, $type, $testData);
         }
         if ($type === 'komodo') {
-            return new Komodo($this->kmaParameters, $this->kmaVarRanges, $testData);
+            return new Komodo($this->parameters, $this->kmaVarRanges, $testData);
+        }
+        if ($type === 'reptile') {
+            return new Reptile($this->parameters, $iter, $this->kmaVarRanges, $testData);
+        }
+        if ($type === 'wolf') {
+            return new Wolf($this->parameters, $iter, $this->kmaVarRanges, $testData);
         }
     }
 }
