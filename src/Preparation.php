@@ -186,7 +186,6 @@ class Preparation
                 if ($optimizer->function === 'ucp') {
                     foreach ($testDataset as $testData) {
                         $ae = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
-
                         if (count($ae) === 1){
                             $absoluteErrors[] = $ae[0]['fitness'];
                         } else {
@@ -220,15 +219,19 @@ class Preparation
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
                 $optimizer->variableType = 'seeds';
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'seeds', $populationSize));
+
                 for ($i = 0; $i < 30; $i++) {
                     if ($optimizer->function === 'ucp') {
                         foreach ($testDataset as $testData) {
                             $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation()[$i], $testData);
                         }
                         $res = array_sum($absoluteErrors) / count($absoluteErrors);
+                    } else if ($optimizer->algorithm === 'wolf') {
+                        $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
                     } else {
                         $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
                     }
+
                     $this->saveToFile($pathToResult, array($res));
                 }
             }
