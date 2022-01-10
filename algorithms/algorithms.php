@@ -619,21 +619,40 @@ class Wolf implements AlgorithmInterface
 
     function execute($population, $function, $popSize)
     {
+        echo 'Iter-'.$this->iter;
+        echo "\n";
+        // print_r($population);
+
         $alphaWolf = $population[0];
         $betaWolf = $population[1];
         $deltaWolf = $population[2];
         $omegaWolf = array_slice($population, 3);
 
-        // 1. Encircling prey
+        // 1. Initialize a
         $a = 2 - (2 * $this->iter) / $this->parameters['maxIteration'];
-        
-        $A_alphaWolf = $alphaWolf['individu'];
-        $A_betaWolf = $betaWolf['individu'];
-        $A_deltaWolf = $deltaWolf['individu'];
 
-        $alphaWolfPositions = (new PreyHunting($this->varRanges))->hunting($alphaWolf, $omegaWolf, $A_alphaWolf, $a);
-        $betaWolfPositions = (new PreyHunting($this->varRanges))->hunting($betaWolf, $omegaWolf, $A_betaWolf, $a);
-        $deltaWolfPositions = (new PreyHunting($this->varRanges))->hunting($deltaWolf, $omegaWolf, $A_deltaWolf, $a);
+        // 2. Initialize Xp (prey position)
+        if ($this->iter === 0){
+            $Xp = $alphaWolf['individu'];
+            
+            $A_alphaWolf = $alphaWolf['individu'];
+            $A_betaWolf = $betaWolf['individu'];
+            $A_deltaWolf = $deltaWolf['individu']; 
+
+        } else {
+            $A_alphaWolf = (new PreyHunting($this->varRanges))->calculateCoef_A($alphaWolf['A_alphaWolf'], $a);
+
+            $A_betaWolf = (new PreyHunting($this->varRanges))->calculateCoef_A($betaWolf['A_betaWolf'], $a);
+
+            $A_deltaWolf = (new PreyHunting($this->varRanges))->calculateCoef_A($deltaWolf['A_deltaWolf'], $a);
+        }
+
+        // 3. Initialize C
+        $C = 2 * (new Randomizers())::randomZeroToOneFraction();
+
+        $alphaWolfPositions = (new PreyHunting($this->varRanges))->hunting($alphaWolf, $omegaWolf, $C, $A_alphaWolf);
+        $betaWolfPositions = (new PreyHunting($this->varRanges))->hunting($betaWolf, $omegaWolf, $C, $A_betaWolf);
+        $deltaWolfPositions = (new PreyHunting($this->varRanges))->hunting($deltaWolf, $omegaWolf, $C, $A_deltaWolf);
 
         if ($function === 'ucp') {
             $result = (new Functions())->initializingFunction($function, $this->testData);
@@ -648,13 +667,18 @@ class Wolf implements AlgorithmInterface
             }
             $population[] = [
                 'fitness' => $result->runFunction($positions, $function),
-                'individu' => $positions
+                'individu' => $positions,
+                'A_alphaWolf' =>  $A_alphaWolf,
+                'A_betaWolf' =>  $A_betaWolf,
+                'A_deltaWolf' =>  $A_deltaWolf
             ];
             $positions = [];
         }
+
         sort($population);
-        print_r($population);
-        die;
+        echo $population[0]['fitness'];
+        echo "\n \n";
+        return $population;
     }
 }
 
