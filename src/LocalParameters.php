@@ -97,6 +97,22 @@ class RSA implements LocalParameter
     }
 }
 
+class GWO implements LocalParameter
+{
+    function __construct($numOfVariabe)
+    {
+        $this->numOfVariable = $numOfVariabe;
+    }
+
+    function getLocalParameter()
+    {
+        return [
+            'maxIteration' => 1000,
+            'populationSize' => 30
+        ];
+    }
+}
+
 class LocalParameterFactory
 {
     function initializingLocalParameter($optimizerType, $numOfVariable)
@@ -107,7 +123,8 @@ class LocalParameterFactory
             ['optimizer' => 'ucpso', 'select' => new UCPSO],
             ['optimizer' => 'mypso1', 'select' => new UCPSO],
             ['optimizer' => 'komodo', 'select' => new KMA($numOfVariable)],
-            ['optimizer' => 'reptile', 'select' => new RSA($numOfVariable)]
+            ['optimizer' => 'reptile', 'select' => new RSA($numOfVariable)],
+            ['optimizer' => 'wolf', 'select' => new RSA($numOfVariable)]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));
         return $optimizerTypes[$index]['select'];

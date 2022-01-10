@@ -28,5 +28,8 @@ class Paths
         if ($type === 'reptile') {
             return 'results/reptile.txt';
         }
+        if ($type === 'wolf') {
+            return 'results/wolf.txt';
+        }
     }
 }
