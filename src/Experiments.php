@@ -9,17 +9,18 @@ interface Experiments
 
 class Normal implements Experiments
 {
-    function __construct($kmaParameters, $variableRanges)
+    function __construct($kmaParameters, $variableRanges, $maxIter)
     {
         $this->kmaParameters = $kmaParameters;
         $this->kmaVarRanges = $variableRanges;
+        $this->maxIter = $maxIter;
     }
 
     function run($algorithm, $population, $function, $popSize, $testData)
     {
         $stop = new Stopper;
 
-        for ($iter = 0; $iter < 1000; $iter++) {
+        for ($iter = 0; $iter < $this->maxIter; $iter++) {
 
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
@@ -90,7 +91,11 @@ class Convergence extends Normal implements Experiments
 {
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
-        return "Convergence";
+        $result = $this->run($algorithm, $population, $function, $popSize, $testData);
+        if (count($result) === 1){
+            return $result[0]['fitness'];
+        } 
+        return $result['fitness'];
     }
 }
 
@@ -108,22 +113,23 @@ class Evaluation extends Normal implements Experiments
 
 class ExperimentFactory
 {
-    function __construct($kmaParameters, $variableRanges)
+    function __construct($kmaParameters, $variableRanges, $maxIter)
     {
         $this->kmaParameters = $kmaParameters;
         $this->kmaVarRanges = $variableRanges;
+        $this->maxIter = $maxIter;
     }
 
     function initializeExperiment($type, $algorithm, $population, $function, $popSize, $testData)
     {
         if ($type === 'normal') {
-            return (new Normal($this->kmaParameters, $this->kmaVarRanges))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Normal($this->kmaParameters, $this->kmaVarRanges, $this->maxIter))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'convergence') {
-            return (new Convergence($this->kmaParameters, $this->kmaVarRanges))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Convergence($this->kmaParameters, $this->kmaVarRanges, $this->maxIter))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'evaluation') {
-            return (new Evaluation($this->kmaParameters, $this->kmaVarRanges))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Evaluation($this->kmaParameters, $this->kmaVarRanges, $this->maxIter))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
     }
 }

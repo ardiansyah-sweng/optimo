@@ -239,6 +239,22 @@ class Preparation
                     $this->saveToFile($pathToResult, array($res));
                 }
             }
+
+            if ($this->experimentType === 'convergence'){
+
+                $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'convergence', 'popSize'));
+
+                for ($maxIter=2; $maxIter <= 100; $maxIter+=2){
+                    $optimizer->maxIter = $maxIter;
+                    for ($i = 0; $i < 30; $i++) {
+                        $res[] = $optimizer->updating($initializer->generateInitialPopulation(), '');
+                    }
+                    $result = array_sum($res) / count($res);
+                    $res = [];    
+                    $this->saveToFile($pathToResult, array($maxIter, $result, $optimizer->popsize));
+                }
+                    
+            }
         }
     }
 }

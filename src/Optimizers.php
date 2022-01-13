@@ -10,9 +10,13 @@ class Optimizers
     public $popsize;
     public $variableType;
     public $variableRanges;
+    public $maxIter;
 
     function updating($initialPopulation, $testData)
     {
+        echo $this->popsize;
+        echo "\n";
+        
         $pops = [];
         $result = (new Functions())->initializingFunction($this->function, $testData);
 
@@ -25,8 +29,14 @@ class Optimizers
         }
 
         sort($pops);
+        
+        if ($this->experimentType === 'convergence'){
+            $maxIter = $this->maxIter;
+        } else {
+            $maxIter = 1000;
+        }
 
-        $experiment = (new ExperimentFactory($this->parameters, $this->variableRanges))->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
+        $experiment = (new ExperimentFactory($this->parameters, $this->variableRanges, $maxIter))->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
 
         return $experiment;
     }

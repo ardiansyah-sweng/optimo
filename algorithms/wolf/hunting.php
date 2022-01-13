@@ -12,8 +12,8 @@ class PreyHunting
        $ret = [];
         foreach ($population as $wolves){
             foreach ($wolves['individu'] as $key => $pos){
-                $D = abs($C * $leaderWolf['individu'][$key] - $pos);
-                $X[] = $leaderWolf['individu'][$key] - $A * $D;
+                $D = abs($C * floatval($leaderWolf['individu'][$key]) - floatval($pos));
+                $X[] = floatval($leaderWolf['individu'][$key]) - $A * $D;
             }
             $ret[] = $X;
             $X = [];
