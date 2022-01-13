@@ -619,40 +619,18 @@ class Wolf implements AlgorithmInterface
 
     function execute($population, $function, $popSize)
     {
-        echo 'Iter-'.$this->iter;
-        echo "\n";
-        // print_r($population);
-
         $alphaWolf = $population[0];
         $betaWolf = $population[1];
         $deltaWolf = $population[2];
-        $omegaWolf = array_slice($population, 3);
 
-        // 1. Initialize a
+        // 1. Initialize a, A, C
         $a = 2 - (2 * $this->iter) / $this->parameters['maxIteration'];
-
-        // 2. Initialize Xp (prey position)
-        if ($this->iter === 0){
-            $Xp = $alphaWolf['individu'];
-            
-            $A_alphaWolf = $alphaWolf['individu'];
-            $A_betaWolf = $betaWolf['individu'];
-            $A_deltaWolf = $deltaWolf['individu']; 
-
-        } else {
-            $A_alphaWolf = (new PreyHunting($this->varRanges))->calculateCoef_A($alphaWolf['A_alphaWolf'], $a);
-
-            $A_betaWolf = (new PreyHunting($this->varRanges))->calculateCoef_A($betaWolf['A_betaWolf'], $a);
-
-            $A_deltaWolf = (new PreyHunting($this->varRanges))->calculateCoef_A($deltaWolf['A_deltaWolf'], $a);
-        }
-
-        // 3. Initialize C
+        $A = (2 * $a) * (new Randomizers())::randomZeroToOneFraction() - $a;
         $C = 2 * (new Randomizers())::randomZeroToOneFraction();
 
-        $alphaWolfPositions = (new PreyHunting($this->varRanges))->hunting($alphaWolf, $omegaWolf, $C, $A_alphaWolf);
-        $betaWolfPositions = (new PreyHunting($this->varRanges))->hunting($betaWolf, $omegaWolf, $C, $A_betaWolf);
-        $deltaWolfPositions = (new PreyHunting($this->varRanges))->hunting($deltaWolf, $omegaWolf, $C, $A_deltaWolf);
+        $alphaWolfPositions = (new PreyHunting($this->varRanges))->hunting($alphaWolf, $population, $C, $A);
+        $betaWolfPositions = (new PreyHunting($this->varRanges))->hunting($betaWolf, $population, $C, $A);
+        $deltaWolfPositions = (new PreyHunting($this->varRanges))->hunting($deltaWolf, $population, $C, $A);
 
         if ($function === 'ucp') {
             $result = (new Functions())->initializingFunction($function, $this->testData);
@@ -667,17 +645,11 @@ class Wolf implements AlgorithmInterface
             }
             $population[] = [
                 'fitness' => $result->runFunction($positions, $function),
-                'individu' => $positions,
-                'A_alphaWolf' =>  $A_alphaWolf,
-                'A_betaWolf' =>  $A_betaWolf,
-                'A_deltaWolf' =>  $A_deltaWolf
+                'individu' => $positions
             ];
             $positions = [];
         }
 
-        sort($population);
-        echo $population[0]['fitness'];
-        echo "\n \n";
         return $population;
     }
 }
