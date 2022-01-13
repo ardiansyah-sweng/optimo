@@ -6,7 +6,7 @@ class WalkingMovementStrategy
     {
         foreach ($eta as $key1 => $vals){
             foreach ($vals as $key2 => $val){
-                $results[] = $bestReptile['individu'][$key2] * $val * 0.1  - $reduce[$key1][$key2] * rand(0,1);
+                $results[] = floatval($bestReptile['individu'][$key2]) * floatval($val) * 0.1  - $reduce[$key1][$key2] * rand(0,1);
             }
             $ret[] = $results;
             $results = [];
@@ -16,10 +16,11 @@ class WalkingMovementStrategy
 
     function bellyWalking($bestReptile, $population, $ES)
     {
+
         foreach ($population as $pop){
             $r1 = (new Randomizers())->getRandomIndexOfIndividu(count($population));
             $x_r1j = $population[$r1];
-            foreach ($x_r1j as $key => $val){
+            foreach ($x_r1j['individu'] as $key => $val){
                 $results[] = $bestReptile['individu'][$key] * $val * $ES * rand(0,1);
             }
             $ret[] = $results;

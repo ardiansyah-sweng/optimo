@@ -595,7 +595,16 @@ class Reptile implements AlgorithmInterface
         }
 
         $population = [];
+        $evaluateVariable = new ExcessLimit;
+
         foreach ($positions as $position) {
+            
+            if ($function === 'ucp') {
+                $tempVar = $position;
+                $position = [];
+                $position = $evaluateVariable->cutVariableLimit($function, $tempVar);
+            }
+
             $population[] = [
                 'fitness' => $result->runFunction($position, $function),
                 'individu' => $position
@@ -645,11 +654,12 @@ class Wolf implements AlgorithmInterface
             foreach ($position as $key2 => $val) {
                 $positions[] = ($val + $betaWolfPositions[$key1][$key2] + $deltaWolfPositions[$key1][$key2]) / 3;
             }
+            if ($function === 'ucp') {
+                $tempVar = $positions;
+                $positions = [];
+                $positions = $evaluateVariable->cutVariableLimit($function, $tempVar);
+            }
             
-            $tempVar = $positions;
-            $positions = [];
-            $positions = $evaluateVariable->cutVariableLimit($function, $tempVar);
-
             $population[] = [
                 'fitness' => $result->runFunction($positions, $function),
                 'individu' => $positions
