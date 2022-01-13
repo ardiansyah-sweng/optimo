@@ -186,7 +186,7 @@ class Preparation
                 if ($optimizer->function === 'ucp') {
                     foreach ($testDataset as $testData) {
                         $ae = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
-                        if (count($ae) === 1){
+                        if (count($ae) === 1) {
                             $absoluteErrors[] = $ae[0]['fitness'];
                         } else {
                             $absoluteErrors[] = $ae['fitness'];
@@ -223,7 +223,11 @@ class Preparation
                 for ($i = 0; $i < 30; $i++) {
                     if ($optimizer->function === 'ucp') {
                         foreach ($testDataset as $testData) {
-                            $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation()[$i], $testData);
+                            if ($optimizer->algorithm === 'wolf') {
+                                $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation(), $testData);
+                            } else {
+                                $absoluteErrors[] = $optimizer->updating($initializer->generateInitialPopulation()[$i], $testData);
+                            }
                         }
                         $res = array_sum($absoluteErrors) / count($absoluteErrors);
                     } else if ($optimizer->algorithm === 'wolf') {

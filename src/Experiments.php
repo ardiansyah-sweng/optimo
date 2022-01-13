@@ -22,7 +22,6 @@ class Normal implements Experiments
         for ($iter = 0; $iter < 1000; $iter++) {
 
             $minFitness = min(array_column($population, 'fitness'));
-
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
             // jika fitness kurang dari sama dengan 0

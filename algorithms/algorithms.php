@@ -639,10 +639,17 @@ class Wolf implements AlgorithmInterface
         }
 
         $population = [];
+        $evaluateVariable = new ExcessLimit;
+
         foreach ($alphaWolfPositions as $key1 => $position) {
             foreach ($position as $key2 => $val) {
                 $positions[] = ($val + $betaWolfPositions[$key1][$key2] + $deltaWolfPositions[$key1][$key2]) / 3;
             }
+            
+            $tempVar = $positions;
+            $positions = [];
+            $positions = $evaluateVariable->cutVariableLimit($function, $tempVar);
+
             $population[] = [
                 'fitness' => $result->runFunction($positions, $function),
                 'individu' => $positions
