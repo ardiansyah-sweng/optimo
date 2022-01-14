@@ -217,12 +217,24 @@ class BisectingKMedoids
             $NextLevel = [];
         }
         // echo '<p>';
-        echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
-        echo 'Medoids:<br>';
-        print_r($arrMedoidForAllClusters);
-        echo '<p>';
-        print_r($S);
-        echo '<br>';
+        // echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
+        // echo 'Medoids:';
+        // echo "<br>";
+        // print_r($arrMedoidForAllClusters[0]);
+        // echo "<p>";
+        // print_r($S[0]);
+        // echo "\n";
+
+        foreach ($arrMedoidForAllClusters as $key => $medoid){
+            // echo 'Predicted PF '. $medoid['actualPF'];
+            // echo "<br>";
+            $S[$key]['predictedPF'] = $medoid['actualPF'];
+            // print_r($S[$key]);
+            // echo "<p>";
+        }
+        return $S;
+        // echo "<p>";
+        // print_r($S);
         // foreach ($S as $key => $val){
         //     print_r($val);
         //     echo '<p>';
@@ -231,6 +243,7 @@ class BisectingKMedoids
 }
 
 $bisecting = new BisectingKMedoids();
-for ($i = 0; $i < 120; $i++) {
-    $bisecting->bisectingKMedoidsClustering($i);
+for ($i = 0; $i < 1; $i++) {
+    $res[] = $bisecting->bisectingKMedoidsClustering($i);
 }
+return $res;
