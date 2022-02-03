@@ -143,23 +143,6 @@ class BisectingKMedoids
         return $ret;
     }
 
-    function convertingECF($tuples)
-    {
-        foreach ($tuples as $key => $val){
-            if ($key !== 'project_id' && $key !== 'actual' && $key !== 'size'){
-                $ret[] = $val;
-            }
-        }
-        return $ret;
-    }
-
-    function convertingRaw($cluster)
-    {
-        foreach ($cluster as $key => $tuples){
-            $convertedRaws[] = $this->convertingECF($tuples);
-        }
-        return $convertedRaws;
-    }
 
     /**
      * Program utama Bisecting K-Medoids
@@ -233,11 +216,10 @@ class BisectingKMedoids
             //$V = []; // Mengosongkan array $V supaya count($V) == 0. Sehingga While berhentin
             $NextLevel = [];
         }
-        echo '<p>';
+        // echo '<p>';
         echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
-        echo 'Medoids:<br>';
-        print_r($arrMedoidForAllClusters);
-        echo '<p></p>';
+
+        //print_r($arrMedoidForAllClusters);
 
         // foreach ($arrMedoidForAllClusters as $vals){
         //     print_r($vals);
@@ -246,59 +228,28 @@ class BisectingKMedoids
 
         //echo '<p>';
         foreach ($S as $key => $cluster){
-            $rawClusters[] = $this->convertingRaw($cluster);
-        }
-        
-        foreach ($rawClusters as $key => $klaster){
-            foreach ($klaster as $tupel){
-                $labels[] = 'c'.$key;
-                $data[] = $tupel;
+            echo $key; echo "<br>";
+            echo 'Medoid: <br>';
+            print_r($arrMedoidForAllClusters[$key]);
+            echo "<p>";
+            foreach ($cluster as $val){
+                print_r($val);
+                echo $key;
+                echo "<br>";
+                $vals[] = $val;
             }
+            echo "<p>";
         }
-
-        //$dataJson = json_encode($data,0);
-        //$labelJson = json_encode($labels, 0);
-
-        $ret['dataTrain'] = $data;
-        $ret['dataLabel'] = $labels;
-        $ret['gamma'] = 0.95;
-        $ret['dataTest'] = [2,2,2,2,3,3,4,5];
-        $ret['cVal'] = 1;
-       
-        print_r(json_encode($ret['dataTrain'],0));
+        print_r($S);
         echo '<br>';
-        print_r(json_encode($ret['dataLabel'],0));
-        echo '<p></p>';
-
-       // print_r(json_encode($ret,0));
-
-        $url = 'http://localhost:8000/count';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response  = curl_exec($ch);
-        curl_close($ch);
-        //$result = array_values(json_decode($response, true));
-        $results = json_decode($response,true);
-        print_r($results['values']);
-        echo '<p></p>';
-
-        //return $klasters;
-        //print_r($S);
-        //echo '<br>';
-        // foreach ($S as $key => $val){
-        //     print_r($val);
-        //     echo '<p>';
-        // }
+        foreach ($S as $key => $val){
+            print_r($val);
+            echo '<p>';
+        }
     }
 }
 
 $bisecting = new BisectingKMedoids();
 for ($i = 0; $i < 120; $i++) {
     $res = $bisecting->bisectingKMedoidsClustering($i);
-    print_r($res);
-    //die;
 }
