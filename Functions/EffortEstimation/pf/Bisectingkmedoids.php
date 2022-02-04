@@ -34,6 +34,23 @@ class BisectingKMedoids
     }
 
     /**
+     * Membaca dataset dari file dataset.php
+     * Return berupa array tupel test data
+     */
+    function getTestData($cacah): array
+    {
+        $dataset = new Dataset();
+        $temp = $dataset->dataset();
+        // Leave One Out - LOO
+        foreach ($temp as $key => $val) {
+            if ($cacah === $key) {
+                return $val;
+            }
+        }
+    }
+
+
+    /**
      * Membangkitkan medoid secara random
      * Return array Tupel medoid yang terpilih secara acak
      */
@@ -145,8 +162,8 @@ class BisectingKMedoids
 
     function convertingECF($tuples)
     {
-        foreach ($tuples as $key => $val){
-            if ($key !== 'project_id' && $key !== 'actual' && $key !== 'size'){
+        foreach ($tuples as $key => $val) {
+            if ($key !== 'project_id' && $key !== 'actual' && $key !== 'size' && $key !== 'actualPF') {
                 $ret[] = $val;
             }
         }
@@ -155,7 +172,7 @@ class BisectingKMedoids
 
     function convertingRaw($cluster)
     {
-        foreach ($cluster as $key => $tuples){
+        foreach ($cluster as $key => $tuples) {
             $convertedRaws[] = $this->convertingECF($tuples);
         }
         return $convertedRaws;
@@ -233,11 +250,10 @@ class BisectingKMedoids
             //$V = []; // Mengosongkan array $V supaya count($V) == 0. Sehingga While berhentin
             $NextLevel = [];
         }
-        echo '<p>';
-        echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
-        echo 'Medoids:<br>';
-        print_r($arrMedoidForAllClusters);
-        echo '<p></p>';
+        // echo '<p>';
+        // echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
+        // echo 'Medoids:<br>';
+        // echo '<p></p>';
 
         // foreach ($arrMedoidForAllClusters as $vals){
         //     print_r($vals);
@@ -245,46 +261,9 @@ class BisectingKMedoids
         // }
 
         //echo '<p>';
-        foreach ($S as $key => $cluster){
-            $rawClusters[] = $this->convertingRaw($cluster);
-        }
-        
-        foreach ($rawClusters as $key => $klaster){
-            foreach ($klaster as $tupel){
-                $labels[] = 'c'.$key;
-                $data[] = $tupel;
-            }
-        }
-
-        //$dataJson = json_encode($data,0);
-        //$labelJson = json_encode($labels, 0);
-
-        $ret['dataTrain'] = $data;
-        $ret['dataLabel'] = $labels;
-        $ret['gamma'] = 0.95;
-        $ret['dataTest'] = [2,2,2,2,3,3,4,5];
-        $ret['cVal'] = 1;
-       
-        print_r(json_encode($ret['dataTrain'],0));
-        echo '<br>';
-        print_r(json_encode($ret['dataLabel'],0));
-        echo '<p></p>';
-
-       // print_r(json_encode($ret,0));
-
-        $url = 'http://localhost:8000/count';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response  = curl_exec($ch);
-        curl_close($ch);
-        //$result = array_values(json_decode($response, true));
-        $results = json_decode($response,true);
-        print_r($results['values']);
-        echo '<p></p>';
+        $ret['medoids'] = $arrMedoidForAllClusters;
+        $ret['clusters'] = $S;
+        return $ret;
 
         //return $klasters;
         //print_r($S);
@@ -298,14 +277,14 @@ class BisectingKMedoids
         // print_r($S[0]);
         // echo "\n";
 
-        foreach ($arrMedoidForAllClusters as $key => $medoid){
-            // echo 'Predicted PF '. $medoid['actualPF'];
-            // echo "<br>";
-            $S[$key]['predictedPF'] = $medoid['actualPF'];
-            // print_r($S[$key]);
-            // echo "<p>";
-        }
-        return $S;
+        // foreach ($arrMedoidForAllClusters as $key => $medoid){
+        // echo 'Predicted PF '. $medoid['actualPF'];
+        // echo "<br>";
+        // $S[$key]['predictedPF'] = $medoid['actualPF'];
+        // print_r($S[$key]);
+        // echo "<p>";
+        // }
+        // return $S;
         // echo "<p>";
         // print_r($S);
         // foreach ($S as $key => $val){
@@ -316,8 +295,86 @@ class BisectingKMedoids
 }
 
 $bisecting = new BisectingKMedoids();
+$cacah = 0;
 for ($i = 0; $i < 120; $i++) {
-    $res = $bisecting->bisectingKMedoidsClustering($i);
+    $rawTestData = $bisecting->getTestData($i);
+    $testData = $bisecting->convertingECF($rawTestData);
+
+    $klaster = $bisecting->bisectingKMedoidsClustering($i);
+
+    while ($cacah < 1) {
+        if (count($klaster['clusters']) < 2) {
+            $klaster = $bisecting->bisectingKMedoidsClustering($i);
+            $cacah = 0;
+        } else {
+            break;
+        }
+    }
+
+    echo $i . "\n";
+    // print_r($klaster['medoids']);
+    foreach ($klaster['clusters'] as $key => $cluster) {
+        $rawClusters[] = $bisecting->convertingRaw($cluster);
+    }
+
+    foreach ($rawClusters as $key => $klasters) {
+        foreach ($klasters as $tupel) {
+            $labels[] = $key;
+            $data[] = $tupel;
+        }
+    }
+
+    $dataJson = json_encode($data, 0);
+    $labelJson = json_encode($labels, 0);
+
+    $ret['dataTrain'] = $data;
+    $ret['dataLabel'] = $labels;
+    $ret['gamma'] = 1;
+    $ret['dataTest'] = $testData;
+    $ret['cVal'] = 1;
+
+    //print_r(json_encode($ret['dataTrain'], 0));
+    //echo '<br>';
+    //print_r(json_encode($ret['dataLabel'], 0));
+    // echo '<p></p>';
+    // print_r(json_encode($ret, 0));
+
+    // echo '<p>';
+    $rawClusters = [];
+    $labels = [];
+    $data = [];
+
+    $url = 'http://localhost:8000/count';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response  = curl_exec($ch);
+    curl_close($ch);
+    $result = array_values(json_decode($response, true));
+    $results = json_decode($response, true);
+
+    foreach ($klaster['medoids'] as $key => $medoid) {
+        foreach ($results['values'] as $key1 => $val){
+            if ($key === $val && $key1 === 'Sigmoid'){
+                echo 'PF: '.$medoid['actualPF'].' Size:'. $rawTestData['size'];
+            }
+        }
+    }
+
+    // foreach ($results['values'] as $key => $val){
+    //         if ($val === $key1){
+    //             echo $medoid['actualPF'];
+    //             echo "\n";
+    //         }
+    //     }
+    // }
+
+    $klaster = [];
+    echo "\n \n";
+
     //print_r($res);
     //die;
 }
