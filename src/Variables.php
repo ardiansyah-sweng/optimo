@@ -177,6 +177,42 @@ class UCP implements VariablesInterface
     }
 }
 
+class UCPSVMZoubi implements VariablesInterface
+{
+    function getVariables($experimentType)
+    {
+        if ($experimentType) {
+            return 'Dataset\EffortEstimation\Seeds\svm\zoubi';
+        }
+
+        return [
+            'numOfVariables' => 2,
+            'ranges' => [
+                ['lowerBound' => 0, 'upperBound' => 35000],
+                ['lowerBound' => 0, 'upperBound' => 32]
+            ]
+        ];
+    }
+}
+
+class UCPSVMZhou implements VariablesInterface
+{
+    function getVariables($experimentType)
+    {
+        if ($experimentType) {
+            return 'Dataset\EffortEstimation\Seeds\svm_zhou';
+        }
+
+        return [
+            'numOfVariables' => 2,
+            'ranges' => [
+                ['lowerBound' => 0.01, 'upperBound' => 100],
+                ['lowerBound' => 0.01, 'upperBound' => 50]
+            ]
+        ];
+    }
+}
+
 class COCOMO implements VariablesInterface
 {
     function getVariables($experimentType)
@@ -245,7 +281,9 @@ class Variables
             ['function' => 'f13', 'select' => new F_12_13],
             ['function' => 'ucp', 'select' => new UCP],
             ['function' => 'cocomo', 'select' => new COCOMO],
-            ['function' => 'agile', 'select' => new Agile]
+            ['function' => 'agile', 'select' => new Agile],
+            ['function' => 'ucpSVMZoubi', 'select' => new UCPSVMZoubi],
+            ['function' => 'ucpSVMZhou', 'select' => new UCPSVMZhou]
         ];
         $index = array_search($functionToOptimized, array_column($functionsToOptimized, 'function'));
         return $functionsToOptimized[$index]['select'];

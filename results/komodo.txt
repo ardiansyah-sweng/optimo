@@ -1772,3 +1772,13 @@ f13,convergence,popSize
 96,-33574706541.149,5
 98,-33574706541.149,5
 100,-33574706541.149,5
+ucpSVM,convergence,popSize
+ucpSVM,convergence,popSize
+ucpSVM,convergence,popSize
+ucpSVM,convergence,popSize
+ucpSVM,convergence,popSize
+ucpSVM,convergence,popSize
+ucpSVMZoubi,convergence,popSize
+ucpSVMZoubi,convergence,popSize
+ucpSVMZoubi,convergence,popSize
+ucpSVMZhou,convergence,popSize

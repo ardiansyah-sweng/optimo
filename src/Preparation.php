@@ -241,7 +241,6 @@ class Preparation
             }
 
             if ($this->experimentType === 'convergence'){
-
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'convergence', 'popSize'));
 
                 for ($maxIter=2; $maxIter <= 100; $maxIter+=2){

@@ -127,6 +127,14 @@ class FunctionUCP implements FunctionsInterface
     }
 }
 
+class FunctionUCPSVM implements FunctionsInterface
+{
+    function runFunction(array $individu, $functionType)
+    {
+        echo 'ucpSVM';die;
+    }
+}
+
 class Functions
 {
     function initializingFunction($functionType, $testData)
@@ -146,6 +154,7 @@ class Functions
             ['function' => 'f12', 'select' => new FunctionF12],
             ['function' => 'f13', 'select' => new FunctionF13],
             ['function' => 'ucp', 'select' => new FunctionUCP($testData)],
+            ['function' => 'ucpSVM', 'select' => new FunctionUCPSVM]
         ];
         $index = array_search($functionType, array_column($functionTypes, 'function'));
         return $functionTypes[$index]['select'];
