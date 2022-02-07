@@ -20,5 +20,8 @@
     ],
     "require-dev": {
         "phpunit/phpunit": "9.5"
+    },
+    "require": {
+        "numphp/numphp": "^1.2"
     }
 }

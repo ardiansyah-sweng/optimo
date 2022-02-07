@@ -1,5 +1,4 @@
 <?php
-
 # read data set
 require_once "dataset.php";
 
@@ -32,6 +31,23 @@ class BisectingKMedoids
         }
         return $ret;
     }
+
+    /**
+     * Membaca dataset dari file dataset.php
+     * Return berupa array tupel test data
+     */
+    function getTestData($cacah): array
+    {
+        $dataset = new Dataset();
+        $temp = $dataset->dataset();
+        // Leave One Out - LOO
+        foreach ($temp as $key => $val) {
+            if ($cacah === $key) {
+                return $val;
+            }
+        }
+    }
+
 
     /**
      * Membangkitkan medoid secara random
@@ -143,6 +159,41 @@ class BisectingKMedoids
         return $ret;
     }
 
+    function convertingECF($tuples)
+    {
+        foreach ($tuples as $key => $val) {
+            if ($key !== 'project_id' && $key !== 'actual' && $key !== 'size' && $key !== 'actualPF') {
+                $ret[] = $val;
+            }
+        }
+        return $ret;
+    }
+
+    function convertingECFToNN($tuples, $flag)
+    {
+        foreach ($tuples as $key => $val) {
+            if (($key === 'size' || $key === 'actualPF') && $flag === 0) {
+                $ret[] = $val;
+            }
+            if ($key === 'actual' && $flag === 1) {
+                $ret[] = $val;
+            }
+        }
+        return $ret;
+    }
+
+    function convertingRaw($cluster, $nn)
+    {
+        foreach ($cluster as $key => $tuples) {
+            if ($nn === 0) {
+                $convertedRaws[] = $this->convertingECF($tuples);
+            }
+            if ($nn === 1) {
+                $convertedRaws[] = $this->convertingECFToNN($tuples, 0);
+            }
+        }
+        return $convertedRaws;
+    }
 
     /**
      * Program utama Bisecting K-Medoids
@@ -203,7 +254,7 @@ class BisectingKMedoids
                     // print_r($arrRandomMedoidTupleParent);
                     $S[] = $val;
                     //print_r($S);
-                    echo '<p>';
+                    //echo '<p>';
                     $arrMedoidForAllClusters[] = $arrRandomMedoidTupleParent;
                     //echo 'Stop<br>';
                 }
@@ -218,21 +269,39 @@ class BisectingKMedoids
         }
         // echo '<p>';
         // echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
+        // echo 'Medoids:<br>';
+        // echo '<p></p>';
+
+        // foreach ($arrMedoidForAllClusters as $vals){
+        //     print_r($vals);
+        //     echo '<br>';
+        // }
+
+        //echo '<p>';
+        $ret['medoids'] = $arrMedoidForAllClusters;
+        $ret['clusters'] = $S;
+        return $ret;
+
+        //return $klasters;
+        //print_r($S);
+        //echo '<br>';
+        // echo '<p>';
+        // echo '<h4>Data ke-' . $cacah . '. Final clusters = ' . count($S) . '</h4>';
         // echo 'Medoids:';
         // echo "<br>";
         // print_r($arrMedoidForAllClusters[0]);
         // echo "<p>";
         // print_r($S[0]);
-        // echo "\n";
+        // echo "<br>";
 
-        foreach ($arrMedoidForAllClusters as $key => $medoid){
-            // echo 'Predicted PF '. $medoid['actualPF'];
-            // echo "<br>";
-            $S[$key]['predictedPF'] = $medoid['actualPF'];
-            // print_r($S[$key]);
-            // echo "<p>";
-        }
-        return $S;
+        // foreach ($arrMedoidForAllClusters as $key => $medoid){
+        // echo 'Predicted PF '. $medoid['actualPF'];
+        // echo "<br>";
+        // $S[$key]['predictedPF'] = $medoid['actualPF'];
+        // print_r($S[$key]);
+        // echo "<p>";
+        // }
+        // return $S;
         // echo "<p>";
         // print_r($S);
         // foreach ($S as $key => $val){
@@ -242,8 +311,318 @@ class BisectingKMedoids
     }
 }
 
-$bisecting = new BisectingKMedoids();
-for ($i = 0; $i < 1; $i++) {
-    $res[] = $bisecting->bisectingKMedoidsClustering($i);
+class Utils
+{
+    function transpose($dataNN)
+    {
+        foreach ($dataNN as $vals) {
+            $ret[] = $vals[0];
+            $rett[] = $vals[1];
+            $rettt[] = $vals[2];
+        }
+        $rets[] = $ret;
+        $rets[] = $rett;
+        $rets[] = $rettt;
+
+        return $rets;
+    }
+
+    function sumKuadrat($columns)
+    {
+        foreach ($columns as $val) {
+            $kuadrat[] = pow($val, 2);
+        }
+        return array_sum($kuadrat);
+    }
+
+    function multiplication($column1, $column2)
+    {
+        foreach ($column1 as $key => $val) {
+            $ret[] = $val * $column2[$key];
+        }
+        return array_sum($ret);
+    }
+
+    function matrixMultiplication($actualY, $transposedDataNN)
+    {
+        $r0c0 = array_sum($transposedDataNN[0]);
+        $r0c1 = array_sum($transposedDataNN[1]);
+        $r0c2 = array_sum($transposedDataNN[2]);
+
+        $r1c0 = $r0c1;
+        $r1c1 = $this->sumKuadrat($transposedDataNN[1]);
+        $r1c2 = $this->multiplication($transposedDataNN[1], $transposedDataNN[2]);
+
+        $r2c0 = $r0c2;
+        $r2c1 = $r1c2;
+        $r2c2 = $this->sumKuadrat($transposedDataNN[2]);
+
+        $XtransposeX = [
+            [$r0c0, $r0c1, $r0c2],
+            [$r1c0, $r1c1, $r1c2],
+            [$r2c0, $r2c1, $r2c2]
+        ];
+
+        $XtransposeY0 = array_sum($actualY);
+        $XtransposeY1 = $this->multiplication($actualY, $transposedDataNN[1]);
+        $XtransposeY2 = $this->multiplication($actualY, $transposedDataNN[2]);
+
+        $XtransposeY = [$XtransposeY0, $XtransposeY1, $XtransposeY2];
+
+        $matrixLibrary = new MatrixLibrary();
+        $XtransposeXinverse = $matrixLibrary->inverseMatrix($XtransposeX);
+
+        foreach ($XtransposeXinverse as $vals) {
+            $w[] = $this->multiplication($XtransposeY, $vals);
+        }
+
+        return $w;
+    }
 }
-return $res;
+
+class MatrixLibrary
+{
+    //Gauss-Jordan elimination method for matrix inverse
+    public function inverseMatrix(array $matrix)
+    {
+        //TODO $matrix validation
+
+        $matrixCount = count($matrix);
+
+        $identityMatrix = $this->identityMatrix($matrixCount);
+        $augmentedMatrix = $this->appendIdentityMatrixToMatrix($matrix, $identityMatrix);
+        $inverseMatrixWithIdentity = $this->createInverseMatrix($augmentedMatrix);
+        $inverseMatrix = $this->removeIdentityMatrix($inverseMatrixWithIdentity);
+
+        return $inverseMatrix;
+    }
+
+    private function createInverseMatrix(array $matrix)
+    {
+        $numberOfRows = count($matrix);
+
+        for ($i = 0; $i < $numberOfRows; $i++) {
+            $matrix = $this->oneOperation($matrix, $i, $i);
+
+            for ($j = 0; $j < $numberOfRows; $j++) {
+                if ($i !== $j) {
+                    $matrix = $this->zeroOperation($matrix, $j, $i, $i);
+                }
+            }
+        }
+        $inverseMatrixWithIdentity = $matrix;
+
+        return $inverseMatrixWithIdentity;
+    }
+
+    private function oneOperation(array $matrix, $rowPosition, $zeroPosition)
+    {
+        if ($matrix[$rowPosition][$zeroPosition] !== 1) {
+            $numberOfCols = count($matrix[$rowPosition]);
+
+            if ($matrix[$rowPosition][$zeroPosition] === 0) {
+                $divisor = 0.0000000001;
+                $matrix[$rowPosition][$zeroPosition] = 0.0000000001;
+            } else {
+                $divisor = $matrix[$rowPosition][$zeroPosition];
+            }
+
+            for ($i = 0; $i < $numberOfCols; $i++) {
+                $matrix[$rowPosition][$i] = $matrix[$rowPosition][$i] / $divisor;
+            }
+        }
+
+        return $matrix;
+    }
+
+    private function zeroOperation(array $matrix, $rowPosition, $zeroPosition, $subjectRow)
+    {
+        $numberOfCols = count($matrix[$rowPosition]);
+
+        if ($matrix[$rowPosition][$zeroPosition] !== 0) {
+            $numberToSubtract = $matrix[$rowPosition][$zeroPosition];
+
+            for ($i = 0; $i < $numberOfCols; $i++) {
+                $matrix[$rowPosition][$i] = $matrix[$rowPosition][$i] - $numberToSubtract * $matrix[$subjectRow][$i];
+            }
+        }
+
+        return $matrix;
+    }
+
+    private function removeIdentityMatrix(array $matrix)
+    {
+        $inverseMatrix = array();
+        $matrixCount = count($matrix);
+
+        for ($i = 0; $i < $matrixCount; $i++) {
+            $inverseMatrix[$i] = array_slice($matrix[$i], $matrixCount);
+        }
+
+        return $inverseMatrix;
+    }
+
+    private function appendIdentityMatrixToMatrix(array $matrix, array $identityMatrix)
+    {
+        //TODO $matrix & $identityMatrix compliance validation (same number of rows/columns, etc)
+
+        $augmentedMatrix = array();
+
+        for ($i = 0; $i < count($matrix); $i++) {
+            $augmentedMatrix[$i] = array_merge($matrix[$i], $identityMatrix[$i]);
+        }
+
+        return $augmentedMatrix;
+    }
+
+    public function identityMatrix(int $size)
+    {
+        //TODO validate $size
+
+        $identityMatrix = array();
+
+        for ($i = 0; $i < $size; $i++) {
+            for ($j = 0; $j < $size; $j++) {
+                if ($i == $j) {
+                    $identityMatrix[$i][$j] = 1;
+                } else {
+                    $identityMatrix[$i][$j] = 0;
+                }
+            }
+        }
+
+        return $identityMatrix;
+    }
+}
+for ($k = 0; $k < 100; $i++) {
+    $bisecting = new BisectingKMedoids();
+    $util = new Utils;
+
+    $cacah = 0;
+    for ($i = 0; $i < 120; $i++) {
+        $rawTestData = $bisecting->getTestData($i);
+        $testData = $bisecting->convertingECF($rawTestData);
+
+        $klaster = $bisecting->bisectingKMedoidsClustering($i);
+
+        while ($cacah < 1) {
+            if (count($klaster['clusters']) < 2) {
+                $klaster = $bisecting->bisectingKMedoidsClustering($i);
+                $cacah = 0;
+            } else {
+                break;
+            }
+        }
+
+        //echo $i . "<br>";
+        foreach ($klaster['clusters'] as $key => $cluster) {
+            $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
+        }
+        foreach ($klaster['clusters'] as $key => $cluster) {
+            $rawClustersNN[] = $bisecting->convertingRaw($cluster, 1);
+        }
+        foreach ($klaster['clusters'] as $cluster) {
+            foreach ($cluster as $tupel) {
+                $actualY[] = $tupel['actual'];
+            }
+        }
+
+        foreach ($rawClusters as $key => $klasters) {
+            foreach ($klasters as $tupel) {
+                $labels[] = $key;
+                $data[] = $tupel;
+            }
+        }
+
+        foreach ($rawClustersNN as $key => $klasters) {
+            foreach ($klasters as $tupel) {
+                $labelsNN[] = $key;
+                array_unshift($tupel, 1); // jika mau pakai regression matrix
+                $dataNN[] = $tupel;
+            }
+        }
+
+        $dataJson = json_encode($data, 0);
+        $labelJson = json_encode($labels, 0);
+
+        $ret['dataTrain'] = $data;
+        $ret['dataLabel'] = $labels;
+        $ret['gamma'] = 0.72;
+        $ret['dataTest'] = $testData;
+        $ret['cVal'] = 0.52;
+
+        $rawClusters = [];
+        $labels = [];
+
+        $url = 'http://localhost:8000/count';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response  = curl_exec($ch);
+        curl_close($ch);
+        $result = array_values(json_decode($response, true));
+        $results = json_decode($response, true);
+
+        foreach ($klaster['medoids'] as $key => $medoid) {
+            foreach ($results['values'] as $key1 => $val) {
+                if ($key === $val) {
+                    $dataInput[] = [
+                        $key1,
+                        $medoid['actualPF'],
+                        $rawTestData['size']
+                    ];
+                }
+                // $dataTrain = $bisecting->convertingECFToNN()
+
+                $rets['dataTrain'] = $dataNN;
+                $rets['dataInput'] = $dataInput;
+            }
+        }
+        //print_r(json_encode($rets,0));
+
+        //print_r($dataNN);
+        $transposedDataNN = $util->transpose($dataNN);
+        $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
+        // print_r($dataInput);die;
+
+        foreach ($dataInput as $input) {
+            $estimatedEffort = $weights[0] + ($weights[1] * $input[2]) + ($weights[2] * $input[1]);
+            //echo 'Kernel: '. $input[0].' Estimated: ' . $estimatedEffort . ' Actual: ' . $rawTestData['actual'];
+
+            $ae[$i][$input[0]] = abs($estimatedEffort - $rawTestData['actual']);
+
+            //echo '<br>';
+        }
+
+
+        $klaster = [];
+        $data = [];
+        $dataInput = [];
+        $rawClustersNN = [];
+        $rets = [];
+        $dataNN = [];
+        $labelsNN = [];
+        $actualY = [];
+        //echo "<br> <br>";
+    }
+
+    //echo '<p></p>';
+    foreach ($ae as $key => $error) {
+        $rb[] = $error['Radial Basis'];
+        $poly[] = $error['Polynomial'];
+        $sig[] = $error['Sigmoid'];
+        $linear[] = $error['Linear'];
+    }
+
+    echo "MAE \n";
+    echo "Radial Basis: " . array_sum($rb) / 120;
+    echo "\n Polynomial: " . array_sum($poly) / 120;
+    echo "\n Sigmoid: " . array_sum($sig) / 120;
+    echo "\n Linear: " . array_sum($linear) / 120;
+    echo "\n \n";
+
+    $rb = []; $poly = []; $sig = []; $linear = [];
+}
