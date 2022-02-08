@@ -35,7 +35,6 @@ class UseCasePoints
         }
         $tes = [];
 
-        
         foreach ($ret as $key => $val){
             if ($key <= 2){
                 $tes[] = floatval($variableValues[$key]) * $val;

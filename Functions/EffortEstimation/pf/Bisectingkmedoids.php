@@ -495,137 +495,169 @@ class MatrixLibrary
     }
 }
 
+class BisectingSVM
+{
 
-$bisecting = new BisectingKMedoids();
-$util = new Utils;
+    function runBisectingSVM($cValue, $gamma)
+    {
+        $bisecting = new BisectingKMedoids();
+        $util = new Utils;
 
-$cacah = 0;
-for ($i = 0; $i < 120; $i++) {
-    $rawTestData = $bisecting->getTestData($i);
-    $testData = $bisecting->convertingECF($rawTestData);
+        $cacah = 0;
+        $dataInput = [];
 
-    $klaster = $bisecting->bisectingKMedoidsClustering($i);
+        for ($i = 0; $i < 120; $i++) {
+            $rawTestData = $bisecting->getTestData($i);
+            $testData = $bisecting->convertingECF($rawTestData);
 
-    while ($cacah < 1) {
-        if (count($klaster['clusters']) < 2) {
             $klaster = $bisecting->bisectingKMedoidsClustering($i);
-            $cacah = 0;
-        } else {
-            break;
-        }
-    }
 
-    //echo $i . "<br>";
-    foreach ($klaster['clusters'] as $key => $cluster) {
-        $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
-    }
-    foreach ($klaster['clusters'] as $key => $cluster) {
-        $rawClustersNN[] = $bisecting->convertingRaw($cluster, 1);
-    }
-    foreach ($klaster['clusters'] as $cluster) {
-        foreach ($cluster as $tupel) {
-            $actualY[] = $tupel['actual'];
-        }
-    }
-
-    foreach ($rawClusters as $key => $klasters) {
-        foreach ($klasters as $tupel) {
-            $labels[] = $key;
-            $data[] = $tupel;
-        }
-    }
-
-    foreach ($rawClustersNN as $key => $klasters) {
-        foreach ($klasters as $tupel) {
-            $labelsNN[] = $key;
-            array_unshift($tupel, 1); // jika mau pakai regression matrix
-            $dataNN[] = $tupel;
-        }
-    }
-
-    $dataJson = json_encode($data, 0);
-    $labelJson = json_encode($labels, 0);
-
-    $ret['dataTrain'] = $data;
-    $ret['dataLabel'] = $labels;
-    $ret['gamma'] = 0.72;
-    $ret['dataTest'] = $testData;
-    $ret['cVal'] = 0.52;
-
-    $rawClusters = [];
-    $labels = [];
-
-    $url = 'http://localhost:8000/count';
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response  = curl_exec($ch);
-    curl_close($ch);
-    $result = array_values(json_decode($response, true));
-    $results = json_decode($response, true);
-
-    foreach ($klaster['medoids'] as $key => $medoid) {
-        foreach ($results['values'] as $key1 => $val) {
-            if ($key === $val) {
-                $dataInput[] = [
-                    $key1,
-                    $medoid['actualPF'],
-                    $rawTestData['size']
-                ];
+            while ($cacah < 1) {
+                if (count($klaster['clusters']) < 2) {
+                    $klaster = $bisecting->bisectingKMedoidsClustering($i);
+                    $cacah = 0;
+                } else {
+                    break;
+                }
             }
-            // $dataTrain = $bisecting->convertingECFToNN()
 
-            $rets['dataTrain'] = $dataNN;
-            $rets['dataInput'] = $dataInput;
+            //echo $i . "<br>";
+            foreach ($klaster['clusters'] as $key => $cluster) {
+                $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
+            }
+            foreach ($klaster['clusters'] as $key => $cluster) {
+                $rawClustersNN[] = $bisecting->convertingRaw($cluster, 1);
+            }
+            foreach ($klaster['clusters'] as $cluster) {
+                foreach ($cluster as $tupel) {
+                    $actualY[] = $tupel['actual'];
+                }
+            }
+
+            foreach ($rawClusters as $key => $klasters) {
+                foreach ($klasters as $tupel) {
+                    $labels[] = $key;
+                    $data[] = $tupel;
+                }
+            }
+
+            foreach ($rawClustersNN as $key => $klasters) {
+                foreach ($klasters as $tupel) {
+                    $labelsNN[] = $key;
+                    array_unshift($tupel, 1); // jika mau pakai regression matrix
+                    $dataNN[] = $tupel;
+                }
+            }
+
+            $dataJson = json_encode($data, 0);
+            $labelJson = json_encode($labels, 0);
+
+            $ret['dataTrain'] = $data;
+            $ret['dataLabel'] = $labels;
+            $ret['gamma'] = $gamma;
+            $ret['dataTest'] = $testData;
+            $ret['cVal'] = $cValue;
+
+            $rawClusters = [];
+            $labels = [];
+
+            $url = 'http://localhost:8000/count';
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response  = curl_exec($ch);
+            curl_close($ch);
+            $result = array_values(json_decode($response, true));
+            $results = json_decode($response, true);
+
+            // print_r($result);
+            // echo '<br>';
+            // print_r($result[0]);
+            // echo '<br>';
+            //die;
+            foreach ($klaster['medoids'] as $key => $medoid) {
+                foreach ($result[0] as $key1 => $val) {
+                    // print_r($key);
+                    // echo " -- ";
+                    //echo ($val).' '. $key;
+                    // echo "\n";
+                    // print_r($val);
+                    //echo "\n";
+                    
+                    if ($key === $val) {
+                        $dataInput[] = [
+                            $key1,
+                            $medoid['actualPF'],
+                            $rawTestData['size']
+                        ];
+                        $rets['dataInput'] = $dataInput;
+                    }
+                    // $dataTrain = $bisecting->convertingECFToNN()
+                    // print_r($dataInput);
+                    // echo '<br>';
+
+                    $rets['dataTrain'] = $dataNN;
+
+                }
+                //echo "\n";
+            }
+            //print_r(json_encode($rets,0));
+
+            //print_r($dataNN);
+            $transposedDataNN = $util->transpose($dataNN);
+            $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
+            // print_r($dataInput);die;
+
+            foreach ($dataInput as $input) {
+                $estimatedEffort = $weights[0] + ($weights[1] * $input[2]) + ($weights[2] * $input[1]);
+                //echo 'Kernel: '. $input[0].' Estimated: ' . $estimatedEffort . ' Actual: ' . $rawTestData['actual'];
+
+                $ae[$i][$input[0]] = abs($estimatedEffort - $rawTestData['actual']);
+
+                //echo '<br>';
+            }
+
+
+            $klaster = [];
+            $data = [];
+            $dataInput = [];
+            $rawClustersNN = [];
+            $rets = [];
+            $dataNN = [];
+            $labelsNN = [];
+            $actualY = [];
+            //echo "<br> <br>";
         }
+
+        //echo '<p></p>';
+        foreach ($ae as $key => $error) {
+            $rb[] = $error['Radial Basis'];
+            $poly[] = $error['Polynomial'];
+            $sig[] = $error['Sigmoid'];
+            $linear[] = $error['Linear'];
+        }
+
+        // echo "MAE \n";
+        // echo "Radial Basis: " . array_sum($rb) / 120;
+        // echo "\n Polynomial: " . array_sum($poly) / 120;
+        // echo "\n Sigmoid: " . array_sum($sig) / 120;
+        // echo "\n Linear: " . array_sum($linear) / 120;
+        // echo "\n \n";
+
+        // echo "MAE \n";
+        // echo "Radial Basis: " . array_sum($rb) / 120;
+        return array_sum($poly) / 120;
+        // echo "\n Sigmoid: " . array_sum($sig) / 120;
+        // echo "\n Linear: " . array_sum($linear) / 120;
+        // echo "\n \n";
+
+
+        // $rb = [];
+        // $poly = [];
+        // $sig = [];
+        // $linear = [];
     }
-    //print_r(json_encode($rets,0));
-
-    //print_r($dataNN);
-    $transposedDataNN = $util->transpose($dataNN);
-    $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
-    // print_r($dataInput);die;
-
-    foreach ($dataInput as $input) {
-        $estimatedEffort = $weights[0] + ($weights[1] * $input[2]) + ($weights[2] * $input[1]);
-        //echo 'Kernel: '. $input[0].' Estimated: ' . $estimatedEffort . ' Actual: ' . $rawTestData['actual'];
-
-        $ae[$i][$input[0]] = abs($estimatedEffort - $rawTestData['actual']);
-
-        //echo '<br>';
-    }
-
-
-    $klaster = [];
-    $data = [];
-    $dataInput = [];
-    $rawClustersNN = [];
-    $rets = [];
-    $dataNN = [];
-    $labelsNN = [];
-    $actualY = [];
-    //echo "<br> <br>";
 }
-
-//echo '<p></p>';
-foreach ($ae as $key => $error) {
-    $rb[] = $error['Radial Basis'];
-    $poly[] = $error['Polynomial'];
-    $sig[] = $error['Sigmoid'];
-    $linear[] = $error['Linear'];
-}
-
-echo "MAE \n";
-echo "Radial Basis: " . array_sum($rb) / 120;
-echo "\n Polynomial: " . array_sum($poly) / 120;
-echo "\n Sigmoid: " . array_sum($sig) / 120;
-echo "\n Linear: " . array_sum($linear) / 120;
-echo "\n \n";
-
-$rb = [];
-$poly = [];
-$sig = [];
-$linear = [];

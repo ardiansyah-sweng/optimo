@@ -127,11 +127,23 @@ class FunctionUCP implements FunctionsInterface
     }
 }
 
-class FunctionUCPSVM implements FunctionsInterface
+class FunctionUCPSVMZoubi implements FunctionsInterface
 {
     function runFunction(array $individu, $functionType)
     {
-        echo 'ucpSVM';die;
+        print_r($individu);
+        die;
+
+        //echo 'ini ucpSVMZoubi';die;
+    }
+}
+
+class FunctionUCPSVMZhou implements FunctionsInterface
+{
+    function runFunction(array $individu, $functionType)
+    {
+        $bisectingSVM = new BisectingSVM;
+        return $bisectingSVM->runBisectingSVM(floatval($individu[0]), floatval($individu[1]));
     }
 }
 
@@ -154,7 +166,8 @@ class Functions
             ['function' => 'f12', 'select' => new FunctionF12],
             ['function' => 'f13', 'select' => new FunctionF13],
             ['function' => 'ucp', 'select' => new FunctionUCP($testData)],
-            ['function' => 'ucpSVM', 'select' => new FunctionUCPSVM]
+            ['function' => 'ucpSVMZoubi', 'select' => new FunctionUCPSVMZoubi],
+            ['function' => 'ucpSVMZhou', 'select' => new FunctionUCPSVMZhou]
         ];
         $index = array_search($functionType, array_column($functionTypes, 'function'));
         return $functionTypes[$index]['select'];
