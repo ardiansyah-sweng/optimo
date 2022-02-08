@@ -41,7 +41,7 @@ class PreparationTest extends TestCase
 
     function test_setupIsOneForOne()
     {
-        $optimizerAlgorithm = ['ga'];
+        $optimizerAlgorithm = ['komodo'];
         $functionToOptimized = ['agile'];
         $prep = new Preparation('convergence', $optimizerAlgorithm, $functionToOptimized, 'seeds');
         $result = $prep->setupIsOneForOne();
@@ -51,8 +51,8 @@ class PreparationTest extends TestCase
 
     function test_setup_oneOptimizerOneFunction()
     {
-        $optimizerAlgorithms = ['reptile'];
-        $functionsToOptimized = ['f13'];
+        $optimizerAlgorithms = ['komodo'];
+        $functionsToOptimized = ['ucpSVMZhou'];
         $prep = new Preparation('convergence', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();
         die;

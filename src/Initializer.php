@@ -37,6 +37,7 @@ class Initializer
         }
 
         if ($this->variableType === 'seeds') {
+
             foreach ($this->functionsToOptimized as $function) {
                 $scan = new DirectoryScanner;
                 $path = (new Variables())->initializeVariableFactory($function);
@@ -66,7 +67,6 @@ class Initializer
                 }
             }
         }
-
         return $population;
     }
 }

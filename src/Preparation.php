@@ -169,6 +169,7 @@ class Preparation
                 $this->experimentType,
                 $variables[0]['numOfVariables']
             );
+
             $optimizer = new Optimizers;
             $optimizer->algorithm = $this->optimizerAlgorithms[0];
             $optimizer->function = $this->functionsToOptimized[0];
@@ -179,7 +180,7 @@ class Preparation
 
             $pathToResult = (new Paths())->initializePath($optimizer->algorithm);
 
-            $data = (new DataProcessor())->initializeDataprocessor('silhavy', 50);
+            $data = (new DataProcessor())->initializeDataprocessor('seeds', 50);
             $testDataset = $data->processingData('Dataset\EffortEstimation\Public\ucp_silhavy.txt');
 
             if ($this->experimentType === 'normal') {
@@ -241,7 +242,6 @@ class Preparation
             }
 
             if ($this->experimentType === 'convergence'){
-
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'convergence', 'popSize'));
 
                 for ($maxIter=2; $maxIter <= 100; $maxIter+=2){

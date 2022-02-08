@@ -19,7 +19,6 @@ class Optimizers
         
         $pops = [];
         $result = (new Functions())->initializingFunction($this->function, $testData);
-
         foreach ($initialPopulation as $individu) {
             $fitness = $result->runFunction($individu, $this->function);
             $pops[] = [
@@ -27,9 +26,9 @@ class Optimizers
                 'individu' => $individu
             ];
         }
-
-        sort($pops);
         
+        sort($pops);
+
         if ($this->experimentType === 'convergence'){
             $maxIter = $this->maxIter;
         } else {
