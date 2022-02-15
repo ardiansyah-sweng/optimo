@@ -140,16 +140,21 @@ class FunctionUCPSVMZoubi implements FunctionsInterface
 
 class FunctionUCPSVMZhou implements FunctionsInterface
 {
+    function __construct($klasterSets)
+    {
+        $this->klasterSets = $klasterSets;
+    }
+
     function runFunction(array $individu, $functionType)
     {
         $bisectingSVM = new BisectingSVM;
-        return $bisectingSVM->runBisectingSVM(floatval($individu[0]), floatval($individu[1]));
+        return $bisectingSVM->runBisectingSVM(floatval($individu[0]), floatval($individu[1]), $this->klasterSets);
     }
 }
 
 class Functions
 {
-    function initializingFunction($functionType, $testData)
+    function initializingFunction($functionType, $testData, $klasterSets)
     {
         $functionTypes = [
             ['function' => 'f1', 'select' => new FunctionF1],
@@ -167,7 +172,7 @@ class Functions
             ['function' => 'f13', 'select' => new FunctionF13],
             ['function' => 'ucp', 'select' => new FunctionUCP($testData)],
             ['function' => 'ucpSVMZoubi', 'select' => new FunctionUCPSVMZoubi],
-            ['function' => 'ucpSVMZhou', 'select' => new FunctionUCPSVMZhou]
+            ['function' => 'ucpSVMZhou', 'select' => new FunctionUCPSVMZhou($klasterSets)]
         ];
         $index = array_search($functionType, array_column($functionTypes, 'function'));
         return $functionTypes[$index]['select'];

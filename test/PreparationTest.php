@@ -53,7 +53,7 @@ class PreparationTest extends TestCase
     {
         $optimizerAlgorithms = ['komodo'];
         $functionsToOptimized = ['ucpSVMZhou'];
-        $prep = new Preparation('convergence', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
+        $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();
         die;
     }
