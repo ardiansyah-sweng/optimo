@@ -1,7 +1,4 @@
 <?php
-
-require 'vendor/autoload.php';
-
 class MatrixLibrary
 {
     //Gauss-Jordan elimination method for matrix inverse
@@ -100,7 +97,6 @@ class MatrixLibrary
     public function identityMatrix(int $size)
     {
         //TODO validate $size
-
         $identityMatrix = array();
 
         for ($i = 0; $i < $size; $i++) {
@@ -112,18 +108,6 @@ class MatrixLibrary
                 }
             }
         }
-
         return $identityMatrix;
     }
 }
-
-// $matrix = array(
-//     array(11, 3, 12),
-//     array(8, 7, 10),
-//     array(13, 14, 15),
-// );
-
-// $matrixLibrary = new MatrixLibrary();
-// $inverseMatrix = $matrixLibrary->inverseMatrix($matrix);
-
-// print_r($inverseMatrix);

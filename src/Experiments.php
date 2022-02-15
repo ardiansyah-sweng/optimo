@@ -9,11 +9,12 @@ interface Experiments
 
 class Normal implements Experiments
 {
-    function __construct($kmaParameters, $variableRanges, $maxIter)
+    function __construct($kmaParameters, $variableRanges, $maxIter, $klasterSets)
     {
         $this->kmaParameters = $kmaParameters;
         $this->kmaVarRanges = $variableRanges;
         $this->maxIter = $maxIter;
+        $this->klasterSets = $klasterSets;
     }
 
     function run($algorithm, $population, $function, $popSize, $testData)
@@ -21,7 +22,6 @@ class Normal implements Experiments
         $stop = new Stopper;
 
         for ($iter = 0; $iter < $this->maxIter; $iter++) {
-
             $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
@@ -33,8 +33,8 @@ class Normal implements Experiments
             // jika fitness lebih besar dari 0
             $bests[] = $population[$indexIndividu];
             $stop->numOfLastResult = 10;
-            
-            if (count($population[$indexIndividu]) === 1){
+
+            if (count($population[$indexIndividu]) === 1) {
                 $lastResults[] = $population[0][$indexIndividu]['fitness'];
             } else {
                 $lastResults[] = $population[$indexIndividu]['fitness'];
@@ -48,20 +48,27 @@ class Normal implements Experiments
             $population = null;
             sort($lastPopulation);
 
+            // print_r($lastPopulation);
+            // echo " last \n";
+
             if ($stop->evaluationKMA($iter, $lastResults) === 'dec' && $algorithm === 'komodo') {
-                for ($i = 0; $i < 5; $i++){
+                for ($i = 0; $i < 5; $i++) {
                     array_pop($lastPopulation);
                 }
 
-                if (count($lastPopulation) === 0){
+                if (count($lastPopulation) === 0) {
                     break;
                 }
             }
 
             if ($stop->evaluationKMA($iter, $lastResults) === 'add' && $algorithm === 'komodo') {
-                for ($i = 0; $i < 5; $i++){
+                for ($i = 0; $i < 5; $i++) {
                     $additionalVars = (new Randomizers())::randomVariableValueByRange($this->kmaVarRanges);
-                    $result = (new Functions())->initializingFunction($function, '');
+                    if ($function === 'ucpSVMZhou') {
+                        $result = (new Functions())->initializingFunction($function, '', $this->klasterSets);
+                    } else {
+                        $result = (new Functions())->initializingFunction($function, '', '');
+                    }
                     $fitness = $result->runFunction($additionalVars, $function);
                     $additionalIndividus[] = [
                         'fitness' => $fitness,
@@ -71,8 +78,10 @@ class Normal implements Experiments
                 $lastPopulation = array_merge($lastPopulation, $additionalIndividus);
             }
 
-            $algo = (new Algorithms($this->kmaParameters, $this->kmaVarRanges))->initilizingAlgorithm($algorithm, $iter, $testData);
+            $algo = (new Algorithms($this->kmaParameters, $this->kmaVarRanges, $this->klasterSets))->initilizingAlgorithm($algorithm, $iter, $testData);
             $population = $algo->execute($lastPopulation, $function, $popSize);
+            
+
         }
 
         $minFitness = min(array_column($bests, 'fitness'));
@@ -92,9 +101,9 @@ class Convergence extends Normal implements Experiments
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
         $result = $this->run($algorithm, $population, $function, $popSize, $testData);
-        if (count($result) === 1){
+        if (count($result) === 1) {
             return $result[0]['fitness'];
-        } 
+        }
         return $result['fitness'];
     }
 }
@@ -104,32 +113,33 @@ class Evaluation extends Normal implements Experiments
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
         $result = $this->run($algorithm, $population, $function, $popSize, $testData);
-        if (count($result) === 1){
+        if (count($result) === 1) {
             return $result[0]['fitness'];
-        } 
+        }
         return $result['fitness'];
     }
 }
 
 class ExperimentFactory
 {
-    function __construct($kmaParameters, $variableRanges, $maxIter)
+    function __construct($kmaParameters, $variableRanges, $maxIter, $klasterSets)
     {
         $this->kmaParameters = $kmaParameters;
         $this->kmaVarRanges = $variableRanges;
         $this->maxIter = $maxIter;
+        $this->klasterSets = $klasterSets;
     }
 
     function initializeExperiment($type, $algorithm, $population, $function, $popSize, $testData)
     {
         if ($type === 'normal') {
-            return (new Normal($this->kmaParameters, $this->kmaVarRanges, $this->maxIter))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Normal($this->kmaParameters, $this->kmaVarRanges, $this->maxIter, $this->klasterSets))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'convergence') {
-            return (new Convergence($this->kmaParameters, $this->kmaVarRanges, $this->maxIter))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Convergence($this->kmaParameters, $this->kmaVarRanges, $this->maxIter, $this->klasterSets))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
         if ($type === 'evaluation') {
-            return (new Evaluation($this->kmaParameters, $this->kmaVarRanges, $this->maxIter))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
+            return (new Evaluation($this->kmaParameters, $this->kmaVarRanges, $this->maxIter, $this->klasterSets))->executeExperiment($algorithm, $population, $function, $popSize, $testData);
         }
     }
 }

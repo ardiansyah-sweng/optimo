@@ -234,6 +234,10 @@ class Preparation
                     } else if ($optimizer->algorithm === 'wolf') {
                         $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
                     } else {
+                        if ($this->functionsToOptimized[0] === 'ucpSVMZhou') {
+                            $klasterSets = (new BisectingKMedoidsGenerator())->clusterGenerator();
+                        }
+                        $optimizer->klasterSets = $klasterSets;
                         $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
                     }
 
@@ -241,19 +245,40 @@ class Preparation
                 }
             }
 
-            if ($this->experimentType === 'convergence'){
+            if ($this->experimentType === 'convergence') {
+
+                //generate new clusters from bisecting kMedoids
+                if ($this->functionsToOptimized[0] === 'ucpSVMZhou') {
+                    $cacah = 0;
+                    $bisecting = new BisectingKMedoids();
+
+                    for ($j = 0; $j < 120; $j++) {
+                        $klasters = $bisecting->bisectingKMedoidsClustering($j);
+                        while ($cacah < 1) {
+                            if (count($klasters['clusters']) < 2) {
+                                $klasters = $bisecting->bisectingKMedoidsClustering($j);
+                                $cacah = 0;
+                            } else {
+                                break;
+                            }
+                        }
+                        $klasterSets[] = $klasters;
+                    }
+                }
+
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'convergence', 'popSize'));
 
-                for ($maxIter=2; $maxIter <= 100; $maxIter+=2){
+                $optimizer->klasterSets = $klasterSets;
+                for ($maxIter = 2; $maxIter <= 10; $maxIter += 2) {
                     $optimizer->maxIter = $maxIter;
-                    for ($i = 0; $i < 30; $i++) {
+                    for ($i = 0; $i < 3; $i++) {
                         $res[] = $optimizer->updating($initializer->generateInitialPopulation(), '');
                     }
+
                     $result = array_sum($res) / count($res);
-                    $res = [];    
+                    $res = [];
                     $this->saveToFile($pathToResult, array($maxIter, $result, $optimizer->popsize));
                 }
-                    
             }
         }
     }
