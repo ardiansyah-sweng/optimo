@@ -22,7 +22,7 @@ class Normal implements Experiments
         $stop = new Stopper;
 
         for ($iter = 0; $iter < $this->maxIter; $iter++) {
-            $minFitness = min(array_column($population, 'fitness'));
+            $minFitness = max(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
             // jika fitness kurang dari sama dengan 0
@@ -80,11 +80,9 @@ class Normal implements Experiments
 
             $algo = (new Algorithms($this->kmaParameters, $this->kmaVarRanges, $this->klasterSets))->initilizingAlgorithm($algorithm, $iter, $testData);
             $population = $algo->execute($lastPopulation, $function, $popSize);
-            
-
         }
 
-        $minFitness = min(array_column($bests, 'fitness'));
+        $minFitness = max(array_column($bests, 'fitness'));
         $indexIndividu = array_search($minFitness, array_column($bests, 'fitness'));
 
         return $bests[$indexIndividu];
@@ -113,10 +111,17 @@ class Evaluation extends Normal implements Experiments
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
         $result = $this->run($algorithm, $population, $function, $popSize, $testData);
-        if (count($result) === 1) {
-            return $result[0]['fitness'];
+        if ($function === 'ucpSVMZhou') {
+            if (count($result) === 1) {
+                return $result[0];
+            }
+            return $result;
+        } else {
+            if (count($result) === 1) {
+                return $result[0]['fitness'];
+            }
+            return $result['fitness'];
         }
-        return $result['fitness'];
     }
 }
 

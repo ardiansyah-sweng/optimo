@@ -33,9 +33,9 @@ class Optimizers
         if ($this->experimentType === 'convergence'){
             $maxIter = $this->maxIter;
         } else {
-            $maxIter = 1000;
+            $maxIter = 30;
         }
-        
+
         if ($this->function === 'ucpSVMZhou'){
             $experiment = (new ExperimentFactory($this->parameters, $this->variableRanges, $maxIter, $this->klasterSets))->initializeExperiment($this->experimentType, $this->algorithm, $pops, $this->function, $this->popsize, $testData);
         } else {

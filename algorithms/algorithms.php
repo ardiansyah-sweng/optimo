@@ -560,12 +560,13 @@ class Komodo implements AlgorithmInterface
 
 class Reptile implements AlgorithmInterface
 {
-    function __construct($parameters, $iter, $varRanges, $testData)
+    function __construct($parameters, $iter, $varRanges, $testData, $klasterSets)
     {
         $this->parameters = $parameters;
         $this->iter = $iter;
         $this->varRanges = $varRanges;
         $this->testData = $testData;
+        $this->klasterSets = $klasterSets;
     }
 
     function execute($population, $function, $popSize)
@@ -617,7 +618,7 @@ class Reptile implements AlgorithmInterface
 
         foreach ($positions as $position) {
 
-            if ($function === 'ucp') {
+            if ($function === 'ucp' || $function === 'ucpSVMZhou') {
                 $tempVar = $position;
                 $position = [];
                 $position = $evaluateVariable->cutVariableLimit($function, $tempVar);
@@ -791,7 +792,7 @@ class Algorithms
             return new Komodo($this->parameters, $this->kmaVarRanges, $testData, $this->klasterSets);
         }
         if ($type === 'reptile') {
-            return new Reptile($this->parameters, $iter, $this->kmaVarRanges, $testData);
+            return new Reptile($this->parameters, $iter, $this->kmaVarRanges,$testData, $this->klasterSets);
         }
         if ($type === 'wolf') {
             return new Wolf($this->parameters, $iter, $this->kmaVarRanges, $testData);

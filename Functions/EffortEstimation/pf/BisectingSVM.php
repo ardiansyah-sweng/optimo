@@ -8,7 +8,7 @@ class BisectingSVM
         $util = new Utils;
   
         $dataInput = [];
-        $jumCluster = 5;
+        $jumCluster = 10;
         for ($i = 0; $i < $jumCluster; $i++) {
             // echo $i.' '.count($klasterSets[$i]['clusters']);
             // echo "\n";
@@ -52,7 +52,7 @@ class BisectingSVM
             $ret['dataTest'] = $testData;
             $ret['cVal'] = $cValue;
 
-            $rawClusters = [];
+            $kernel = "Sigmoid";
 
             $url = 'http://localhost:8000/count';
             $ch = curl_init();
@@ -65,37 +65,69 @@ class BisectingSVM
             curl_close($ch);
             $result = array_values(json_decode($response, true))[0];
             $results = json_decode($response, true);
+            
             // echo $cValue.' '. $gamma."\n";
-            // var_dump($response);
+            // print_r($result['Linear']);
             // echo "\n";
+            // die;
 
-            $kernel = 'Linear';
-            foreach ($klasterSets[$i]['medoids'] as $key => $medoid) {
-                foreach ($result as $key1 => $val) {
-                    if ($key === $val && $key1 === $kernel) {
-                        $dataInput[] = [
-                            $key1,
-                            $medoid['actualPF'],
-                            $rawTestData['size']
-                        ];
-                        $rets['dataInput'] = $dataInput;
+            //check predicted cluster contains testData or not
+            $predictedClusterNo = $result[$kernel];
+            //echo 'Jum cluster: '. count($rawClusters).' '. 'Pred. Cluster: '. $predictedClusterNo;
+            //echo '  Test data ke-'. $i." -> ";
+            // print_r($testData);
+            foreach ($rawClusters as $key => $cluster){
+                if ($predictedClusterNo === $key){
+                    foreach ($cluster as $ecf){
+                        if ($testData === $ecf){
+                            $label[] = 1;
+                        } else {
+                            $label[] = 0;
+                        }
                     }
-                    $rets['dataTrain'] = $dataNN;
+                    if (array_sum($label) !== 0){
+                        //echo 'Failed';
+                    } else {
+                        //echo 'Success';
+                        $cumm[] = 1;
+                    }
+                    //echo "\n";
                 }
             }
 
-            $transposedDataNN = $util->transpose($dataNN);
-            $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
+            //echo "\n \n";
+            $rawClusters = [];
+            $label = [];
 
-            foreach ($dataInput as $input) {
-                $estimatedEffort = $weights[0] + ($weights[1] * $input[2]) + ($weights[2] * $input[1]);
-                $ae[$i][$input[0]] = abs($estimatedEffort - $rawTestData['actual']);
-            }
+            // $kernel = 'Linear';
+            // foreach ($klasterSets[$i]['medoids'] as $key => $medoid) {
+            //     foreach ($result as $key1 => $val) {
+            //         if ($key === $val && $key1 === $kernel) {
+            //             $dataInput[] = [
+            //                 $key1,
+            //                 $medoid['actualPF'],
+            //                 $rawTestData['size']
+            //             ];
+            //             $rets['dataInput'] = $dataInput;
+            //         }
+            //         $rets['dataTrain'] = $dataNN;
+            //     }
+            // }
+
+            // $transposedDataNN = $util->transpose($dataNN);
+            // $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
+
+            // foreach ($dataInput as $input) {
+            //     $estimatedEffort = $weights[0] + ($weights[1] * $input[2]) + ($weights[2] * $input[1]);
+            //     $ae[$i][$input[0]] = abs($estimatedEffort - $rawTestData['actual']);
+            // }
             
             //$dataNN = [];
             $rawClustersNN = [];
             $labelsNN = [];
         }
+        //echo 'accuracy: '. array_sum($cumm) / $jumCluster;
+        return array_sum($cumm) / $jumCluster;
         //echo "\n";
         $labels = [];
         $data = [];
@@ -106,17 +138,17 @@ class BisectingSVM
         $labelsNN = [];
         $actualY = [];
 
-        foreach ($ae as $key => $error) {
+        //foreach ($ae as $key => $error) {
             // $rb[] = $error['Radial Basis'];
             // $poly[] = $error['Polynomial'];
             // $sig[] = $error['Sigmoid'];
-            $linear[] = $error[$kernel];
-        }
+            //$linear[] = $error[$kernel];
+        //}
 
         // $maeRadial = array_sum($rb) / $jumCluster;
         // $maePolynomial = array_sum($poly) / $jumCluster;
         // $maeSigmoid = array_sum($sig) / $jumCluster;
-        $maeLinear = array_sum($linear) / $jumCluster;
+        //$maeLinear = array_sum($linear) / $jumCluster;
 
         // $ret = [
         //     'fitnessRadial' => $maeRadial,
@@ -125,6 +157,6 @@ class BisectingSVM
         //     'fitnessLinear' => $maeLinear 
         // ];
 
-        return $maeLinear;
+        //return $maeLinear;
     }
 }
