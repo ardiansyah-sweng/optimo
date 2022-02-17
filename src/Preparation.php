@@ -240,8 +240,7 @@ class Preparation
                         $optimizer->klasterSets = $klasterSets;
                         $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
                     }
-
-                    $this->saveToFile($pathToResult, array($res));
+                    $this->saveToFile($pathToResult, array($res['fitness'], $res['individu'][0], $res['individu'][1]) );
                 }
             }
 

@@ -25,9 +25,9 @@ class BisectingKMedoids
         $temp = $dataset->dataset();
         // Leave One Out - LOO
         foreach ($temp as $key => $val) {
-            if ($cacah != $key) {
+            //if ($cacah != $key) {
                 $ret[] = $val;
-            }
+            //}
         }
         return $ret;
     }

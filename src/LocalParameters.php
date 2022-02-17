@@ -12,8 +12,8 @@ class GA implements LocalParameter
         return [
             'parameterName' => 'gaParameter',
             'populationSize' => 30,
-            'cr'=>0.9,
-            'mr'=>0.01
+            'cr' => 0.9,
+            'mr' => 0.01
         ];
     }
 }
@@ -57,7 +57,7 @@ class KMA implements LocalParameter
 {
     function __construct($numOfVariabe)
     {
-        $this->numOfVariable = $numOfVariabe;    
+        $this->numOfVariable = $numOfVariabe;
     }
 
     function getLocalParameter()
@@ -89,10 +89,10 @@ class RSA implements LocalParameter
     function getLocalParameter()
     {
         return [
-            'maxIteration' => 1000,
-            'populationSize' => 10,
+            'maxIteration' => 3,
+            'populationSize' => 3,
             'alpha' => 0.1,
-            'beta' => 0.1 
+            'beta' => 0.1
         ];
     }
 }
