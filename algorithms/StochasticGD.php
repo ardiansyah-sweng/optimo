@@ -16,6 +16,7 @@ class StochasticGD
     function optimizing($testData, $weights)
     {
         $saveFile = new FileSaver;
+        $rets = [];
         for ($i = 0; $i < 1000; $i++) {
             foreach ($weights as $key => $weight) {
                 if ($key > 0) {
@@ -29,14 +30,20 @@ class StochasticGD
             $weights = $this->updateWeights($lastWeights, $error);
 
             if ($error <= 0.009 && $error >= -0.009){
-                echo $i . ' ' . $testData[0] . ' ' . $estimated . ' ' . $error ;
+                //echo $i . ' ' . $testData[0] . ' ' . $estimated . ' ' . $error ;
                 //$saveFile->saveToFile('results\normalSVM.txt', array($testData[0]), //array($estimated), array($error));
+                $rets[] = [
+                    $testData[0], 
+                    $estimated, 
+                    $error
+                ];
                 break;
             }
             $result = [];
             // print_r($weights);
             // echo "\n";
         }
+        return $rets;
     }
 
     function dataProcessing()
@@ -45,9 +52,10 @@ class StochasticGD
             foreach (array_keys($testData) as $key) {
                 $weights[] = (new Randomizers())->randomZeroToOneFraction();
             }
-            echo "\n";
-            $this->optimizing($testData, $weights);
+            //echo "\n";
+            $res[] = $this->optimizing($testData, $weights);
             $weights = [];
         }
+        return $res;
     }
 }

@@ -7,8 +7,7 @@ class BisectingSVM
         $bisecting = new BisectingKMedoids();
         $util = new Utils;
 
-        $dataInput = [];
-        $jumCluster = 120;
+        $jumCluster = 10;
         for ($i = 0; $i < $jumCluster; $i++) {
             
             $rawTestData = $bisecting->getTestData($i);
@@ -51,7 +50,7 @@ class BisectingSVM
             $ret['dataTest'] = $testData;
             $ret['cVal'] = $cValue;
 
-            $kernel = "Radial Basis";
+            $kernel = "Sigmoid";
 
             $url = 'http://localhost:8000/count';
             $ch = curl_init();
@@ -95,6 +94,7 @@ class BisectingSVM
 
         $sgdOptimizer = new StochasticGD;
         $sgdOptimizer->normalizedDataset = $normalDataInputs;
-        $sgdOptimizer->dataProcessing();
+        $res = $sgdOptimizer->dataProcessing();
+        print_r($res);
     }
 }
