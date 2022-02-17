@@ -2240,4 +2240,18 @@ f13,convergence,popSize
 98,-51408086789.456,10
 100,-51408086789.456,10
 
-Evaluation Sigmoid
+Evaluation Accuracy Sigmoid
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3
+ucpSVMZhou,seeds,3

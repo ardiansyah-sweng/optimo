@@ -33,7 +33,7 @@ class Optimizers
         if ($this->experimentType === 'convergence'){
             $maxIter = $this->maxIter;
         } else {
-            $maxIter = 30;
+            $maxIter = 3;
         }
 
         if ($this->function === 'ucpSVMZhou'){

@@ -58,6 +58,14 @@ class PreparationTest extends TestCase
         die;
     }
 
+    function test_normal()
+    {
+        //for ($i = 0; $i < 30; $i++) {
+            $klasterSet = (new BisectingKMedoidsGenerator())->clusterGenerator();
+            $normal = (new BisectingSVM())->runBisectingSVM(1, 1, $klasterSet);
+        //}
+    }
+
     function test_setup_oneOptimizerAllFunctions()
     {
         $optimizerAlgorithms = ['komodo'];
@@ -65,7 +73,7 @@ class PreparationTest extends TestCase
 
         $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();
-        die;    
+        die;
     }
 
     function test_setup_allOptimizerOneFunction()
