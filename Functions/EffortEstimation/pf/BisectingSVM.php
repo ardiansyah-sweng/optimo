@@ -5,9 +5,10 @@ class BisectingSVM
     function runBisectingSVM($cValue, $gamma, $klasterSets)
     {
         $bisecting = new BisectingKMedoids();
-        $util = new Utils;
+        $saveFile = new FileSaver;
 
-        $jumCluster = 120;
+        $jumCluster = 100;
+        $temp = 0;
         for ($i = 0; $i < $jumCluster; $i++) {
             
             $rawTestData = $bisecting->getTestData($i);
@@ -16,6 +17,7 @@ class BisectingSVM
             foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
                 $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
             }
+
             foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
                 $rawClustersNN[] = $bisecting->convertingRaw($cluster, 1);
             }
@@ -27,7 +29,7 @@ class BisectingSVM
             }
 
             foreach ($rawClusters as $key => $klasters) {
-                foreach ($klasters as $tupel) {
+                foreach ($klasters as $key1 => $tupel) {
                     $labels[] = $key;
                     $data[] = $tupel;
                 }
@@ -50,19 +52,25 @@ class BisectingSVM
             $ret['dataTest'] = $testData;
             $ret['cVal'] = $cValue;
 
-            $kernel = "Polynomial";
+            $kernel = "Sigmoid";
 
             $predictedClusterNo = (new API())->getAPI($kernel, $ret);
             $rawClusters = [];
             $counter = 0;
+            
+            echo 'Predicted cluster No.- '.$predictedClusterNo .' Jum cluster: '. count($klasterSets[$i]['medoids'])."\n";
+
             while ($counter < 1){
                 if ($predictedClusterNo >= count($klasterSets[$i]['medoids'])){
-                    $klasterSets = null;
-                    $ret = null;
+                    die;
+                    $klasterSets = [];
+                    $ret = [];
+                    $rawClusters = [];
                     $klasterSets = (new BisectingKMedoidsGenerator())->clusterGenerator();
                     foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
                         $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
                     }
+
                     foreach ($rawClusters as $key => $klasters) {
                         foreach ($klasters as $tupel) {
                             $labels[] = $key;
@@ -77,8 +85,9 @@ class BisectingSVM
 
                     $predictedClusterNo = (new API())->getAPI($kernel, $ret);
                     $counter = 0;
-                    $saveFile = new FileSaver;
+
                     $saveFile->saveToFile('results\normalSVM.txt', array($i));
+ 
 
                 } else {
                     $medoid = $klasterSets[$i]['medoids'][$predictedClusterNo];
@@ -90,7 +99,9 @@ class BisectingSVM
                 $medoid['actualPF'],
                 $rawTestData['size']
             ];
-            //die;            
+            
+            $predictAccuracy = (new EvaluationMeasure($rawTestData, $klasterSets[$i]['clusters'][$predictedClusterNo]));
+            $temp += $predictAccuracy->accuracyCalc();
 
             // $transposedDataNN = $util->transpose($dataNN);
             // $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
@@ -104,6 +115,9 @@ class BisectingSVM
             $rawClustersNN = [];
             $labelsNN = [];
         }
+        $accuracy = $temp / $jumCluster;
+        $saveFile->saveToFile('results\normalSVM.txt', array($accuracy));
+        return $accuracy;
 
         $dataNormalization = new MinMaxScaler;
         $dataNormalization->dataset = $dataInputs;
