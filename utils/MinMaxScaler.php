@@ -49,4 +49,19 @@ class MinMaxScaler
         }
         return $normalData;
     }
+
+    function denormalizing($normalDataInput, $normalRes, $actualData)
+    {
+        foreach ($normalRes as $key1 => $vals) {
+            foreach ($vals[0] as $key2 => $val) {
+                if ($key2 === 1){
+                    $estimated = $actualData[$key1][0] - ($normalDataInput[$key1][0] - $val) *  $actualData[$key1][0];
+                    $errors[] = abs($estimated - $actualData[$key1][0]);
+                    // echo 'estimated: '.$estimated .' actual '. $actualData[$key1][0]. ' error: '. abs($estimated - $actualData[$key1][0])."\n";
+                }
+            }
+        }
+        echo 'Data: '.count($errors);echo"\n";
+        return array_sum($errors) / count($errors);
+    }
 }

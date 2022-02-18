@@ -7,7 +7,7 @@ class BisectingSVM
         $bisecting = new BisectingKMedoids();
         $util = new Utils;
 
-        $jumCluster = 10;
+        $jumCluster = 120;
         for ($i = 0; $i < $jumCluster; $i++) {
             
             $rawTestData = $bisecting->getTestData($i);
@@ -50,30 +50,47 @@ class BisectingSVM
             $ret['dataTest'] = $testData;
             $ret['cVal'] = $cValue;
 
-            $kernel = "Sigmoid";
+            $kernel = "Polynomial";
 
-            $url = 'http://localhost:8000/count';
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($ret, 0));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response  = curl_exec($ch);
-            curl_close($ch);
-            $result = array_values(json_decode($response, true))[0];
-            $results = json_decode($response, true);
-
-            //check predicted cluster contains testData or not
-            $predictedClusterNo = $result[$kernel];
+            $predictedClusterNo = (new API())->getAPI($kernel, $ret);
             $rawClusters = [];
+            $counter = 0;
+            while ($counter < 1){
+                if ($predictedClusterNo >= count($klasterSets[$i]['medoids'])){
+                    $klasterSets = null;
+                    $ret = null;
+                    $klasterSets = (new BisectingKMedoidsGenerator())->clusterGenerator();
+                    foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
+                        $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
+                    }
+                    foreach ($rawClusters as $key => $klasters) {
+                        foreach ($klasters as $tupel) {
+                            $labels[] = $key;
+                            $data[] = $tupel;
+                        }
+                    }
+                    $ret['dataTrain'] = $data;
+                    $ret['dataLabel'] = $labels;
+                    $ret['gamma'] = $gamma;
+                    $ret['dataTest'] = $testData;
+                    $ret['cVal'] = $cValue;
 
-            $medoid = $klasterSets[$i]['medoids'][$predictedClusterNo];
+                    $predictedClusterNo = (new API())->getAPI($kernel, $ret);
+                    $counter = 0;
+                    $saveFile = new FileSaver;
+                    $saveFile->saveToFile('results\normalSVM.txt', array($i));
+
+                } else {
+                    $medoid = $klasterSets[$i]['medoids'][$predictedClusterNo];
+                    $counter = 1;
+                }
+            }
             $dataInputs[] = [
                 $rawTestData['actual'],
                 $medoid['actualPF'],
                 $rawTestData['size']
             ];
+            //die;            
 
             // $transposedDataNN = $util->transpose($dataNN);
             // $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
@@ -94,7 +111,9 @@ class BisectingSVM
 
         $sgdOptimizer = new StochasticGD;
         $sgdOptimizer->normalizedDataset = $normalDataInputs;
-        $res = $sgdOptimizer->dataProcessing();
-        print_r($res);
+        $normalRes = $sgdOptimizer->dataProcessing();
+        $originalResults = $dataNormalization->denormalizing($normalDataInputs, $normalRes, $dataInputs);
+        return $originalResults;
     }
 }
+
