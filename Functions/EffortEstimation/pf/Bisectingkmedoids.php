@@ -331,7 +331,9 @@ class BisectingKMedoidsGenerator
         $cacah = 0;
         $bisecting = new BisectingKMedoids();
 
-        for ($j = 0; $j < 120; $j++) {
+        $numOfData = count($bisecting->readDataset(0));
+
+        for ($j = 0; $j < $numOfData; $j++) {
             $klasters = $bisecting->bisectingKMedoidsClustering($j);
             while ($cacah < 1) {
                 if (count($klasters['clusters']) < 2) {

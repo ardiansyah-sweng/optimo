@@ -22,7 +22,7 @@ class Normal implements Experiments
         $stop = new Stopper;
 
         for ($iter = 0; $iter < $this->maxIter; $iter++) {
-            $minFitness = max(array_column($population, 'fitness'));
+            $minFitness = min(array_column($population, 'fitness'));
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
 
             // jika fitness kurang dari sama dengan 0
@@ -82,7 +82,7 @@ class Normal implements Experiments
             $population = $algo->execute($lastPopulation, $function, $popSize);
         }
 
-        $minFitness = max(array_column($bests, 'fitness'));
+        $minFitness = min(array_column($bests, 'fitness'));
         $indexIndividu = array_search($minFitness, array_column($bests, 'fitness'));
 
         return $bests[$indexIndividu];

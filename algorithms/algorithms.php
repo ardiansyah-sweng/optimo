@@ -149,7 +149,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
         }
 
         if ($this->iter === 0) {
-            $minFitness = min(array_column($population, 'fitness'));
+            $minFitness = min(array_column($population, 'fitness')); //TODO changeable into min or max function
             $indexIndividu = array_search($minFitness, array_column($population, 'fitness'));
             $gBest = $population[$indexIndividu];
 
@@ -187,7 +187,7 @@ class ParticleSwarmOptimizer implements AlgorithmInterface
                 $chaoticValue = 0.7;
             }
         } else {
-            $minFitness = min(array_column($population, 'pBest'));
+            $minFitness = min(array_column($population, 'pBest')); //TODO changeable into min or max function
             $indexIndividu = array_search($minFitness, array_column($population, 'pBest'));
             $gBest = $population[$indexIndividu];
 

@@ -6,11 +6,10 @@ class BisectingSVM
     {
         $bisecting = new BisectingKMedoids();
         $saveFile = new FileSaver;
+        $util = new Utils;
 
-        $jumCluster = 100;
-        $temp = 0;
+        $jumCluster = count($klasterSets);
         for ($i = 0; $i < $jumCluster; $i++) {
-            
             $rawTestData = $bisecting->getTestData($i);
             $testData = $bisecting->convertingECF($rawTestData);
 
@@ -52,17 +51,13 @@ class BisectingSVM
             $ret['dataTest'] = $testData;
             $ret['cVal'] = $cValue;
 
-            $kernel = "Sigmoid";
-
+            $kernel = "rbf";
             $predictedClusterNo = (new API())->getAPI($kernel, $ret);
             $rawClusters = [];
             $counter = 0;
-            
-            echo 'Predicted cluster No.- '.$predictedClusterNo .' Jum cluster: '. count($klasterSets[$i]['medoids'])."\n";
 
-            while ($counter < 1){
-                if ($predictedClusterNo >= count($klasterSets[$i]['medoids'])){
-                    die;
+            while ($counter < 1) {
+                if ($predictedClusterNo >= count($klasterSets[$i]['medoids'])) {
                     $klasterSets = [];
                     $ret = [];
                     $rawClusters = [];
@@ -85,49 +80,49 @@ class BisectingSVM
 
                     $predictedClusterNo = (new API())->getAPI($kernel, $ret);
                     $counter = 0;
-
-                    $saveFile->saveToFile('results\normalSVM.txt', array($i));
- 
-
                 } else {
                     $medoid = $klasterSets[$i]['medoids'][$predictedClusterNo];
                     $counter = 1;
                 }
             }
-            $dataInputs[] = [
+
+            // $predictAccuracy = (new EvaluationMeasure($rawTestData, $klasterSets[$i]['clusters'][$predictedClusterNo]));
+
+            $dataInputs = [
                 $rawTestData['actual'],
                 $medoid['actualPF'],
                 $rawTestData['size']
             ];
-            
-            $predictAccuracy = (new EvaluationMeasure($rawTestData, $klasterSets[$i]['clusters'][$predictedClusterNo]));
-            $temp += $predictAccuracy->accuracyCalc();
 
-            // $transposedDataNN = $util->transpose($dataNN);
-            // $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
+            $transposedDataNN = $util->transpose($dataNN);
+            $weights = $util->matrixMultiplication($actualY, $transposedDataNN);
 
-            // foreach ($dataInput as $input) {
-            //     $estimatedEffort = $weights[0] + ($weights[1] * $input[2]) + ($weights[2] * $input[1]);
-            //     $ae[$i][$input[0]] = abs($estimatedEffort - $rawTestData['actual']);
-            // }
+            $estimatedEffort = $weights[0] + ($weights[1] * $dataInputs[2]) + ($weights[2] * $dataInputs[1]);
+            $ae = abs($estimatedEffort - $rawTestData['actual']);
+            $errors[] = $ae;
+            //$saveFile->saveToFile('results\normalSVM.txt', array($ae));
 
             //$dataNN = [];
+            $dataInputs = []; //comment untuk SGD
             $rawClustersNN = [];
             $labelsNN = [];
         }
-        $accuracy = $temp / $jumCluster;
-        $saveFile->saveToFile('results\normalSVM.txt', array($accuracy));
-        return $accuracy;
+        $mae = array_sum($errors) / $jumCluster;
+        //$saveFile->saveToFile('results\normalSVM.txt', array($mae));
+        return $mae;
 
-        $dataNormalization = new MinMaxScaler;
-        $dataNormalization->dataset = $dataInputs;
-        $normalDataInputs = $dataNormalization->normalization();
+        // $accuracy = $temp / $jumCluster;
+        // $saveFile->saveToFile('results\normalSVM.txt', array($accuracy));
+        // return $accuracy;
 
-        $sgdOptimizer = new StochasticGD;
-        $sgdOptimizer->normalizedDataset = $normalDataInputs;
-        $normalRes = $sgdOptimizer->dataProcessing();
-        $originalResults = $dataNormalization->denormalizing($normalDataInputs, $normalRes, $dataInputs);
-        return $originalResults;
+        // $dataNormalization = new MinMaxScaler;
+        // $dataNormalization->dataset = $dataInputs;
+        // $normalDataInputs = $dataNormalization->normalization();
+
+        // $sgdOptimizer = new StochasticGD;
+        // $sgdOptimizer->normalizedDataset = $normalDataInputs;
+        // $normalRes = $sgdOptimizer->dataProcessing();
+        // $originalResults = $dataNormalization->denormalizing($normalDataInputs, $normalRes, $dataInputs);
+        // return $originalResults;
     }
 }
-

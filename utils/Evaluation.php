@@ -12,7 +12,7 @@ class EvaluationMeasure
     {
         foreach ($this->predictedCluster as $tuple){
             if ($this->testData === $tuple){
-                return 1;
+                return true;
             }
         }
     }

@@ -15,7 +15,6 @@ class API
         curl_close($ch);
         $result = array_values(json_decode($response, true))[0];
         $results = json_decode($response, true);
-
         return $result[$kernel];
     }
 }
