@@ -242,6 +242,7 @@ class Preparation
                     }
                     $this->saveToFile($pathToResult, array($res['fitness'], $res['individu'][0], $res['individu'][1]) );
                 }
+                $klasterSets = [];
             }
 
             if ($this->experimentType === 'convergence') {

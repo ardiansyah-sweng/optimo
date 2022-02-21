@@ -89,8 +89,8 @@ class RSA implements LocalParameter
     function getLocalParameter()
     {
         return [
-            'maxIteration' => 3,
-            'populationSize' => 3,
+            'maxIteration' => 10,
+            'populationSize' => 10,
             'alpha' => 0.1,
             'beta' => 0.1
         ];

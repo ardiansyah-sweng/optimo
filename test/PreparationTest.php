@@ -61,9 +61,10 @@ class PreparationTest extends TestCase
     function test_normal()
     {
         $saveFile = new FileSaver;
-        for ($i = 0; $i < 1; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $klasterSet = (new BisectingKMedoidsGenerator())->clusterGenerator();
             $normal = (new BisectingSVM())->runBisectingSVM(1, 1, $klasterSet);
+            $saveFile->saveToFile('results\normalSVM.txt', array('======='));
             $saveFile->saveToFile('results\normalSVM.txt', array($normal));
         }
     }
