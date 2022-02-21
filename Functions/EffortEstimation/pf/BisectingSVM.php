@@ -13,15 +13,15 @@ class BisectingSVM
             $rawTestData = $bisecting->getTestData($i);
             $testData = $bisecting->convertingECF($rawTestData);
 
-            foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
+            foreach ($klasterSets[0]['clusters'] as $key => $cluster) {
                 $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
             }
 
-            foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
+            foreach ($klasterSets[0]['clusters'] as $key => $cluster) {
                 $rawClustersNN[] = $bisecting->convertingRaw($cluster, 1);
             }
 
-            foreach ($klasterSets[$i]['clusters'] as $cluster) {
+            foreach ($klasterSets[0]['clusters'] as $cluster) {
                 foreach ($cluster as $tupel) {
                     $actualY[] = $tupel['actual'];
                 }
@@ -57,31 +57,31 @@ class BisectingSVM
             $counter = 0;
 
             while ($counter < 1) {
-                if ($predictedClusterNo >= count($klasterSets[$i]['medoids'])) {
-                    $klasterSets = [];
-                    $ret = [];
-                    $rawClusters = [];
-                    $klasterSets = (new BisectingKMedoidsGenerator())->clusterGenerator();
-                    foreach ($klasterSets[$i]['clusters'] as $key => $cluster) {
-                        $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
-                    }
+                if ($predictedClusterNo >= count($klasterSets[0]['medoids'])) {
+                    // $klasterSets = [];
+                    // $ret = [];
+                    // $rawClusters = [];
+                    // $klasterSets = (new BisectingKMedoidsGenerator())->clusterGenerator();
+                    // foreach ($klasterSets[0]['clusters'] as $key => $cluster) {
+                    //     $rawClusters[] = $bisecting->convertingRaw($cluster, 0);
+                    // }
 
-                    foreach ($rawClusters as $key => $klasters) {
-                        foreach ($klasters as $tupel) {
-                            $labels[] = $key;
-                            $data[] = $tupel;
-                        }
-                    }
-                    $ret['dataTrain'] = $data;
-                    $ret['dataLabel'] = $labels;
-                    $ret['gamma'] = $gamma;
-                    $ret['dataTest'] = $testData;
-                    $ret['cVal'] = $cValue;
+                    // foreach ($rawClusters as $key => $klasters) {
+                    //     foreach ($klasters as $tupel) {
+                    //         $labels[] = $key;
+                    //         $data[] = $tupel;
+                    //     }
+                    // }
+                    // $ret['dataTrain'] = $data;
+                    // $ret['dataLabel'] = $labels;
+                    // $ret['gamma'] = $gamma;
+                    // $ret['dataTest'] = $testData;
+                    // $ret['cVal'] = $cValue;
 
                     $predictedClusterNo = (new API())->getAPI($kernel, $ret);
                     $counter = 0;
                 } else {
-                    $medoid = $klasterSets[$i]['medoids'][$predictedClusterNo];
+                    $medoid = $klasterSets[0]['medoids'][$predictedClusterNo];
                     $counter = 1;
                 }
             }

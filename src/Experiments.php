@@ -32,7 +32,7 @@ class Normal implements Experiments
 
             // jika fitness lebih besar dari 0
             $bests[] = $population[$indexIndividu];
-            $stop->numOfLastResult = 10;
+            $stop->numOfLastResult = 3;
 
             if (count($population[$indexIndividu]) === 1) {
                 $lastResults[] = $population[0][$indexIndividu]['fitness'];
