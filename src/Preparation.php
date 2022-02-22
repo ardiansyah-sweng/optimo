@@ -221,7 +221,7 @@ class Preparation
                 $optimizer->variableType = 'seeds';
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'seeds', $populationSize));
 
-                for ($i = 0; $i < 30; $i++) {
+                for ($i = 15; $i < 30; $i++) {
                     if ($optimizer->function === 'ucp') {
                         foreach ($testDataset as $testData) {
                             if ($optimizer->algorithm === 'wolf') {
