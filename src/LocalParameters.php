@@ -107,8 +107,8 @@ class GWO implements LocalParameter
     function getLocalParameter()
     {
         return [
-            'maxIteration' => 1000,
-            'populationSize' => 15
+            'maxIteration' => 10,
+            'populationSize' => 10
         ];
     }
 }

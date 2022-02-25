@@ -51,7 +51,7 @@ class PreparationTest extends TestCase
 
     function test_setup_oneOptimizerOneFunction()
     {
-        $optimizerAlgorithms = ['reptile'];
+        $optimizerAlgorithms = ['komodo'];
         $functionsToOptimized = ['ucpSVMZhou'];
         $prep = new Preparation('evaluation', $optimizerAlgorithms, $functionsToOptimized, 'seeds');
         $prep->setup();
@@ -61,10 +61,10 @@ class PreparationTest extends TestCase
     function test_normal()
     {
         $saveFile = new FileSaver;
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 30; $i++) {
             $klasterSet = (new BisectingKMedoidsGenerator())->clusterGenerator();
             $normal = (new BisectingSVM())->runBisectingSVM(1, 1, $klasterSet);
-            $saveFile->saveToFile('results\normalSVM.txt', array('======='));
+            //$saveFile->saveToFile('results\normalSVM.txt', array('======='));
             $saveFile->saveToFile('results\normalSVM.txt', array($normal));
         }
     }

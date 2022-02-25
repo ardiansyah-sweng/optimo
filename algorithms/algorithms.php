@@ -637,12 +637,13 @@ class Reptile implements AlgorithmInterface
 
 class Wolf implements AlgorithmInterface
 {
-    function __construct($parameters, $iter, $varRanges, $testData)
+    function __construct($parameters, $iter, $varRanges, $testData, $klasterSets)
     {
         $this->parameters = $parameters;
         $this->iter = $iter;
         $this->varRanges = $varRanges;
         $this->testData = $testData;
+        $this->klasterSets = $klasterSets;
     }
 
     function execute($population, $function, $popSize)
@@ -792,10 +793,10 @@ class Algorithms
             return new Komodo($this->parameters, $this->kmaVarRanges, $testData, $this->klasterSets);
         }
         if ($type === 'reptile') {
-            return new Reptile($this->parameters, $iter, $this->kmaVarRanges,$testData, $this->klasterSets);
+            return new Reptile($this->parameters, $iter, $this->kmaVarRanges, $testData, $this->klasterSets);
         }
         if ($type === 'wolf') {
-            return new Wolf($this->parameters, $iter, $this->kmaVarRanges, $testData);
+            return new Wolf($this->parameters, $iter, $this->kmaVarRanges, $testData, $this->klasterSets);
         }
     }
 }

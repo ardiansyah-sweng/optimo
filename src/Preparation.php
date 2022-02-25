@@ -221,7 +221,7 @@ class Preparation
                 $optimizer->variableType = 'seeds';
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'seeds', $populationSize));
 
-                for ($i = 15; $i < 30; $i++) {
+                for ($i = 20; $i < 30; $i++) {
                     if ($optimizer->function === 'ucp') {
                         foreach ($testDataset as $testData) {
                             if ($optimizer->algorithm === 'wolf') {
@@ -232,6 +232,10 @@ class Preparation
                         }
                         $res = array_sum($absoluteErrors) / count($absoluteErrors);
                     } else if ($optimizer->algorithm === 'wolf') {
+                        if ($this->functionsToOptimized[0] === 'ucpSVMZhou') {
+                            $klasterSets = (new BisectingKMedoidsGenerator())->clusterGenerator();
+                        }
+                        $optimizer->klasterSets = $klasterSets;
                         $res = $optimizer->updating($initializer->generateInitialPopulation(), '');
                     } else {
                         if ($this->functionsToOptimized[0] === 'ucpSVMZhou') {
@@ -240,7 +244,7 @@ class Preparation
                         $optimizer->klasterSets = $klasterSets;
                         $res = $optimizer->updating($initializer->generateInitialPopulation()[$i], '');
                     }
-                    $this->saveToFile($pathToResult, array($res['fitness'], $res['individu'][0], $res['individu'][1]) );
+                    $this->saveToFile($pathToResult, array($res['fitness'], $res['individu'][0], $res['individu'][1]));
                 }
                 $klasterSets = [];
             }
