@@ -31,5 +31,8 @@ class Paths
         if ($type === 'wolf') {
             return 'results/wolf.txt';
         }
+        if ($type === 'lion') {
+            return 'results/lion.txt';
+        }
     }
 }

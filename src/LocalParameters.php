@@ -55,9 +55,9 @@ class UCPSO implements LocalParameter
 
 class KMA implements LocalParameter
 {
-    function __construct($numOfVariabe)
+    function __construct($numOfVariable)
     {
-        $this->numOfVariable = $numOfVariabe;
+        $this->numOfVariable = $numOfVariable;
     }
 
     function getLocalParameter()
@@ -81,9 +81,9 @@ class KMA implements LocalParameter
  */
 class RSA implements LocalParameter
 {
-    function __construct($numOfVariabe)
+    function __construct($numOfVariable)
     {
-        $this->numOfVariable = $numOfVariabe;
+        $this->numOfVariable = $numOfVariable;
     }
 
     function getLocalParameter()
@@ -99,16 +99,36 @@ class RSA implements LocalParameter
 
 class GWO implements LocalParameter
 {
-    function __construct($numOfVariabe)
+    function __construct($numOfVariable)
     {
-        $this->numOfVariable = $numOfVariabe;
+        $this->numOfVariable = $numOfVariable;
     }
 
     function getLocalParameter()
     {
         return [
-            'maxIteration' => 1000,
-            'populationSize' => 15
+            'maxIteration' => 10,
+            'populationSize' => 10
+        ];
+    }
+}
+
+/**
+ * Yazdani M, Jolai F. Lion Optimization Algorithm (LOA): A nature-inspired metaheuristic algorithm. J Comput Des Eng [Internet]. 2016 Jan 1;3(1):24–36. Available from: http://dx.doi.org/10.1016/j.jcde.2015.06.003
+ */
+class LOA implements LocalParameter
+{
+    function __construct($numOfVariable)
+    {
+        $this->numOfVariable = $numOfVariable;
+    }
+
+    function getLocalParameter()
+    {
+        return [
+            'populationSize' => 50,
+            'percentOfNomadLions' => 0.2,
+            'sexRate' => 0.8
         ];
     }
 }
@@ -124,7 +144,8 @@ class LocalParameterFactory
             ['optimizer' => 'mypso1', 'select' => new UCPSO],
             ['optimizer' => 'komodo', 'select' => new KMA($numOfVariable)],
             ['optimizer' => 'reptile', 'select' => new RSA($numOfVariable)],
-            ['optimizer' => 'wolf', 'select' => new GWO($numOfVariable)]
+            ['optimizer' => 'wolf', 'select' => new GWO($numOfVariable)],
+            ['optimizer' => 'lion', 'select' => new LOA($numOfVariable)]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));
         return $optimizerTypes[$index]['select'];
