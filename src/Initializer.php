@@ -37,7 +37,6 @@ class Initializer
         }
 
         if ($this->variableType === 'seeds') {
-
             foreach ($this->functionsToOptimized as $function) {
                 $scan = new DirectoryScanner;
                 $path = (new Variables())->initializeVariableFactory($function);
@@ -48,7 +47,7 @@ class Initializer
                 $result = $dataProcessor->initializeDataprocessor('seeds', $this->populationSize);
                 $population = $result->processingData($seedFiles[0]);
 
-                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2' || $this->optimizerAlgorithms[0] === 'ga' || $this->optimizerAlgorithms[0] === 'komodo' || $this->optimizerAlgorithms[0] === 'reptile')) {
+                if ($this->experimentType === 'evaluation' && ($this->optimizerAlgorithms[0] === 'pso' || $this->optimizerAlgorithms[0] === 'mypso2' || $this->optimizerAlgorithms[0] === 'ga' || $this->optimizerAlgorithms[0] === 'komodo' || $this->optimizerAlgorithms[0] === 'reptile' || $this->optimizerAlgorithms[0] === 'lion')) {
                     $population = [];
                     foreach ($seedFiles as $seedFile) {
                         $population[] = $result->processingData($seedFile);

@@ -111,6 +111,7 @@ class Evaluation extends Normal implements Experiments
     function executeExperiment($algorithm, $population, $function, $popSize, $testData)
     {
         $result = $this->run($algorithm, $population, $function, $popSize, $testData);
+        
         if ($function === 'ucpSVMZhou') {
             if (count($result) === 1) {
                 return $result[0];

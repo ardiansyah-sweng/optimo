@@ -15,9 +15,6 @@ class Optimizers
 
     function updating($initialPopulation, $testData)
     {
-        echo $this->popsize;
-        echo "\n";
-
         $pops = [];
         $result = (new Functions())->initializingFunction($this->function, $testData, $this->klasterSets);
 

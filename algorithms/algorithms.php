@@ -693,6 +693,157 @@ class Wolf implements AlgorithmInterface
     }
 }
 
+class Lion implements AlgorithmInterface
+{
+    function __construct($parameters, $iter, $varRanges, $testData, $klasterSets)
+    {
+        $this->parameters = $parameters;
+        $this->iter = $iter;
+        $this->varRanges = $varRanges;
+        $this->testData = $testData;
+        $this->klasterSets = $klasterSets;
+    }
+
+    function createNomadLions($population, $popsize, $numOfNomadLions)
+    {
+        $counter = 0;
+        $nomadLionIndexes = [];
+
+        while ($counter < 1) {
+            for ($i = 0; $i < $numOfNomadLions; $i++) {
+                $nomadLionIndexes[] = (new Randomizers())->getRandomIndexOfIndividu($popsize);
+            }
+            if (count(array_unique($nomadLionIndexes)) < $numOfNomadLions) {
+                $counter = 0;
+                $nomadLionIndexes = [];
+            } else {
+                break;
+            }
+        }
+
+        $numOfMaleNomad = round((1 - $this->parameters['sexRate']) * $numOfNomadLions);
+
+        //Create male sex label
+        while ($counter < 1) {
+            for ($i = 0; $i < $numOfMaleNomad; $i++) {
+                $maleNomadIndexes[] = (new Randomizers())->getRandomIndexOfIndividu($numOfNomadLions);
+            }
+            if (count(array_unique($maleNomadIndexes)) < $numOfMaleNomad) {
+                $counter = 0;
+                $maleNomadIndexes = [];
+            } else {
+                break;
+            }
+        }
+
+        foreach ($maleNomadIndexes as $maleNomadIndex) {
+            echo $nomadLionIndexes[$maleNomadIndex]."\n";
+            $maleNomadLions[] = $population[$nomadLionIndexes[$maleNomadIndex]];
+        }
+
+        //Create female sex label
+        foreach ($nomadLionIndexes as $nomadKey) {
+            foreach ($maleNomadIndexes as $maleNomadKey) {
+                if ($nomadKey === $nomadLionIndexes[$maleNomadKey]) {
+                    break;
+                }
+                $temps[] = $nomadKey;
+            }
+            if (count($temps) == $numOfMaleNomad) {
+                $femaleNomadIndexes[] = $nomadKey;
+            }
+            $temps = [];
+        }
+        echo "-----\n";
+        foreach ($femaleNomadIndexes as $femaleNomadIndex) {
+            echo $femaleNomadIndex."\n";
+            $femaleNomadLions[] = $population[$femaleNomadIndex];
+        }
+
+        return [
+            'nomadLionIndexes' => $nomadLionIndexes,
+            'maleNomadLions' => $maleNomadLions,
+            'femaleNomadLions' => $femaleNomadLions
+        ];
+    }
+
+    function createPrideLions($population, $nomadLionIndexes, $numOfNomadLions)
+    {
+        foreach (array_keys($population) as $popKey) {
+            foreach ($nomadLionIndexes as $nomadKey) {
+                if ($popKey === $nomadKey) {
+                    break;
+                }
+                $temps[] = $popKey;
+            }
+            if (count($temps) == $numOfNomadLions) {
+                $prideIndexes[] = $popKey;
+            }
+            $temps = [];
+        }
+
+        $numOfMalePride = round($this->parameters['sexRate'] * count($prideIndexes));
+        $numOfFemalePride = count($prideIndexes) - $numOfMalePride;
+
+        // Create female sex label
+        $counter = 0;
+        while ($counter < 1) {
+            for ($i = 0; $i < $numOfFemalePride; $i++) {
+                $femalePrideIndexes[] = (new Randomizers())->getRandomIndexOfIndividu(count($prideIndexes));
+            }
+
+            if (count(array_unique($femalePrideIndexes)) < $numOfFemalePride) {
+                $counter = 0;
+                $femalePrideIndexes = [];
+            } else {
+                break;
+            }
+        }
+        echo "\n \n";
+        foreach ($femalePrideIndexes as $femalePrideIndex) {
+            echo $prideIndexes[$femalePrideIndex]."\n";
+            $femalePrideLions[] = $population[$prideIndexes[$femalePrideIndex]];
+        }
+
+        //create male sex label
+        foreach ($prideIndexes as $prideKey) {
+            foreach ($femalePrideIndexes as $femalePrideKey) {
+                if ($prideKey === $prideIndexes[$femalePrideKey]) {
+                    break;
+                }
+                $temps[] = $prideKey;
+            }
+            if (count($temps) == $numOfFemalePride) {
+                $malePrideIndexes[] = $prideKey;
+            }
+            $temps = [];
+        }
+        echo "----\n";
+        foreach ($malePrideIndexes as $key=>$malePrideIndex) {
+            echo $key.' '.$malePrideIndex."\n";
+            $malePrideLions[] = $population[$malePrideIndex];
+        }
+
+        return [
+            'malePrideLions' => $malePrideLions,
+            'femalePrideLions' => $femalePrideLions
+        ];
+    }
+
+
+
+    function execute($population, $function, $popSize)
+    {
+        $numOfNomadLions = round($this->parameters['percentOfNomadLions'] * $popSize);
+        $nomadLions = $this->createNomadLions($population, $popSize, $numOfNomadLions);
+        print_r($nomadLions);die;
+        echo "\n";
+
+        $prideLions = $this->createPrideLions($population, $nomadLions['nomadLionIndexes'], $numOfNomadLions);
+        die;
+    }
+}
+
 class UniformCPSO implements AlgorithmInterface
 {
     function __construct($iter, $algorithm, $testData)
@@ -797,6 +948,9 @@ class Algorithms
         }
         if ($type === 'wolf') {
             return new Wolf($this->parameters, $iter, $this->kmaVarRanges, $testData, $this->klasterSets);
+        }
+        if ($type === 'lion') {
+            return new Lion($this->parameters, $iter, $this->kmaVarRanges, $testData, $this->klasterSets);
         }
     }
 }
