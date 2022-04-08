@@ -128,7 +128,8 @@ class LOA implements LocalParameter
         return [
             'populationSize' => 50,
             'percentOfNomadLions' => 0.2,
-            'sexRate' => 0.8
+            'sexRate' => 0.8,
+            'numOfHunters' => 4
         ];
     }
 }

@@ -737,7 +737,6 @@ class Lion implements AlgorithmInterface
         }
 
         foreach ($maleNomadIndexes as $maleNomadIndex) {
-            echo $nomadLionIndexes[$maleNomadIndex]."\n";
             $maleNomadLions[] = $population[$nomadLionIndexes[$maleNomadIndex]];
         }
 
@@ -754,9 +753,8 @@ class Lion implements AlgorithmInterface
             }
             $temps = [];
         }
-        echo "-----\n";
+
         foreach ($femaleNomadIndexes as $femaleNomadIndex) {
-            echo $femaleNomadIndex."\n";
             $femaleNomadLions[] = $population[$femaleNomadIndex];
         }
 
@@ -799,9 +797,8 @@ class Lion implements AlgorithmInterface
                 break;
             }
         }
-        echo "\n \n";
+
         foreach ($femalePrideIndexes as $femalePrideIndex) {
-            echo $prideIndexes[$femalePrideIndex]."\n";
             $femalePrideLions[] = $population[$prideIndexes[$femalePrideIndex]];
         }
 
@@ -818,9 +815,8 @@ class Lion implements AlgorithmInterface
             }
             $temps = [];
         }
-        echo "----\n";
-        foreach ($malePrideIndexes as $key=>$malePrideIndex) {
-            echo $key.' '.$malePrideIndex."\n";
+
+        foreach ($malePrideIndexes as $key => $malePrideIndex) {
             $malePrideLions[] = $population[$malePrideIndex];
         }
 
@@ -830,16 +826,45 @@ class Lion implements AlgorithmInterface
         ];
     }
 
-
+    function createHunters($femalePrideLions)
+    {
+        $counter = 0;
+        while ($counter < 1) {
+            for ($i = 0; $i < $this->parameters['numOfHunters']; $i++) {
+                $hunterIndexes[] = (new Randomizers())->getRandomIndexOfIndividu(count($femalePrideLions));
+            }
+            if (count(array_unique($hunterIndexes)) < $this->parameters['numOfHunters']) {
+                $counter = 0;
+                $hunterIndexes = [];
+            } else {
+                break;
+            }
+        }
+        foreach ($hunterIndexes as $hunterIndex) {
+            $hunters[] = $femalePrideLions[$hunterIndex];
+        }
+        sort($hunters);
+        $centerHunter = $hunters[0]; //TODO check for MAX or MIN objective function
+        array_shift($hunters);
+        $numOfLeftWingHunters = round(count($hunters) / 2);
+        $numOfRightWingHunters = count($hunters) - $numOfLeftWingHunters;
+        $leftWingHunters = array_slice($hunters, 0, $numOfLeftWingHunters);
+        $rightWingHunters = array_slice($hunters, $numOfLeftWingHunters, $numOfRightWingHunters);
+        
+        return [
+            'centerHunter' => $centerHunter,
+            'leftHunters' => $leftWingHunters,
+            'rightHunters' => $rightWingHunters
+        ];
+    }
 
     function execute($population, $function, $popSize)
     {
         $numOfNomadLions = round($this->parameters['percentOfNomadLions'] * $popSize);
         $nomadLions = $this->createNomadLions($population, $popSize, $numOfNomadLions);
-        print_r($nomadLions);die;
-        echo "\n";
-
         $prideLions = $this->createPrideLions($population, $nomadLions['nomadLionIndexes'], $numOfNomadLions);
+        $hunters = $this->createHunters($prideLions['femalePrideLions']);
+        print_r($hunters);
         die;
     }
 }
