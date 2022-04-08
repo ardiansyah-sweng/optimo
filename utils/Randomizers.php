@@ -23,6 +23,11 @@ class Randomizers
         return $ret;
     }
 
+    static function randomOneVariable($upperBound, $lowerBound)
+    {
+        return mt_rand($lowerBound * 100, $upperBound * 100) / 100;
+    }
+
     static function getCutPointIndex($lengthOfChromosome)
     {
         return rand(0, $lengthOfChromosome - 1);

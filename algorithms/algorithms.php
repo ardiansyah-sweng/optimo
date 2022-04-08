@@ -709,6 +709,7 @@ class Lion implements AlgorithmInterface
         $counter = 0;
         $nomadLionIndexes = [];
 
+        ## TODO create specific class for randomize selected individu
         while ($counter < 1) {
             for ($i = 0; $i < $numOfNomadLions; $i++) {
                 $nomadLionIndexes[] = (new Randomizers())->getRandomIndexOfIndividu($popsize);
@@ -826,6 +827,7 @@ class Lion implements AlgorithmInterface
         ];
     }
 
+    ## TODO divide hunter group for left and right wings randomly
     function createHunters($femalePrideLions)
     {
         $counter = 0;
@@ -844,18 +846,138 @@ class Lion implements AlgorithmInterface
             $hunters[] = $femalePrideLions[$hunterIndex];
         }
         sort($hunters);
+        $originalHunters = $hunters;
         $centerHunter = $hunters[0]; //TODO check for MAX or MIN objective function
         array_shift($hunters);
         $numOfLeftWingHunters = round(count($hunters) / 2);
         $numOfRightWingHunters = count($hunters) - $numOfLeftWingHunters;
         $leftWingHunters = array_slice($hunters, 0, $numOfLeftWingHunters);
         $rightWingHunters = array_slice($hunters, $numOfLeftWingHunters, $numOfRightWingHunters);
-        
+
         return [
             'centerHunter' => $centerHunter,
             'leftHunters' => $leftWingHunters,
-            'rightHunters' => $rightWingHunters
+            'rightHunters' => $rightWingHunters,
+            'hunters' => $originalHunters
         ];
+    }
+
+    function createPREY($hunters)
+    {
+        $numOfCols = count($hunters[0]['individu']);
+        for ($i = 0; $i < $numOfCols; $i++) {
+            foreach ($hunters as $variables) {
+                $cols[] = $variables['individu'][$i];
+            }
+            $averageOfCols[] = array_sum($cols) / count($cols);
+            $cols = [];
+        }
+        return $averageOfCols;
+    }
+
+    function isLeftHunter($key)
+    {
+        if ($key === 'leftHunters') {
+            return TRUE;
+        }
+    }
+
+    function isRightHunter($key)
+    {
+        if ($key === 'rightHunters') {
+            return TRUE;
+        }
+    }
+
+    function isCenterHunter($key)
+    {
+        if ($key === 'centerHunter') {
+            return TRUE;
+        }
+    }
+
+    function updateLeftHunters($positions, $PREY, $function)
+    {
+        foreach ($positions as $key => $position) {
+            if ((2 * $PREY[$key] - $position) < $PREY[$key]) {
+                $lowerBound = 2 * $PREY[$key] - $position;
+                $upperBound = $PREY[$key];
+                $calcPosition = (new Randomizers())->randomOneVariable($upperBound, $lowerBound);
+            } else if ((2 * $PREY[$key] - $position) > $PREY[$key]) {
+                $lowerBound = $PREY[$key];
+                $upperBound = 2 * $PREY[$key] - $position;
+                $calcPosition = (new Randomizers())->randomOneVariable($upperBound, $lowerBound);
+            } else {
+                $calcPosition = $position;
+            }
+            $positions[$key] = $calcPosition;
+        }
+
+        if ($function === 'ucp') {
+            $result = (new Functions())->initializingFunction($function, $this->testData, '');
+        } else if ($function === 'ucpSVMZhou') {
+            $result = (new Functions())->initializingFunction($function, '', $this->klasterSets);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '', '');
+        }
+
+        return [
+            'fitness' => $result->runFunction($positions, $function),
+            'individu' => $positions
+        ];
+    }
+
+    function updateCenterHunter($positions, $PREY, $function)
+    {
+        foreach ($positions as $key => $position) {
+            if ((2 * $PREY[$key] - $position) < $PREY[$key]) {
+                $calcPosition = (new Randomizers())->randomOneVariable($position, $PREY[$key]);
+            } else if ((2 * $PREY[$key] - $position) > $PREY[$key]) {
+                $calcPosition = (new Randomizers())->randomOneVariable($PREY[$key], $position);
+            } else {
+                $calcPosition = $position;
+            }
+            $positions[$key] = $calcPosition;
+        }
+
+        if ($function === 'ucp') {
+            $result = (new Functions())->initializingFunction($function, $this->testData, '');
+        } else if ($function === 'ucpSVMZhou') {
+            $result = (new Functions())->initializingFunction($function, '', $this->klasterSets);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '', '');
+        }
+
+        return [
+            'fitness' => $result->runFunction($positions, $function),
+            'individu' => $positions
+        ];
+    }
+
+    function hunting($hunters, $PREY, $function)
+    {
+        $evaluateVariable = new ExcessLimit;
+
+        ## TODO refactor to combined left and right hunter using one function only
+        foreach ($hunters as $key => $hunter) {
+            if ($this->isLeftHunter($key)) {
+                foreach ($hunter as $key => $variables) {
+                    $hunter[$key] = $this->updateLeftHunters($variables['individu'], $PREY, $function);
+                }
+            }
+
+            if ($this->isRightHunter($key)) {
+                foreach ($hunter as $key => $variables) {
+                    $hunter[$key] = $this->updateLeftHunters($variables['individu'], $PREY, $function);
+                }
+            }
+
+            if ($this->isCenterHunter($key)) {
+                print_r($hunter)."\n \n";
+                $hunter = $this->updateCenterHunter($hunter['individu'], $PREY, $function);
+                print_r($hunter) . "\n \n";
+            }
+        }
     }
 
     function execute($population, $function, $popSize)
@@ -864,7 +986,8 @@ class Lion implements AlgorithmInterface
         $nomadLions = $this->createNomadLions($population, $popSize, $numOfNomadLions);
         $prideLions = $this->createPrideLions($population, $nomadLions['nomadLionIndexes'], $numOfNomadLions);
         $hunters = $this->createHunters($prideLions['femalePrideLions']);
-        print_r($hunters);
+        $PREY = $this->createPREY($hunters['hunters']);
+        $this->hunting($hunters, $PREY, $function);
         die;
     }
 }
