@@ -126,10 +126,27 @@ class LOA implements LocalParameter
     function getLocalParameter()
     {
         return [
+            'maxIteration' => 10,
             'populationSize' => 50,
             'percentOfNomadLions' => 0.2,
             'sexRate' => 0.8,
             'numOfHunters' => 4
+        ];
+    }
+}
+
+class PRO implements LocalParameter
+{
+    function __construct($numOfVariable)
+    {
+        $this->numOfVariable = $numOfVariable;
+    }
+
+    function getLocalParameter()
+    {
+        return [
+            'maxIteration' => 10,
+            'populationSize' => 30
         ];
     }
 }
@@ -146,7 +163,8 @@ class LocalParameterFactory
             ['optimizer' => 'komodo', 'select' => new KMA($numOfVariable)],
             ['optimizer' => 'reptile', 'select' => new RSA($numOfVariable)],
             ['optimizer' => 'wolf', 'select' => new GWO($numOfVariable)],
-            ['optimizer' => 'lion', 'select' => new LOA($numOfVariable)]
+            ['optimizer' => 'lion', 'select' => new LOA($numOfVariable)],
+            ['optimizer' => 'pro', 'select' => new PRO($numOfVariable)]
         ];
         $index = array_search($optimizerType, array_column($optimizerTypes, 'optimizer'));
         return $optimizerTypes[$index]['select'];

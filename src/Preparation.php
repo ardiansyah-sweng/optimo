@@ -109,7 +109,6 @@ class Preparation
 
         ## One Optimizer for All Functions
         if ($this->setupIsOneForAll()) {
-
             if ($this->optimizerAlgorithms[0] === 'komodo') {
                 $populationSize = $parameters[0]['n1'];
             } else {
@@ -220,8 +219,7 @@ class Preparation
             }
 
             if ($this->experimentType === 'evaluation' && $this->variableType === 'seeds') {
-
-                $optimizer->variableType = 'seeds';
+                                $optimizer->variableType = 'seeds';
                 $this->saveToFile($pathToResult, array($this->functionsToOptimized[0], 'seeds', $populationSize));
 
                 for ($i = 0; $i < 30; $i++) {

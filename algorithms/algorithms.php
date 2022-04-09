@@ -875,9 +875,9 @@ class Lion implements AlgorithmInterface
         return $averageOfCols;
     }
 
-    function isLeftHunter($key)
+    function isWingHunters($key)
     {
-        if ($key === 'leftHunters') {
+        if ($key === 'leftHunters' || $key === 'rightHunters') {
             return TRUE;
         }
     }
@@ -896,9 +896,26 @@ class Lion implements AlgorithmInterface
         }
     }
 
-    function updateLeftHunters($positions, $PREY, $function)
+    function fitnessIsImproved($lastFitness, $currFitness)
     {
-        foreach ($positions as $key => $position) {
+        ## For MIN function only!
+        ## Refactor for adaptable for MIN MAX function
+        if ($currFitness < $lastFitness) {
+            return TRUE;
+        }
+    }
+
+    function updatePREY($PI, $hunter, $PREY)
+    {
+        foreach ($PREY as $preyKey => $preyVal){
+            $ret[] = $preyVal + (new Randomizers())->randomZeroToOneFraction() * $PI * ($preyVal - $hunter[$preyKey]);
+        }
+        return $ret;
+    }
+
+    function updateWingHunters($variables, $PREY, $function)
+    {
+        foreach ($variables['individu'] as $key => $position) {
             if ((2 * $PREY[$key] - $position) < $PREY[$key]) {
                 $lowerBound = 2 * $PREY[$key] - $position;
                 $upperBound = $PREY[$key];
@@ -910,7 +927,7 @@ class Lion implements AlgorithmInterface
             } else {
                 $calcPosition = $position;
             }
-            $positions[$key] = $calcPosition;
+            $variables['individu'][$key] = $calcPosition;
         }
 
         if ($function === 'ucp') {
@@ -920,10 +937,11 @@ class Lion implements AlgorithmInterface
         } else {
             $result = (new Functions())->initializingFunction($function, '', '');
         }
+        $fitness = $result->runFunction($variables['individu'], $function);
 
         return [
-            'fitness' => $result->runFunction($positions, $function),
-            'individu' => $positions
+            'fitness' => $fitness,
+            'individu' => $variables['individu']
         ];
     }
 
@@ -954,30 +972,53 @@ class Lion implements AlgorithmInterface
         ];
     }
 
-    function hunting($hunters, $PREY, $function)
+    function hunting($hunters, $function)
     {
-        $evaluateVariable = new ExcessLimit;
+        foreach ($hunters['hunters'] as $hunterType => $hunter) {
 
-        ## TODO refactor to combined left and right hunter using one function only
-        foreach ($hunters as $key => $hunter) {
-            if ($this->isLeftHunter($key)) {
-                foreach ($hunter as $key => $variables) {
-                    $hunter[$key] = $this->updateLeftHunters($variables['individu'], $PREY, $function);
+            if ($this->isWingHunters($hunterType)) {
+
+                foreach ($hunter as $hunterKey => $variables) {
+                    $updatedHunter = $this->updateWingHunters($variables, $hunters['prey'], $function);
+                    if ($this->fitnessIsImproved($variables['fitness'], $updatedHunter['fitness'])) {
+                        $PI = ($variables['fitness'] - $updatedHunter['fitness']) / $variables['fitness'];
+                        $hunters['prey'] = $this->updatePREY($PI, $variables['individu'], $hunters['prey']);
+                    }
+                    $hunter[$hunterKey] = $updatedHunter;
+                }
+                if ($hunterType === 'leftHunters') {
+                    $hunters['hunters']['leftHunters'] = $hunter;
+                }
+                if ($hunterType === 'rightHunters') {
+                    $hunters['hunters']['rightHunters'] = $hunter;
                 }
             }
 
-            if ($this->isRightHunter($key)) {
-                foreach ($hunter as $key => $variables) {
-                    $hunter[$key] = $this->updateLeftHunters($variables['individu'], $PREY, $function);
+            if ($this->isCenterHunter($hunterType)) {
+                $updatedHunter = $this->updateCenterHunter($hunter['individu'], $hunters['prey'], $function);
+
+                if ($this->fitnessIsImproved($hunter['fitness'], $updatedHunter['fitness'])) {
+                    $PI = ($hunter['fitness'] - $updatedHunter['fitness']) / $hunter['fitness'];
+                    $hunters['prey'] = $this->updatePREY($PI, $hunter['individu'], $hunters['prey']);
                 }
+                $hunters['hunters']['centerHunter'] = $updatedHunter;
             }
 
-            if ($this->isCenterHunter($key)) {
-                print_r($hunter)."\n \n";
-                $hunter = $this->updateCenterHunter($hunter['individu'], $PREY, $function);
-                print_r($hunter) . "\n \n";
+        }
+        return [
+            'hunters' => $hunters['hunters'],
+            'prey' => $hunters['prey']
+        ];
+    }
+
+    function selectFemaleLionsBesideHunters($hunters, $femalePrideLions)
+    {
+        foreach ($femalePrideLions as $femalePrideLion){
+            if (!array_search($femalePrideLion, $hunters)){
+                $ret[] = $femalePrideLion;
             }
         }
+        return $ret;
     }
 
     function execute($population, $function, $popSize)
@@ -985,9 +1026,19 @@ class Lion implements AlgorithmInterface
         $numOfNomadLions = round($this->parameters['percentOfNomadLions'] * $popSize);
         $nomadLions = $this->createNomadLions($population, $popSize, $numOfNomadLions);
         $prideLions = $this->createPrideLions($population, $nomadLions['nomadLionIndexes'], $numOfNomadLions);
-        $hunters = $this->createHunters($prideLions['femalePrideLions']);
-        $PREY = $this->createPREY($hunters['hunters']);
-        $this->hunting($hunters, $PREY, $function);
+
+        $createdHunters = $this->createHunters($prideLions['femalePrideLions']);
+        $femaleLions = $this->selectFemaleLionsBesideHunters($createdHunters['hunters'], $prideLions['femalePrideLions']);
+        print_r($femaleLions);die;
+        $PREY = $this->createPREY($createdHunters['hunters']);
+        $hunters = [
+            'hunters' => $createdHunters,
+            'prey' => $PREY
+        ];
+
+        ## Updating
+        $hunters = $this->hunting($hunters, $function);
+
         die;
     }
 }
@@ -1059,6 +1110,43 @@ class MyPSO3 implements AlgorithmInterface
     }
 }
 
+class PooRich implements AlgorithmInterface
+{
+    function __construct($parameters, $iter, $varRanges, $testData, $klasterSets)
+    {
+        $this->parameters = $parameters;
+        $this->iter = $iter;
+        $this->varRanges = $varRanges;
+        $this->testData = $testData;
+        $this->klasterSets = $klasterSets;
+    }
+
+    function execute($population, $function, $popSize)
+    {  
+        $best = $population[0];
+        $randomStudentIndex = rand(0, $popSize-1);
+        $randomStudent = $population[$randomStudentIndex]['individu'];
+        //print_r($randomStudent);die;
+        foreach ($best['individu'] as $key => $val){
+            $positions[] = $val + pow(-1,rand(1,2)) * (new Randomizers())->randomZeroToOneFraction() * ($val - $randomStudent[$key]);
+        }
+        if ($function === 'ucp') {
+            $result = (new Functions())->initializingFunction($function, $this->testData, '');
+        } else if ($function === 'ucpSVMZhou') {
+            $result = (new Functions())->initializingFunction($function, '', $this->klasterSets);
+        } else {
+            $result = (new Functions())->initializingFunction($function, '', '');
+        }
+        echo $best['fitness'].' '. $result->runFunction($positions, $function);
+
+        // return [
+        //     'fitness' => $result->runFunction($positions, $function),
+        //     'individu' => $positions
+        // ];
+        die;
+    }
+}
+
 class Algorithms
 {
     function __construct($parameters, $kmaVarRanges, $klasterSets)
@@ -1099,6 +1187,9 @@ class Algorithms
         }
         if ($type === 'lion') {
             return new Lion($this->parameters, $iter, $this->kmaVarRanges, $testData, $this->klasterSets);
+        }
+        if ($type === 'pro') {
+            return new PooRich($this->parameters, $iter, $this->kmaVarRanges, $testData, $this->klasterSets);
         }
     }
 }

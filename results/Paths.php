@@ -34,5 +34,8 @@ class Paths
         if ($type === 'lion') {
             return 'results/lion.txt';
         }
+        if ($type === 'pro') {
+            return 'results/pro.txt';
+        }
     }
 }
